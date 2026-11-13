@@ -4,6 +4,9 @@ export const CLOTHING_IDS = [
   "brown-leather-jacket",
   "white-tee",
   "red-polka-dress",
+  "yellow-shorts",
+  "purple-socks",
+  "orange-scarf",
 ] as const;
 
 export type ClothingId = (typeof CLOTHING_IDS)[number];
@@ -45,6 +48,24 @@ export const CLOTHING_CATALOG: Record<ClothingId, ClothingDef> = {
     name: "Red polka dress",
     assetPath: "assets/clothes/red-polka-dress.svg",
     textureKey: "clothes-red-polka-dress",
+  },
+  "yellow-shorts": {
+    id: "yellow-shorts",
+    name: "Yellow shorts",
+    assetPath: "assets/clothes/yellow-shorts.svg",
+    textureKey: "clothes-yellow-shorts",
+  },
+  "purple-socks": {
+    id: "purple-socks",
+    name: "Purple socks",
+    assetPath: "assets/clothes/purple-socks.svg",
+    textureKey: "clothes-purple-socks",
+  },
+  "orange-scarf": {
+    id: "orange-scarf",
+    name: "Orange scarf",
+    assetPath: "assets/clothes/orange-scarf.svg",
+    textureKey: "clothes-orange-scarf",
   },
 };
 

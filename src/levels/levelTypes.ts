@@ -10,8 +10,15 @@ export interface ShelfDefinition {
   items: ClothingId[];
 }
 
+export interface LevelMove {
+  from: string;
+  to: string;
+}
+
 export interface LevelDefinition {
   id: string;
   name: string;
   shelves: ShelfDefinition[];
+  /** Known winning move sequence (shelf ids), replayed by tests as a solvability proof. */
+  solution?: LevelMove[];
 }

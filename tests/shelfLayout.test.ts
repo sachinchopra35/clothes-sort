@@ -51,12 +51,13 @@ describe("computeShelfLayout", () => {
     expect(right.y - left.y).toBeCloseTo(SHELF_ROW_STEP / 2, 0);
   });
 
-  it("keeps shelves inside the shelf zone", () => {
-    const layout = computeShelfLayout(LEVELS[1].shelves);
+  it("keeps every level's shelves inside the shelf zone", () => {
     const zone = shelfZoneBounds();
-    for (const entry of layout) {
-      expect(entry.y).toBeGreaterThanOrEqual(zone.y);
-      expect(entry.y).toBeLessThanOrEqual(zone.y + zone.height);
+    for (const level of LEVELS) {
+      for (const entry of computeShelfLayout(level.shelves)) {
+        expect(entry.y, level.id).toBeGreaterThanOrEqual(zone.y);
+        expect(entry.y, level.id).toBeLessThanOrEqual(zone.y + zone.height);
+      }
     }
   });
 

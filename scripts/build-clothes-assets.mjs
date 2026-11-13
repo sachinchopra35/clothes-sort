@@ -16,6 +16,9 @@ const FLUENT = {
   tee: `${BASE}/T-shirt/Flat/t-shirt_flat.svg`,
   dress: `${BASE}/Dress/Flat/dress_flat.svg`,
   coat: `${BASE}/Coat/Flat/coat_flat.svg`,
+  shorts: `${BASE}/Shorts/Flat/shorts_flat.svg`,
+  socks: `${BASE}/Socks/Flat/socks_flat.svg`,
+  scarf: `${BASE}/Scarf/Flat/scarf_flat.svg`,
 };
 
 function replaceColors(svg, map) {
@@ -124,6 +127,32 @@ const VARIANTS = [
       ["#6B438B", "#9B1B30"],
     ],
     polka: true,
+  },
+  {
+    id: "yellow-shorts",
+    url: FLUENT.shorts,
+    colors: [
+      ["#00D26A", "#F2B705"],
+      ["#6AFCAC", "#FFE07A"],
+    ],
+  },
+  {
+    id: "purple-socks",
+    url: FLUENT.socks,
+    colors: [
+      ["#3F5FFF", "#7B2CBF"],
+      ["#46A4FB", "#C77DFF"],
+      ["#F9C23C", "#F1E4FF"],
+    ],
+  },
+  {
+    id: "orange-scarf",
+    url: FLUENT.scarf,
+    colors: [
+      ["#990838", "#C2570C"],
+      ["#CA0B4A", "#F07C14"],
+      ["#F8312F", "#FFB347"],
+    ],
   },
 ];
 

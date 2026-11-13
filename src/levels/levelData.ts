@@ -1,3 +1,4 @@
+import { GENERATED_LEVELS } from "./generatedLevels";
 import type { LevelDefinition } from "./levelTypes";
 
 /**
@@ -16,7 +17,8 @@ const C = {
   dr: "red-polka-dress" as const,
 };
 
-export const LEVELS: LevelDefinition[] = [
+/** Levels 1-3 copy Bird Sort 2; later levels come from scripts/levels-generate.ts. */
+const HANDCRAFTED_LEVELS: LevelDefinition[] = [
   {
     id: "level-1",
     name: "Level 1",
@@ -106,6 +108,8 @@ export const LEVELS: LevelDefinition[] = [
     ],
   },
 ];
+
+export const LEVELS: LevelDefinition[] = [...HANDCRAFTED_LEVELS, ...GENERATED_LEVELS];
 
 export function getLevelById(id: string): LevelDefinition | undefined {
   return LEVELS.find((l) => l.id === id);
