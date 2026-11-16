@@ -11,7 +11,7 @@ export const MODAL_UI_DEPTH = 20_000;
 export const SIDE_PANEL_WIDTH = 72;
 
 /** Play area below top bar / above bottom margin. */
-export const TOP_BAR_HEIGHT = 140;
+export const TOP_BAR_HEIGHT = 172;
 export const BOTTOM_MARGIN = 80;
 
 /** Clear space under the top bar before the first shelf row. */
@@ -33,14 +33,30 @@ export const SHELF_WIDTH_RATIO = 0.44;
 export const SHELF_ROW_GAP = SHELF_ROW_STEP;
 
 /**
- * Clothing on a shelf: wall (index 0) → open end (last index).
- * Items overlap along the shelf; open-end slots use higher depth (drawn in front).
+ * Clothing on a shelf: index 0 at the wardrobe wall, last index at the open end.
+ * Open-end slots use higher depth (drawn in front).
  */
 export const SLOT_SIZE = 122;
-/** Center-to-center spacing along the shelf (less than SLOT_SIZE → overlap). */
-export const SLOT_PITCH = 58;
-/** @deprecated Use SLOT_PITCH; kept for tests that referenced gap. */
-export const SLOT_GAP = SLOT_PITCH;
+/** Inset from the shelf edge that touches the wardrobe wall. */
+export const SHELF_WALL_INSET = 10;
+/** Breathing room at the open end (toward the center of the wardrobe). */
+export const OPEN_END_INSET = 6;
+/** Max overlap between neighbors when the shelf is tight (future high-capacity levels). */
+export const SLOT_MAX_OVERLAP = 22;
+
+/**
+ * Center-to-center spacing along the shelf. Uses full gap on wide shelves;
+ * tightens with slight overlap only when needed so columns do not meet in the middle.
+ */
+export function slotPitchForShelf(shelfWidth: number, capacity: number): number {
+  if (capacity <= 1) return 0;
+  const fitPitch =
+    (shelfWidth - SHELF_WALL_INSET - OPEN_END_INSET - SLOT_SIZE) /
+    (capacity - 1);
+  const roomyPitch = SLOT_SIZE + 4;
+  const tightPitch = SLOT_SIZE - SLOT_MAX_OVERLAP;
+  return Math.min(roomyPitch, Math.max(tightPitch, fitPitch));
+}
 /** Display scale relative to SLOT_SIZE (game sprites, not hit box). */
 export const CLOTHING_DISPLAY_SCALE = 1.02;
 

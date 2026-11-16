@@ -1,12 +1,13 @@
 import Phaser from "phaser";
 import { LEVELS, getLevelIndex } from "../levels/levelData";
 import { isLevelUnlocked, setSelectedLevelId } from "../state/progress";
+import { scaleButtonSize } from "../config/uiButtons";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
 
 /** Half-width from center to each arrow button centre */
 const ARROW_OFFSET = 380;
-const ARROW_SIZE = 96;
+const ARROW_SIZE = scaleButtonSize(96, 96).width;
 const LABEL_MAX_WIDTH = 520;
 
 export interface LevelPickerOptions {

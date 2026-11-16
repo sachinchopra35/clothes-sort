@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { SCENE_GAME, SCENE_MENU } from "../config/gameConfig";
+import { scaleButtonSize } from "../config/uiButtons";
 import { DESIGN_HEIGHT, DESIGN_WIDTH } from "../config/layout";
 import { theme } from "../config/theme";
 import { WardrobeBackground } from "../objects/WardrobeBackground";
@@ -44,21 +45,23 @@ export class MainMenuScene extends Phaser.Scene {
       onChange: () => {},
     });
 
+    const play = scaleButtonSize(420, 120);
     new Button(this, {
       x: DESIGN_WIDTH / 2,
       y: DESIGN_HEIGHT / 2 + 200,
-      width: 420,
-      height: 120,
+      width: play.width,
+      height: play.height,
       label: "Play",
       fontSize: theme.fontSize.heading,
       onClick: () => this.startGame(),
     });
 
+    const secondary = scaleButtonSize(320, 88);
     new Button(this, {
       x: DESIGN_WIDTH / 2,
       y: DESIGN_HEIGHT - 268,
-      width: 320,
-      height: 88,
+      width: secondary.width,
+      height: secondary.height,
       label: "How to play",
       fontSize: theme.fontSize.body,
       onClick: () => this.openInstructions(),
@@ -67,8 +70,8 @@ export class MainMenuScene extends Phaser.Scene {
     new Button(this, {
       x: DESIGN_WIDTH / 2,
       y: DESIGN_HEIGHT - 160,
-      width: 320,
-      height: 88,
+      width: secondary.width,
+      height: secondary.height,
       label: "Settings",
       fontSize: theme.fontSize.body,
       onClick: () => this.openSettings(),

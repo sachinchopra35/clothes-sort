@@ -1,10 +1,12 @@
 import Phaser from "phaser";
+import { playShelfSlideWhoosh } from "../audio/uiSounds";
 import {
   SHELF_BRACKET_WIDTH,
   SHELF_DEPTH,
   SHELF_PLANK_HEIGHT,
-  SLOT_PITCH,
+  SHELF_WALL_INSET,
   SLOT_SIZE,
+  slotPitchForShelf,
 } from "../config/layout";
 import { theme } from "../config/theme";
 import type { ShelfSide } from "../levels/levelTypes";
@@ -79,18 +81,17 @@ export class Shelf extends Phaser.GameObjects.Container {
     g.strokeRoundedRect(0, plankY, width, SHELF_PLANK_HEIGHT, 4);
   }
 
-  /** Local position for item at slot index (0 = wall). */
+  /** Local position for item at slot index (0 = wardrobe wall). */
   getSlotLocalPosition(index: number): { x: number; y: number } {
-    const totalSlotWidth =
-      SLOT_SIZE + (this.capacity - 1) * SLOT_PITCH;
-    const startX = (this.shelfWidth - totalSlotWidth) / 2;
+    const pitch = slotPitchForShelf(this.shelfWidth, this.capacity);
     const slotY = -SLOT_SIZE / 2 - 10;
-
-    const offset = index * SLOT_PITCH + SLOT_SIZE / 2;
     const x =
       this.side === "left"
-        ? startX + offset
-        : this.shelfWidth - startX - offset;
+        ? SHELF_WALL_INSET + SLOT_SIZE / 2 + index * pitch
+        : this.shelfWidth -
+          SHELF_WALL_INSET -
+          SLOT_SIZE / 2 -
+          index * pitch;
 
     return { x, y: slotY };
   }
@@ -121,6 +122,8 @@ export class Shelf extends Phaser.GameObjects.Container {
       this.side === "left" ? this.x - 700 : this.x + 700;
     const deltaX = targetX - this.x;
     const duration = 480;
+
+    playShelfSlideWhoosh(this.side);
 
     return new Promise((resolve) => {
       let remaining = 1 + companions.length;

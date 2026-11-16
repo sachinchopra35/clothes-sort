@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { playUiKnock } from "../audio/uiSounds";
 import { theme } from "../config/theme";
 
 export interface ToggleSwitchOptions {
@@ -10,9 +11,9 @@ export interface ToggleSwitchOptions {
   onChange: (enabled: boolean) => void;
 }
 
-const TRACK_W = 104;
-const TRACK_H = 52;
-const KNOB_R = 20;
+const TRACK_W = 118;
+const TRACK_H = 58;
+const KNOB_R = 23;
 const KNOB_MARGIN = 6;
 
 export class ToggleSwitch extends Phaser.GameObjects.Container {
@@ -50,13 +51,14 @@ export class ToggleSwitch extends Phaser.GameObjects.Container {
     this.track = scene.add.graphics();
     this.knob = scene.add.graphics();
 
-    const hitZone = scene.add.zone(0, 0, options.rowWidth, 72);
+    const hitZone = scene.add.zone(0, 0, options.rowWidth, 84);
     hitZone.setInteractive({ useHandCursor: true });
 
     this.add([labelText, this.track, this.knob, hitZone]);
     this.draw();
 
     hitZone.on("pointerdown", () => {
+      playUiKnock();
       this.enabled = !this.enabled;
       this.draw();
       this.onChange(this.enabled);

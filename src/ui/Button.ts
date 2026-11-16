@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { playUiKnock } from "../audio/uiSounds";
 import { theme } from "../config/theme";
 
 export interface ButtonOptions {
@@ -64,6 +65,7 @@ export class Button extends Phaser.GameObjects.Container {
     this.redraw(options.width, options.height, false);
 
     this.hitZone.on("pointerdown", () => {
+      playUiKnock();
       this.redraw(options.width, options.height, true);
       this.y = this.baseY + 4;
     });
