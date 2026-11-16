@@ -20,8 +20,8 @@ export const SHELF_ZONE_TOP_INSET = 200;
 /** Floor space reserved for plinth + decorative dog pile (not gameplay). */
 export const FLOOR_DECOR_HEIGHT = 360;
 
-/** Fixed vertical distance between shelves in the same column. */
-export const SHELF_ROW_STEP = 200;
+/** Fixed vertical distance between shelf rows in the same column. */
+export const SHELF_ROW_STEP = 228;
 export const HORIZONTAL_PLAY_MARGIN = 24;
 
 export const SHELF_DEPTH = 28;
@@ -32,9 +32,22 @@ export const SHELF_WIDTH_RATIO = 0.44;
 /** Legacy alias — layout uses SHELF_ROW_STEP for shelf rows. */
 export const SHELF_ROW_GAP = SHELF_ROW_STEP;
 
-/** Slot layout on a shelf (for clothing items in step 2). */
-export const SLOT_SIZE = 100;
-export const SLOT_GAP = 18;
+/**
+ * Clothing on a shelf: wall (index 0) → open end (last index).
+ * Items overlap along the shelf; open-end slots use higher depth (drawn in front).
+ */
+export const SLOT_SIZE = 122;
+/** Center-to-center spacing along the shelf (less than SLOT_SIZE → overlap). */
+export const SLOT_PITCH = 58;
+/** @deprecated Use SLOT_PITCH; kept for tests that referenced gap. */
+export const SLOT_GAP = SLOT_PITCH;
+/** Display scale relative to SLOT_SIZE (game sprites, not hit box). */
+export const CLOTHING_DISPLAY_SCALE = 1.02;
+
+/** Phaser depth for a clothing sprite on a shelf (open end = front). */
+export function clothingDepthOnShelf(shelfY: number, slotIndex: number): number {
+  return shelfY + 20 + slotIndex * 4;
+}
 
 export interface LayoutConfig {
   designWidth: number;

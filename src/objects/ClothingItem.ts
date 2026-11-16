@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { SLOT_SIZE } from "../config/layout";
+import { CLOTHING_DISPLAY_SCALE, SLOT_SIZE } from "../config/layout";
 import type { ClothingId } from "../game/clothing";
 import { CLOTHING_CATALOG } from "../game/clothing";
 
@@ -22,7 +22,7 @@ export class ClothingItem extends Phaser.GameObjects.Container {
     this.clothingId = clothingId;
     const key = CLOTHING_CATALOG[clothingId].textureKey;
     this.image = scene.add.image(0, 0, key);
-    const scale = (SLOT_SIZE * 0.88) / this.image.width;
+    const scale = (SLOT_SIZE * CLOTHING_DISPLAY_SCALE) / this.image.width;
     this.image.setScale(scale);
     this.add(this.image);
     this.setSize(SLOT_SIZE, SLOT_SIZE);

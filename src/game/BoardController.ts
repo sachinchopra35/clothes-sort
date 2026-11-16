@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { clothingDepthOnShelf } from "../config/layout";
 import type { LevelDefinition } from "../levels/levelTypes";
 import type { ShelfLayoutEntry } from "../layout/shelfLayout";
 import { ClothingItem } from "../objects/ClothingItem";
@@ -50,7 +51,7 @@ export class BoardController {
       boardShelf.items.forEach((clothingId, index) => {
         const pos = shelf.getSlotWorldPosition(index);
         const item = new ClothingItem(scene, pos.x, pos.y, clothingId);
-        item.setDepth(entry.y + 1 + index);
+        item.setDepth(clothingDepthOnShelf(entry.y, index));
         items.push(item);
       });
       this.itemsByShelf.set(entry.definition.id, items);
@@ -133,7 +134,7 @@ export class BoardController {
     const animPromises = movingViews.map((item, i) => {
       const slotIndex = toItems.length - moveCount + i;
       const pos = destShelf.getSlotWorldPosition(slotIndex);
-      item.setDepth(destShelf.y + 1 + slotIndex);
+      item.setDepth(clothingDepthOnShelf(destShelf.y, slotIndex));
       return item.animateTo(pos.x, pos.y);
     });
     await Promise.all(animPromises);
@@ -188,7 +189,7 @@ export class BoardController {
       boardShelf.items.forEach((clothingId, index) => {
         const pos = shelf.getSlotWorldPosition(index);
         const item = new ClothingItem(this.scene, pos.x, pos.y, clothingId);
-        item.setDepth(entry.y + 1 + index);
+        item.setDepth(clothingDepthOnShelf(entry.y, index));
         items.push(item);
       });
       this.itemsByShelf.set(entry.definition.id, items);

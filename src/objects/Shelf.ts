@@ -3,7 +3,7 @@ import {
   SHELF_BRACKET_WIDTH,
   SHELF_DEPTH,
   SHELF_PLANK_HEIGHT,
-  SLOT_GAP,
+  SLOT_PITCH,
   SLOT_SIZE,
 } from "../config/layout";
 import { theme } from "../config/theme";
@@ -82,11 +82,11 @@ export class Shelf extends Phaser.GameObjects.Container {
   /** Local position for item at slot index (0 = wall). */
   getSlotLocalPosition(index: number): { x: number; y: number } {
     const totalSlotWidth =
-      this.capacity * SLOT_SIZE + (this.capacity - 1) * SLOT_GAP;
+      SLOT_SIZE + (this.capacity - 1) * SLOT_PITCH;
     const startX = (this.shelfWidth - totalSlotWidth) / 2;
-    const slotY = -SLOT_SIZE / 2 - 8;
+    const slotY = -SLOT_SIZE / 2 - 10;
 
-    const offset = index * (SLOT_SIZE + SLOT_GAP) + SLOT_SIZE / 2;
+    const offset = index * SLOT_PITCH + SLOT_SIZE / 2;
     const x =
       this.side === "left"
         ? startX + offset
