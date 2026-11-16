@@ -9,14 +9,19 @@
     "preview": "vite preview",
     "test": "vitest run",
     "build:clothes": "node scripts/build-clothes-assets.mjs",
+    "build:icon": "node scripts/build-app-icon.mjs",
     "levels:analyze": "vite-node scripts/levels-analyze.ts",
     "levels:generate": "vite-node scripts/levels-generate.ts",
     "levels:generate:more": "vite-node scripts/levels-generate.ts --more"
   },
   "dependencies": {
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/ios": "^8.6.2",
     "phaser": "^3.87.0"
   },
   "devDependencies": {
+    "sharp": "^0.33.5",
     "typescript": "^5.7.3",
     "vite": "^6.0.7",
     "vitest": "^3.0.5"
