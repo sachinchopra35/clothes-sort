@@ -25,6 +25,8 @@ export const theme = {
     panelStroke: 0x8b6340,
     accent: 0xf4a261,
     locked: "#9a8b7e",
+    success: "#5dce6a",
+    successStroke: "#2f6b38",
   },
 
   fontFamily: '"Fredoka", "Trebuchet MS", system-ui, sans-serif',

@@ -4,15 +4,17 @@ import { scaleButtonSize } from "../config/uiButtons";
 import { DESIGN_HEIGHT, DESIGN_WIDTH } from "../config/layout";
 import { theme } from "../config/theme";
 import { WardrobeBackground } from "../objects/WardrobeBackground";
-import { getSelectedLevelId } from "../state/progress";
+import { getSelectedLevelId, resetProgressCache } from "../state/progress";
 import { Button } from "../ui/Button";
 import { LevelPicker } from "../ui/LevelPicker";
+import { CheatCodePanel } from "../ui/CheatCodePanel";
 import { InstructionsPanel } from "../ui/InstructionsPanel";
 import { SettingsPanel } from "../ui/SettingsPanel";
 
 export class MainMenuScene extends Phaser.Scene {
   private settingsPanel: SettingsPanel | null = null;
   private instructionsPanel: InstructionsPanel | null = null;
+  private cheatPanel: CheatCodePanel | null = null;
   private picker!: LevelPicker;
 
   constructor() {
@@ -20,6 +22,8 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   create(): void {
+    resetProgressCache();
+
     new WardrobeBackground(this, { dimOverlay: 0.35 });
 
     const title = this.add.text(DESIGN_WIDTH / 2, 280, "Clothes Sort", {
@@ -43,6 +47,7 @@ export class MainMenuScene extends Phaser.Scene {
       y: DESIGN_HEIGHT / 2 - 40,
       initialLevelId: getSelectedLevelId(),
       onChange: () => {},
+      onLockedTap: (levelId) => this.openCheatCode(levelId),
     });
 
     const play = scaleButtonSize(420, 120);
@@ -84,8 +89,31 @@ export class MainMenuScene extends Phaser.Scene {
     this.scene.start(SCENE_GAME, { levelId });
   }
 
+  private openCheatCode(levelId: string): void {
+    if (
+      this.cheatPanel ||
+      this.instructionsPanel ||
+      this.settingsPanel
+    ) {
+      return;
+    }
+    this.cheatPanel = new CheatCodePanel(this, {
+      levelId,
+      onCancel: () => this.closeCheatCode(),
+      onSuccess: () => {
+        this.closeCheatCode();
+        this.picker.refresh();
+      },
+    });
+  }
+
+  private closeCheatCode(): void {
+    this.cheatPanel?.destroy();
+    this.cheatPanel = null;
+  }
+
   private openInstructions(): void {
-    if (this.instructionsPanel || this.settingsPanel) return;
+    if (this.instructionsPanel || this.settingsPanel || this.cheatPanel) return;
     this.instructionsPanel = new InstructionsPanel(this, () => {
       this.instructionsPanel?.destroy();
       this.instructionsPanel = null;
@@ -93,7 +121,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private openSettings(): void {
-    if (this.settingsPanel || this.instructionsPanel) return;
+    if (this.settingsPanel || this.instructionsPanel || this.cheatPanel) return;
     this.settingsPanel = new SettingsPanel(this, () => {
       this.settingsPanel?.destroy();
       this.settingsPanel = null;

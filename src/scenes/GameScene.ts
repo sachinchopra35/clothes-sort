@@ -7,7 +7,7 @@ import { BoardController } from "../game/BoardController";
 import { computeShelfLayout } from "../layout/shelfLayout";
 import { getLevelById, getLevelIndex, LEVELS } from "../levels/levelData";
 import { WardrobeBackground } from "../objects/WardrobeBackground";
-import { unlockLevel } from "../state/progress";
+import { completeLevel, unlockNextLevel } from "../state/progress";
 import { Button } from "../ui/Button";
 import { ConfirmPanel } from "../ui/ConfirmPanel";
 import { LevelCompletePanel } from "../ui/LevelCompletePanel";
@@ -20,7 +20,7 @@ export class GameScene extends Phaser.Scene {
   private board: BoardController | null = null;
   private levelId = "level-1";
   private completePanel: LevelCompletePanel | null = null;
-  private restartConfirmPanel: ConfirmPanel | null = null;
+  private confirmPanel: ConfirmPanel | null = null;
   private backButton: Button | null = null;
   private restartButton: Button | null = null;
 
@@ -32,8 +32,8 @@ export class GameScene extends Phaser.Scene {
     this.levelId = data.levelId ?? "level-1";
     this.completePanel?.destroy();
     this.completePanel = null;
-    this.restartConfirmPanel?.destroy();
-    this.restartConfirmPanel = null;
+    this.confirmPanel?.destroy();
+    this.confirmPanel = null;
     if (this.board) this.board.onWon = null;
 
     const level = getLevelById(this.levelId);
@@ -65,7 +65,7 @@ export class GameScene extends Phaser.Scene {
       height: hud.height,
       label: "Back",
       fontSize: theme.fontSize.body,
-      onClick: () => this.scene.start(SCENE_MENU),
+      onClick: () => this.openBackConfirm(),
     });
     this.backButton.setDepth(GAME_HUD_DEPTH);
 
@@ -90,28 +90,47 @@ export class GameScene extends Phaser.Scene {
     title.setDepth(GAME_HUD_DEPTH);
   }
 
-  private openRestartConfirm(): void {
-    if (this.completePanel || this.restartConfirmPanel) return;
+  private openBackConfirm(): void {
+    if (this.completePanel || this.confirmPanel) return;
 
     this.backButton?.setInputEnabled(false);
     this.restartButton?.setInputEnabled(false);
 
-    this.restartConfirmPanel = new ConfirmPanel(this, {
+    this.confirmPanel = new ConfirmPanel(this, {
+      title: "Leave level?",
+      message: "You will lose your progress on this level.",
+      cancelLabel: "Keep playing",
+      confirmLabel: "Main menu",
+      onCancel: () => this.closeConfirmPanel(),
+      onConfirm: () => {
+        this.closeConfirmPanel();
+        this.scene.start(SCENE_MENU);
+      },
+    });
+  }
+
+  private openRestartConfirm(): void {
+    if (this.completePanel || this.confirmPanel) return;
+
+    this.backButton?.setInputEnabled(false);
+    this.restartButton?.setInputEnabled(false);
+
+    this.confirmPanel = new ConfirmPanel(this, {
       title: "Restart level?",
       message: "You will lose your progress on this level.",
       cancelLabel: "Keep playing",
       confirmLabel: "Restart",
-      onCancel: () => this.closeRestartConfirm(),
+      onCancel: () => this.closeConfirmPanel(),
       onConfirm: () => {
-        this.closeRestartConfirm();
+        this.closeConfirmPanel();
         this.restartLevel();
       },
     });
   }
 
-  private closeRestartConfirm(): void {
-    this.restartConfirmPanel?.destroy();
-    this.restartConfirmPanel = null;
+  private closeConfirmPanel(): void {
+    this.confirmPanel?.destroy();
+    this.confirmPanel = null;
     if (!this.completePanel) {
       this.backButton?.setInputEnabled(true);
       this.restartButton?.setInputEnabled(true);
@@ -128,7 +147,8 @@ export class GameScene extends Phaser.Scene {
 
   private onLevelWon(): void {
     if (this.completePanel) return;
-    unlockLevel(this.levelId);
+    completeLevel(this.levelId);
+    unlockNextLevel(this.levelId);
 
     const idx = getLevelIndex(this.levelId);
     const hasNext = idx >= 0 && idx < LEVELS.length - 1;

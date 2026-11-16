@@ -1,6 +1,10 @@
 import Phaser from "phaser";
 import { LEVELS, getLevelIndex } from "../levels/levelData";
-import { isLevelUnlocked, setSelectedLevelId } from "../state/progress";
+import {
+  isLevelCompleted,
+  isLevelUnlocked,
+  setSelectedLevelId,
+} from "../state/progress";
 import { scaleButtonSize } from "../config/uiButtons";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
@@ -15,13 +19,16 @@ export interface LevelPickerOptions {
   y: number;
   initialLevelId: string;
   onChange: (levelId: string) => void;
+  onLockedTap?: (levelId: string) => void;
 }
 
 export class LevelPicker extends Phaser.GameObjects.Container {
   private levelId: string;
   private levelLabel: Phaser.GameObjects.Text;
+  private completeTick: Phaser.GameObjects.Text;
   private lockHint: Phaser.GameObjects.Text;
   private readonly onChange: (levelId: string) => void;
+  private readonly onLockedTap?: (levelId: string) => void;
 
   constructor(scene: Phaser.Scene, options: LevelPickerOptions) {
     super(scene, options.x, options.y);
@@ -29,6 +36,7 @@ export class LevelPicker extends Phaser.GameObjects.Container {
 
     this.levelId = options.initialLevelId;
     this.onChange = options.onChange;
+    this.onLockedTap = options.onLockedTap;
 
     new Button(
       scene,
@@ -58,6 +66,16 @@ export class LevelPicker extends Phaser.GameObjects.Container {
       this,
     );
 
+    this.completeTick = scene.add.text(0, -48, "✓", {
+      fontFamily: theme.fontFamily,
+      fontSize: "72px",
+      color: theme.ui.success,
+      stroke: theme.ui.successStroke,
+      strokeThickness: 6,
+    });
+    this.completeTick.setOrigin(0.5);
+    this.completeTick.setVisible(false);
+
     this.levelLabel = scene.add.text(0, 8, "", {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.heading,
@@ -73,9 +91,14 @@ export class LevelPicker extends Phaser.GameObjects.Container {
       color: theme.ui.textMuted,
     });
     this.lockHint.setOrigin(0.5);
+    this.lockHint.setInteractive({ useHandCursor: true });
+    this.lockHint.on("pointerdown", () => {
+      if (isLevelUnlocked(this.levelId)) return;
+      this.onLockedTap?.(this.levelId);
+    });
 
-    this.add([this.levelLabel, this.lockHint]);
-    this.setSize(LABEL_MAX_WIDTH, 160);
+    this.add([this.completeTick, this.levelLabel, this.lockHint]);
+    this.setSize(LABEL_MAX_WIDTH, 200);
     this.refreshLabel();
   }
 
@@ -85,6 +108,10 @@ export class LevelPicker extends Phaser.GameObjects.Container {
 
   isSelectionPlayable(): boolean {
     return isLevelUnlocked(this.levelId);
+  }
+
+  refresh(): void {
+    this.refreshLabel();
   }
 
   private shift(delta: number): void {
@@ -100,9 +127,16 @@ export class LevelPicker extends Phaser.GameObjects.Container {
   private refreshLabel(): void {
     const idx = getLevelIndex(this.levelId);
     const unlocked = isLevelUnlocked(this.levelId);
+    const completed = isLevelCompleted(this.levelId);
 
     this.levelLabel.setText(`Level ${idx + 1}`);
     this.levelLabel.setColor(unlocked ? theme.ui.text : theme.ui.locked);
+    this.completeTick.setVisible(completed);
     this.lockHint.setText(unlocked ? "" : "🔒 Locked");
+    if (unlocked) {
+      this.lockHint.disableInteractive();
+    } else {
+      this.lockHint.setInteractive({ useHandCursor: true });
+    }
   }
 }
