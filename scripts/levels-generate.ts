@@ -6,6 +6,7 @@
  *   npm run levels:generate:21           — append levels 21–22 (capacity 5), never rewrites 4–20
  *   npm run levels:generate:23           — append levels 23–40, never rewrites earlier levels
  *   npm run levels:generate:41           — append levels 41–60
+ *   npm run levels:generate:61           — append levels 61–80
  *   npm run levels:generate -- --all    — full rewrite 4–20 (slow; rarely needed)
  */
 import { readFile, writeFile } from "node:fs/promises";
@@ -616,10 +617,310 @@ const SPECS_41_60: LevelSpec[] = [
   },
 ];
 
+const SPEC_61_80_BASE = {
+  emptyShelves: 2,
+  capacity: 5,
+  maxStartRun: 2,
+  attempts: 250,
+  pickStrategy: "nearestTarget" as const,
+};
+
+/** ~one step harder than 41–60; bands vary for fun mix (not strictly progressive). */
+const BAND_61_COZY: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 240,
+  scoreBand: [36, 46] as [number, number],
+};
+const BAND_61_MED: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 260,
+  scoreBand: [44, 52] as [number, number],
+};
+const BAND_61_FULL: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 280,
+  scoreBand: [52, 58] as [number, number],
+};
+const BAND_61_PEAK: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 300,
+  scoreBand: [54, 58] as [number, number],
+};
+/** Tighter scramble (maxStartRun 1); scores sit lower but play tougher. */
+const BAND_61_SCRAMBLE: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 320,
+  scoreBand: [32, 42] as [number, number],
+};
+
+/** Levels 61–80: themed variety, capacity 5, slightly tougher score targets. */
+const SPECS_61_80: LevelSpec[] = [
+  {
+    ...SPEC_61_80_BASE,
+    number: 61,
+    seed: 61,
+    ...BAND_61_MED,
+    types: ["red-tee", "white-tee", "green-tee", "blue-tee", "purple-tee", "yellow-shorts"],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 62,
+    seed: 62,
+    ...BAND_61_MED,
+    types: [
+      "light-blue-jeans",
+      "black-bootcut-jeans",
+      "red-jeans",
+      "brown-leather-jacket",
+      "white-tee",
+      "purple-socks",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 63,
+    seed: 63,
+    ...BAND_61_COZY,
+    types: ["red-trainers", "black-boots", "purple-socks", "yellow-shorts", "blue-cap", "orange-scarf"],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 64,
+    seed: 64,
+    ...BAND_61_MED,
+    types: ["red-polka-dress", "orange-dress", "teal-kimono", "pink-gloves", "black-boots", "green-scarf"],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 65,
+    seed: 65,
+    ...BAND_61_COZY,
+    types: ["coral-swimsuit", "yellow-sun-hat", "yellow-shorts", "red-trainers", "blue-tee", "orange-scarf"],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 66,
+    seed: 66,
+    maxStartRun: 1,
+    ...BAND_61_SCRAMBLE,
+    types: [
+      "brown-leather-jacket",
+      "green-scarf",
+      "orange-scarf",
+      "pink-gloves",
+      "purple-socks",
+      "black-boots",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 67,
+    seed: 67,
+    ...BAND_61_COZY,
+    types: [
+      "red-tee",
+      "red-jeans",
+      "red-trainers",
+      "red-polka-dress",
+      "orange-dress",
+      "black-bootcut-jeans",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 68,
+    seed: 68,
+    ...BAND_61_COZY,
+    types: ["blue-tee", "blue-cap", "light-blue-jeans", "teal-kimono", "white-tee", "purple-socks"],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 69,
+    seed: 69,
+    ...BAND_61_MED,
+    types: [
+      "blue-cap",
+      "yellow-sun-hat",
+      "pink-gloves",
+      "purple-tee",
+      "green-tee",
+      "orange-scarf",
+      "yellow-shorts",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 70,
+    seed: 70,
+    maxStartRun: 1,
+    ...BAND_61_SCRAMBLE,
+    types: [
+      "brown-leather-jacket",
+      "green-scarf",
+      "light-blue-jeans",
+      "white-tee",
+      "purple-socks",
+      "orange-dress",
+      "red-trainers",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 71,
+    seed: 71,
+    ...BAND_61_FULL,
+    types: [
+      "white-tee",
+      "brown-leather-jacket",
+      "light-blue-jeans",
+      "red-polka-dress",
+      "yellow-shorts",
+      "orange-scarf",
+      "purple-socks",
+      "black-bootcut-jeans",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 72,
+    seed: 72,
+    ...BAND_61_FULL,
+    types: [
+      "teal-kimono",
+      "coral-swimsuit",
+      "green-scarf",
+      "orange-dress",
+      "purple-tee",
+      "pink-gloves",
+      "yellow-sun-hat",
+      "red-polka-dress",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 73,
+    seed: 73,
+    ...BAND_61_COZY,
+    types: [
+      "purple-tee",
+      "purple-socks",
+      "red-polka-dress",
+      "teal-kimono",
+      "pink-gloves",
+      "blue-cap",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 74,
+    seed: 74,
+    ...BAND_61_FULL,
+    types: [
+      "orange-dress",
+      "orange-scarf",
+      "red-tee",
+      "yellow-shorts",
+      "green-tee",
+      "black-boots",
+      "red-trainers",
+      "blue-tee",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 75,
+    seed: 75,
+    maxStartRun: 1,
+    ...BAND_61_SCRAMBLE,
+    types: [
+      "black-boots",
+      "black-bootcut-jeans",
+      "brown-leather-jacket",
+      "white-tee",
+      "green-scarf",
+      "purple-socks",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 76,
+    seed: 76,
+    ...BAND_61_COZY,
+    types: [
+      "yellow-sun-hat",
+      "yellow-shorts",
+      "red-tee",
+      "green-tee",
+      "orange-scarf",
+      "purple-socks",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 77,
+    seed: 77,
+    ...BAND_61_FULL,
+    types: [
+      "red-polka-dress",
+      "teal-kimono",
+      "green-scarf",
+      "orange-scarf",
+      "pink-gloves",
+      "blue-cap",
+      "light-blue-jeans",
+      "red-jeans",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 78,
+    seed: 78,
+    ...BAND_61_FULL,
+    types: [
+      "red-trainers",
+      "black-boots",
+      "purple-socks",
+      "blue-cap",
+      "yellow-shorts",
+      "white-tee",
+      "green-tee",
+      "orange-scarf",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 79,
+    seed: 79,
+    ...BAND_61_PEAK,
+    types: [
+      "brown-leather-jacket",
+      "green-scarf",
+      "orange-scarf",
+      "pink-gloves",
+      "purple-socks",
+      "yellow-sun-hat",
+      "teal-kimono",
+      "coral-swimsuit",
+    ],
+  },
+  {
+    ...SPEC_61_80_BASE,
+    number: 80,
+    seed: 80,
+    ...BAND_61_PEAK,
+    types: [
+      "red-tee",
+      "teal-kimono",
+      "black-boots",
+      "yellow-sun-hat",
+      "green-scarf",
+      "red-polka-dress",
+      "red-trainers",
+      "blue-tee",
+    ],
+  },
+];
+
 const APPEND_BATCHES: Record<number, LevelSpec[]> = {
   21: SPECS_21_22,
   23: SPECS_23_40,
   41: SPECS_41_60,
+  61: SPECS_61_80,
 };
 
 type Mode = "4-10" | "11-20" | "append" | "all";
