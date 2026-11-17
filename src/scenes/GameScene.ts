@@ -18,6 +18,7 @@ import { Button } from "../ui/Button";
 import { ConfirmPanel } from "../ui/ConfirmPanel";
 import { hasSeenUndoIntro, markUndoIntroSeen } from "../state/undoIntro";
 import { LevelCompletePanel } from "../ui/LevelCompletePanel";
+import { playConfetti } from "../ui/playConfetti";
 import { UndoButton } from "../ui/UndoButton";
 import { showBriefMessage } from "../ui/BriefMessage";
 import { UndoIntroPanel } from "../ui/UndoIntroPanel";
@@ -229,6 +230,10 @@ export class GameScene extends Phaser.Scene {
         if (next) this.scene.restart({ levelId: next.id });
       },
       onMenu: () => void startSceneWithFade(this, SCENE_MENU),
+    });
+
+    requestAnimationFrame(() => {
+      playConfetti();
     });
   }
 }
