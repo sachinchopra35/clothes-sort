@@ -7,16 +7,21 @@ import {
 } from "../config/panelLayout";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
+import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = DESIGN_WIDTH - 96;
-const PANEL_TOP = 160;
-const PANEL_H = DESIGN_HEIGHT - PANEL_TOP - 140;
+const PANEL_H = 1020;
+const PANEL_TOP = Math.round((DESIGN_HEIGHT - PANEL_H) / 2);
 const CX = DESIGN_WIDTH / 2;
+const PANEL_PIVOT_Y = PANEL_TOP + PANEL_H / 2;
 const PADDING = 40;
-const HEADER = 100;
-const FOOTER = PANEL_INSET + PANEL_BUTTON_H + 24;
+const HEADER = 92;
+const FOOTER = PANEL_INSET + PANEL_BUTTON_H + 28;
+/** Cleared between the scroll clip and the “read more” hint when content scrolls. */
+const SCROLL_HINT_RESERVE = 68;
+const INSTRUCTION_FONT = "42px";
 /** Extra space between wrapped lines (on top of font size). */
-const BODY_LINE_SPACING = 34;
+const BODY_LINE_SPACING = 20;
 
 const INSTRUCTIONS = [
   "Tap a shelf to pick up the clothes at its open end.",
@@ -73,17 +78,22 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
 
     const textWidth = PANEL_W - PADDING * 2;
     const viewTop = PANEL_TOP + HEADER;
-    const viewHeight = PANEL_H - HEADER - FOOTER;
+    const viewHeightFull = PANEL_H - HEADER - FOOTER;
     const textX = panelLeft + PADDING;
 
     const body = scene.add.text(0, 0, INSTRUCTIONS, {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.body,
+      fontSize: INSTRUCTION_FONT,
       color: theme.ui.text,
       align: "left",
       lineSpacing: BODY_LINE_SPACING,
       wordWrap: { width: textWidth },
     });
+
+    const scrollable = body.height > viewHeightFull + 4;
+    const viewHeight = scrollable
+      ? viewHeightFull - SCROLL_HINT_RESERVE
+      : viewHeightFull;
 
     const scrollContent = scene.add.container(textX, viewTop);
     scrollContent.add(body);
@@ -97,10 +107,12 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
 
     const maxScroll = Math.max(0, body.height - viewHeight);
     let scrollOffset = 0;
+    /** Local Y inside the pop-in container (see modalPopIn). */
+    const scrollHomeY = viewTop - PANEL_PIVOT_Y;
 
     const applyScroll = (next: number) => {
       scrollOffset = Phaser.Math.Clamp(next, 0, maxScroll);
-      scrollContent.y = viewTop - scrollOffset;
+      scrollContent.y = scrollHomeY - scrollOffset;
     };
 
     const scrollZone = scene.add.zone(
@@ -133,10 +145,10 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
     const btnY = PANEL_TOP + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2;
     const btnW = panelContentWidth(PANEL_W);
 
-    if (maxScroll > 4) {
+    if (scrollable) {
       const hint = scene.add.text(
         CX,
-        btnY - PANEL_BUTTON_H / 2 - 36,
+        btnY - PANEL_BUTTON_H / 2 - 40,
         "Swipe up or down to read more",
         {
           fontFamily: theme.fontFamily,
@@ -169,6 +181,11 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
         scene.input.off("wheel", this.wheelHandler);
       }
       maskGraphics.destroy();
+    });
+
+    playModalPopIn(scene, this, backdrop, {
+      pivotX: CX,
+      pivotY: PANEL_PIVOT_Y,
     });
   }
 }

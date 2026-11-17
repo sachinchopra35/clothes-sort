@@ -20,7 +20,9 @@ export class Button extends Phaser.GameObjects.Container {
   private bg: Phaser.GameObjects.Graphics;
   private labelText: Phaser.GameObjects.Text;
   private hitZone: Phaser.GameObjects.Zone;
-  private readonly baseY: number;
+  private readonly btnW: number;
+  private readonly btnH: number;
+  private pressNudge = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -34,7 +36,8 @@ export class Button extends Phaser.GameObjects.Container {
       scene.add.existing(this);
     }
 
-    this.baseY = options.y;
+    this.btnW = options.width;
+    this.btnH = options.height;
     const innerW = Math.max(48, options.width - 28);
     const innerH = Math.max(32, options.height - 16);
     let fontPx = parsePx(options.fontSize ?? theme.fontSize.body);
@@ -66,18 +69,17 @@ export class Button extends Phaser.GameObjects.Container {
 
     this.hitZone.on("pointerdown", () => {
       playUiKnock();
-      this.redraw(options.width, options.height, true);
-      this.y = this.baseY + 4;
+      this.redraw(this.btnW, this.btnH, true);
+      if (this.pressNudge === 0) {
+        this.y += 4;
+        this.pressNudge = 4;
+      }
     });
     this.hitZone.on("pointerup", () => {
-      this.redraw(options.width, options.height, false);
-      this.y = this.baseY;
+      this.releasePress();
       options.onClick();
     });
-    this.hitZone.on("pointerout", () => {
-      this.redraw(options.width, options.height, false);
-      this.y = this.baseY;
-    });
+    this.hitZone.on("pointerout", () => this.releasePress());
   }
 
   setInputEnabled(enabled: boolean): void {
@@ -85,12 +87,15 @@ export class Button extends Phaser.GameObjects.Container {
       this.hitZone.setInteractive({ useHandCursor: true });
     } else {
       this.hitZone.disableInteractive();
-      this.redraw(
-        this.hitZone.width,
-        this.hitZone.height,
-        false,
-      );
-      this.y = this.baseY;
+      this.releasePress();
+    }
+  }
+
+  private releasePress(): void {
+    this.redraw(this.btnW, this.btnH, false);
+    if (this.pressNudge !== 0) {
+      this.y -= this.pressNudge;
+      this.pressNudge = 0;
     }
   }
 

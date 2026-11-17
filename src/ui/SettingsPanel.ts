@@ -9,11 +9,15 @@ import { getSettings, setMusicEnabled, setSoundEnabled } from "../state/settings
 import { theme } from "../config/theme";
 import { Button } from "./Button";
 import { ToggleSwitch } from "./ToggleSwitch";
+import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = 680;
-const PANEL_H = 440;
+const PANEL_H = 480;
 const CX = DESIGN_WIDTH / 2;
 const CY = DESIGN_HEIGHT / 2;
+/** Vertical gap between toggle row centres. */
+const TOGGLE_ROW_STEP = 108;
+const TOGGLE_TOP = 156;
 
 export class SettingsPanel extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, onClose: () => void) {
@@ -54,11 +58,14 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
 
     const settings = getSettings();
 
+    const soundY = panelTop + TOGGLE_TOP;
+    const musicY = soundY + TOGGLE_ROW_STEP;
+
     new ToggleSwitch(
       scene,
       {
         x: CX,
-        y: CY - 44,
+        y: soundY,
         rowWidth: rowW,
         label: "Sound effects",
         value: settings.soundEnabled,
@@ -71,7 +78,7 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
       scene,
       {
         x: CX,
-        y: CY + 56,
+        y: musicY,
         rowWidth: rowW,
         label: "Music",
         value: settings.musicEnabled,
@@ -83,8 +90,8 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     const divider = scene.add.graphics();
     divider.lineStyle(1, theme.ui.panelStroke, 0.6);
     divider.beginPath();
-    divider.moveTo(panelLeft + PANEL_INSET, CY - 10);
-    divider.lineTo(panelLeft + PANEL_W - PANEL_INSET, CY - 10);
+    divider.moveTo(panelLeft + PANEL_INSET, soundY + TOGGLE_ROW_STEP / 2);
+    divider.lineTo(panelLeft + PANEL_W - PANEL_INSET, soundY + TOGGLE_ROW_STEP / 2);
     divider.strokePath();
     this.add(divider);
 
@@ -103,5 +110,7 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
       },
       this,
     );
+
+    playModalPopIn(scene, this, backdrop, { pivotX: CX, pivotY: CY });
   }
 }

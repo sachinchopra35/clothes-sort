@@ -10,9 +10,15 @@ import { CLOTHING_CATALOG, CLOTHING_IDS } from "../game/clothing";
 const TEXTURE_PX = 192;
 const ITEM_SCALE = ((SLOT_SIZE * CLOTHING_DISPLAY_SCALE) / TEXTURE_PX) * 0.86;
 /** Pixels per second — intentionally very slow. */
-const SPEED_PX_PER_SEC = 13;
+const SPEED_PX_PER_SEC = 20;
 const ITEM_SPACING = 148;
 const EDGE_PAD = 80;
+/** Swipe flick cap (px/s). */
+const MAX_FLICK_SPEED = 720;
+/** How quickly extra speed from a swipe returns to the natural drift (ms time constant). */
+const FLICK_DECAY_MS = 2400;
+/** Smooth pointer velocity while dragging (0–1). */
+const DRAG_VEL_SMOOTH = 0.28;
 
 export type MarqueeDirection = "left" | "right";
 
@@ -26,7 +32,16 @@ export interface MenuClothesMarqueeOptions {
 
 export class MenuClothesMarquee extends Phaser.GameObjects.Container {
   private readonly items: Phaser.GameObjects.Image[] = [];
-  private readonly speed: number;
+  private readonly baseSpeed: number;
+  private readonly loopLength: number;
+  private readonly centerY: number;
+  private scrollPos = 0;
+  private flickSpeed = 0;
+  private dragging = false;
+  private lastPointerX = 0;
+  private lastMoveAt = 0;
+  private smoothedDragVel = 0;
+  private readonly hitZone: Phaser.GameObjects.Zone;
   private readonly onUpdate = (_time: number, delta: number) => this.tick(delta);
 
   constructor(scene: Phaser.Scene, options: MenuClothesMarqueeOptions) {
@@ -35,7 +50,7 @@ export class MenuClothesMarquee extends Phaser.GameObjects.Container {
 
     const { bandTop, bandHeight, direction } = options;
     const clothingOffset = options.clothingOffset ?? 0;
-    this.speed = direction === "left" ? -SPEED_PX_PER_SEC : SPEED_PX_PER_SEC;
+    this.baseSpeed = direction === "left" ? -SPEED_PX_PER_SEC : SPEED_PX_PER_SEC;
 
     const maskShape = scene.make.graphics({ x: 0, y: 0 }, false);
     maskShape.fillStyle(0xffffff, 1);
@@ -44,60 +59,101 @@ export class MenuClothesMarquee extends Phaser.GameObjects.Container {
     const mask = maskShape.createGeometryMask();
     this.setMask(mask);
 
-    const centerY = bandTop + bandHeight / 2;
-    const count = Math.ceil((DESIGN_WIDTH + EDGE_PAD * 2) / ITEM_SPACING) + 3;
-    let x = -EDGE_PAD;
+    this.centerY = bandTop + bandHeight / 2;
+    const count = Math.ceil((DESIGN_WIDTH + EDGE_PAD * 2) / ITEM_SPACING) + 4;
 
     for (let i = 0; i < count; i++) {
       const id = CLOTHING_IDS[(clothingOffset + i) % CLOTHING_IDS.length]!;
       const key = CLOTHING_CATALOG[id].textureKey;
-      const img = scene.add.image(x, centerY, key);
+      const img = scene.add.image(0, this.centerY, key);
       img.setScale(ITEM_SCALE);
       const tilt = Phaser.Math.Between(-7, 7);
       img.setRotation(Phaser.Math.DEG_TO_RAD * tilt);
       img.setAlpha(0.9);
       this.add(img);
       this.items.push(img);
-      x += ITEM_SPACING;
     }
+
+    this.loopLength = this.items.length * ITEM_SPACING;
+    this.layoutItems();
+
+    this.hitZone = scene.add.zone(
+      SIDE_PANEL_WIDTH + playWidth / 2,
+      this.centerY,
+      playWidth,
+      bandHeight,
+    );
+    this.hitZone.setInteractive();
+    this.add(this.hitZone);
+
+    this.hitZone.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      this.dragging = true;
+      this.flickSpeed = 0;
+      this.lastPointerX = pointer.x;
+      this.lastMoveAt = pointer.time;
+      this.smoothedDragVel = 0;
+    });
+
+    this.hitZone.on("pointermove", (pointer: Phaser.Input.Pointer) => {
+      if (!this.dragging || !pointer.isDown) return;
+      const dx = pointer.x - this.lastPointerX;
+      if (dx !== 0) {
+        this.scrollPos += dx;
+        this.layoutItems();
+        const dt = Math.max(pointer.time - this.lastMoveAt, 1);
+        const instant = (dx / dt) * 1000;
+        this.smoothedDragVel = Phaser.Math.Linear(
+          this.smoothedDragVel,
+          instant,
+          DRAG_VEL_SMOOTH,
+        );
+        this.lastPointerX = pointer.x;
+        this.lastMoveAt = pointer.time;
+      }
+    });
+
+    const endDrag = () => {
+      if (!this.dragging) return;
+      this.dragging = false;
+      this.flickSpeed = Phaser.Math.Clamp(
+        this.smoothedDragVel,
+        -MAX_FLICK_SPEED,
+        MAX_FLICK_SPEED,
+      );
+    };
+
+    this.hitZone.on("pointerup", endDrag);
 
     scene.events.on(Phaser.Scenes.Events.UPDATE, this.onUpdate);
   }
 
+  /** Place every sprite on the infinite loop so the row always covers the band. */
+  private layoutItems(): void {
+    const scrollMod =
+      ((this.scrollPos % this.loopLength) + this.loopLength) % this.loopLength;
+    const minX = -EDGE_PAD - ITEM_SPACING;
+    const maxX = DESIGN_WIDTH + EDGE_PAD + ITEM_SPACING;
+
+    for (let i = 0; i < this.items.length; i++) {
+      let x = i * ITEM_SPACING + scrollMod;
+      while (x < minX) x += this.loopLength;
+      while (x > maxX) x -= this.loopLength;
+      this.items[i]!.x = x;
+    }
+  }
+
   private tick(delta: number): void {
-    const dx = this.speed * (delta / 1000);
-    const leftBound = -EDGE_PAD - 40;
-    const rightBound = DESIGN_WIDTH + EDGE_PAD + 40;
-
-    for (const img of this.items) {
-      img.x += dx;
+    if (!this.dragging) {
+      const decay = 1 - Math.exp(-delta / FLICK_DECAY_MS);
+      this.flickSpeed = Phaser.Math.Linear(this.flickSpeed, 0, decay);
+      this.scrollPos += (this.baseSpeed + this.flickSpeed) * (delta / 1000);
     }
-
-    if (this.speed < 0) {
-      for (const img of this.items) {
-        if (img.x < leftBound) {
-          let rightmost = -Infinity;
-          for (const other of this.items) {
-            rightmost = Math.max(rightmost, other.x);
-          }
-          img.x = rightmost + ITEM_SPACING;
-        }
-      }
-    } else {
-      for (const img of this.items) {
-        if (img.x > rightBound) {
-          let leftmost = Infinity;
-          for (const other of this.items) {
-            leftmost = Math.min(leftmost, other.x);
-          }
-          img.x = leftmost - ITEM_SPACING;
-        }
-      }
-    }
+    this.layoutItems();
   }
 
   destroy(fromScene?: boolean): void {
     this.scene.events.off(Phaser.Scenes.Events.UPDATE, this.onUpdate);
+    this.hitZone.removeAllListeners();
     super.destroy(fromScene);
   }
 }

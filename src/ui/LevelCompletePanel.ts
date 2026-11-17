@@ -8,6 +8,7 @@ import {
 import { theme } from "../config/theme";
 import { pickLevelCompleteSubtitle } from "./levelCompleteMessages";
 import { Button } from "./Button";
+import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = 680;
 const PANEL_H = 460;
@@ -108,5 +109,7 @@ export class LevelCompletePanel extends Phaser.GameObjects.Container {
       },
       this,
     );
+
+    playModalPopIn(scene, this, backdrop, { pivotX: cx, pivotY: cy });
   }
 }

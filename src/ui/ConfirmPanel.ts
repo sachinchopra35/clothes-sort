@@ -7,6 +7,7 @@ import {
 } from "../config/panelLayout";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
+import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = 640;
 const PANEL_H = 400;
@@ -113,5 +114,7 @@ export class ConfirmPanel extends Phaser.GameObjects.Container {
       },
       this,
     );
+
+    playModalPopIn(scene, this, backdrop, { pivotX: cx, pivotY: cy });
   }
 }

@@ -10,6 +10,7 @@ import {
 import { unlockLevelAndPrior } from "../state/progress";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
+import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = 640;
 const PANEL_H = 520;
@@ -259,12 +260,21 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
     this.errorText.setOrigin(0.5, 0);
     this.add(this.errorText);
 
-    scene.input.once("pointerup", () => {
+    this.inputEl.style.opacity = "0";
+    this.inputEl.style.transition = "opacity 140ms ease-out";
+
+    const revealInput = () => {
+      this.inputEl.style.opacity = "1";
       this.focusInput();
+    };
+
+    playModalPopIn(scene, this, backdrop, {
+      pivotX: cx,
+      pivotY: cy,
+      onComplete: revealInput,
     });
-    requestAnimationFrame(() => this.focusInput());
-    scene.time.delayedCall(120, () => this.focusInput());
-    scene.time.delayedCall(280, () => this.focusInput());
+
+    scene.input.once("pointerup", () => this.focusInput());
   }
 
   destroy(fromScene?: boolean): void {

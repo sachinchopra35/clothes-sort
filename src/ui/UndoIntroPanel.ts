@@ -3,6 +3,7 @@ import { DESIGN_HEIGHT, DESIGN_WIDTH, MODAL_UI_DEPTH } from "../config/layout";
 import { PANEL_BUTTON_H, PANEL_INSET, panelContentWidth } from "../config/panelLayout";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
+import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = 640;
 const PANEL_H = 420;
@@ -76,5 +77,7 @@ export class UndoIntroPanel extends Phaser.GameObjects.Container {
       },
       this,
     );
+
+    playModalPopIn(scene, this, backdrop, { pivotX: cx, pivotY: cy });
   }
 }
