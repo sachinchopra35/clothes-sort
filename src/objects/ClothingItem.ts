@@ -3,6 +3,10 @@ import { CLOTHING_DISPLAY_SCALE, SLOT_SIZE } from "../config/layout";
 import type { ClothingId } from "../game/clothing";
 import { CLOTHING_CATALOG } from "../game/clothing";
 
+/** Moves with less horizontal travel than this are treated as vertical (no tilt). */
+const MIN_TILT_HORIZONTAL_PX = 10;
+const MAX_MOVE_TILT_DEG = 14;
+
 export class ClothingItem extends Phaser.GameObjects.Container {
   readonly clothingId: ClothingId;
   private readonly image: Phaser.GameObjects.Image;
@@ -32,6 +36,7 @@ export class ClothingItem extends Phaser.GameObjects.Container {
     if (this.lifted === lift) return;
     this.lifted = lift;
     this.scene.tweens.killTweensOf(this);
+    this.rotation = 0;
     this.scene.tweens.add({
       targets: this,
       y: this.baseY + (lift ? -22 : 0),
@@ -42,8 +47,19 @@ export class ClothingItem extends Phaser.GameObjects.Container {
   }
 
   animateTo(x: number, y: number, duration = 220): Promise<void> {
+    const dx = x - this.x;
+    const horizontal =
+      Math.abs(dx) >= MIN_TILT_HORIZONTAL_PX
+        ? Math.sign(dx)
+        : 0;
+    const maxTilt =
+      horizontal !== 0
+        ? horizontal * Phaser.Math.DEG_TO_RAD * MAX_MOVE_TILT_DEG
+        : 0;
+
     this.lifted = false;
     this.scene.tweens.killTweensOf(this);
+    this.rotation = 0;
     this.baseY = y;
     return new Promise((resolve) => {
       this.scene.tweens.add({
@@ -53,7 +69,18 @@ export class ClothingItem extends Phaser.GameObjects.Container {
         scale: 1,
         duration,
         ease: "Quad.out",
-        onComplete: () => resolve(),
+        onUpdate: (tween) => {
+          if (maxTilt === 0) {
+            this.rotation = 0;
+            return;
+          }
+          const envelope = Math.sin(tween.progress * Math.PI);
+          this.rotation = maxTilt * envelope;
+        },
+        onComplete: () => {
+          this.rotation = 0;
+          resolve();
+        },
       });
     });
   }

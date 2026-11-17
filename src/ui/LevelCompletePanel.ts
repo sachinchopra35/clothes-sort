@@ -6,6 +6,7 @@ import {
   panelContentWidth,
 } from "../config/panelLayout";
 import { theme } from "../config/theme";
+import { pickLevelCompleteSubtitle } from "./levelCompleteMessages";
 import { Button } from "./Button";
 
 const PANEL_W = 680;
@@ -13,6 +14,7 @@ const PANEL_H = 460;
 const BTN_GAP = 20;
 
 export interface LevelCompletePanelOptions {
+  levelNumber: number;
   hasNextLevel: boolean;
   onNext: () => void;
   onMenu: () => void;
@@ -48,17 +50,22 @@ export class LevelCompletePanel extends Phaser.GameObjects.Container {
     panel.strokeRoundedRect(panelLeft, panelTop, PANEL_W, PANEL_H, 24);
     this.add(panel);
 
-    const title = scene.add.text(cx, panelTop + 56, "Level complete!", {
+    const title = scene.add.text(
+      cx,
+      panelTop + 56,
+      `Level ${options.levelNumber} complete`,
+      {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.heading,
       color: theme.ui.text,
       align: "center",
       wordWrap: { width: btnW },
-    });
+      },
+    );
     title.setOrigin(0.5, 0);
     this.add(title);
 
-    const subtitle = scene.add.text(cx, panelTop + 120, "Every shelf cleared.", {
+    const subtitle = scene.add.text(cx, panelTop + 120, pickLevelCompleteSubtitle(), {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.body,
       color: theme.ui.textMuted,

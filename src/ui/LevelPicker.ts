@@ -10,7 +10,7 @@ import { theme } from "../config/theme";
 import { Button } from "./Button";
 
 /** Half-width from center to each arrow button centre */
-const ARROW_OFFSET = 380;
+const ARROW_OFFSET = 270;
 const ARROW_SIZE = scaleButtonSize(96, 96).width;
 const LABEL_MAX_WIDTH = 520;
 
@@ -30,9 +30,17 @@ export class LevelPicker extends Phaser.GameObjects.Container {
   private readonly onChange: (levelId: string) => void;
   private readonly onLockedTap?: (levelId: string) => void;
 
-  constructor(scene: Phaser.Scene, options: LevelPickerOptions) {
+  constructor(
+    scene: Phaser.Scene,
+    options: LevelPickerOptions,
+    parent?: Phaser.GameObjects.Container,
+  ) {
     super(scene, options.x, options.y);
-    scene.add.existing(this);
+    if (parent) {
+      parent.add(this);
+    } else {
+      scene.add.existing(this);
+    }
 
     this.levelId = options.initialLevelId;
     this.onChange = options.onChange;
@@ -66,7 +74,7 @@ export class LevelPicker extends Phaser.GameObjects.Container {
       this,
     );
 
-    this.completeTick = scene.add.text(0, -48, "✓", {
+    this.completeTick = scene.add.text(0, -52, "✓", {
       fontFamily: theme.fontFamily,
       fontSize: "72px",
       color: theme.ui.success,
@@ -76,16 +84,16 @@ export class LevelPicker extends Phaser.GameObjects.Container {
     this.completeTick.setOrigin(0.5);
     this.completeTick.setVisible(false);
 
-    this.levelLabel = scene.add.text(0, 8, "", {
+    this.levelLabel = scene.add.text(0, 0, "", {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.heading,
+      fontSize: theme.fontSize.menuLevel,
       color: theme.ui.text,
       align: "center",
       wordWrap: { width: LABEL_MAX_WIDTH },
     });
     this.levelLabel.setOrigin(0.5);
 
-    this.lockHint = scene.add.text(0, 72, "", {
+    this.lockHint = scene.add.text(0, 52, "", {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.small,
       color: theme.ui.textMuted,

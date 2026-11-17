@@ -11,14 +11,20 @@ import { completeLevel, unlockNextLevel } from "../state/progress";
 import { Button } from "../ui/Button";
 import { ConfirmPanel } from "../ui/ConfirmPanel";
 import { LevelCompletePanel } from "../ui/LevelCompletePanel";
+import {
+  fadeInCamera,
+  type SceneIntroFadeData,
+  startSceneWithFade,
+} from "./sceneFade";
 
-interface GameSceneData {
+interface GameSceneData extends SceneIntroFadeData {
   levelId?: string;
 }
 
 export class GameScene extends Phaser.Scene {
   private board: BoardController | null = null;
   private levelId = "level-1";
+  private introFade = false;
   private completePanel: LevelCompletePanel | null = null;
   private confirmPanel: ConfirmPanel | null = null;
   private backButton: Button | null = null;
@@ -28,8 +34,12 @@ export class GameScene extends Phaser.Scene {
     super(SCENE_GAME);
   }
 
-  create(data: GameSceneData): void {
+  init(data: GameSceneData): void {
     this.levelId = data.levelId ?? "level-1";
+    this.introFade = data.introFade ?? false;
+  }
+
+  create(): void {
     this.completePanel?.destroy();
     this.completePanel = null;
     this.confirmPanel?.destroy();
@@ -38,7 +48,7 @@ export class GameScene extends Phaser.Scene {
 
     const level = getLevelById(this.levelId);
     if (!level) {
-      this.scene.start(SCENE_MENU);
+      void startSceneWithFade(this, SCENE_MENU);
       return;
     }
 
@@ -88,6 +98,11 @@ export class GameScene extends Phaser.Scene {
     });
     title.setOrigin(0.5);
     title.setDepth(GAME_HUD_DEPTH);
+
+    if (this.introFade) {
+      fadeInCamera(this);
+      this.introFade = false;
+    }
   }
 
   private openBackConfirm(): void {
@@ -104,7 +119,7 @@ export class GameScene extends Phaser.Scene {
       onCancel: () => this.closeConfirmPanel(),
       onConfirm: () => {
         this.closeConfirmPanel();
-        this.scene.start(SCENE_MENU);
+        void startSceneWithFade(this, SCENE_MENU);
       },
     });
   }
@@ -157,12 +172,13 @@ export class GameScene extends Phaser.Scene {
     this.restartButton?.setInputEnabled(false);
 
     this.completePanel = new LevelCompletePanel(this, {
+      levelNumber: idx + 1,
       hasNextLevel: hasNext,
       onNext: () => {
         const next = LEVELS[idx + 1];
         if (next) this.scene.restart({ levelId: next.id });
       },
-      onMenu: () => this.scene.start(SCENE_MENU),
+      onMenu: () => void startSceneWithFade(this, SCENE_MENU),
     });
   }
 }

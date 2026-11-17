@@ -84,7 +84,7 @@ export class BoardController {
     }
   }
 
-  private async onShelfTap(shelfId: string): Promise<void> {
+  private onShelfTap(shelfId: string): void {
     if (this.busy) return;
     const shelf = this.boardShelf(shelfId);
     const view = this.shelfViews.get(shelfId);
@@ -115,7 +115,7 @@ export class BoardController {
     const space = shelf.capacity - shelf.items.length;
     const moveCount = Math.min(group.count, space);
 
-  this.busy = true;
+    this.busy = true;
     this.clearSelection();
 
     const movingViews = fromItems.splice(fromItems.length - moveCount, moveCount);
@@ -129,8 +129,25 @@ export class BoardController {
       return;
     }
     this.state = result.state;
+    this.busy = false;
 
     const destShelf = this.shelfViews.get(shelfId)!;
+    void this.playMoveVisuals(
+      movingViews,
+      moveCount,
+      destShelf,
+      toItems,
+      result.clearedShelfIds,
+    );
+  }
+
+  private async playMoveVisuals(
+    movingViews: ClothingItem[],
+    moveCount: number,
+    destShelf: Shelf,
+    toItems: ClothingItem[],
+    clearedShelfIds: string[],
+  ): Promise<void> {
     const animPromises = movingViews.map((item, i) => {
       const slotIndex = toItems.length - moveCount + i;
       const pos = destShelf.getSlotWorldPosition(slotIndex);
@@ -139,7 +156,7 @@ export class BoardController {
     });
     await Promise.all(animPromises);
 
-    for (const clearedId of result.clearedShelfIds) {
+    for (const clearedId of clearedShelfIds) {
       const clearedShelf = this.shelfViews.get(clearedId);
       const clearedItems = this.itemsByShelf.get(clearedId) ?? [];
       if (clearedShelf) {
@@ -148,8 +165,6 @@ export class BoardController {
       clearedItems.forEach((item) => item.destroy());
       this.itemsByShelf.delete(clearedId);
     }
-
-    this.busy = false;
 
     if (isWon(this.state)) {
       this.onWon?.();

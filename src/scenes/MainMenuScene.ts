@@ -4,61 +4,85 @@ import { scaleButtonSize } from "../config/uiButtons";
 import { DESIGN_HEIGHT, DESIGN_WIDTH } from "../config/layout";
 import { theme } from "../config/theme";
 import { WardrobeBackground } from "../objects/WardrobeBackground";
+import { WardrobeFrameOverlay } from "../objects/wardrobeFrame";
 import { getSelectedLevelId, resetProgressCache } from "../state/progress";
 import { Button } from "../ui/Button";
-import { LevelPicker } from "../ui/LevelPicker";
+import { MenuPlayCard } from "../ui/MenuPlayCard";
 import { CheatCodePanel } from "../ui/CheatCodePanel";
 import { InstructionsPanel } from "../ui/InstructionsPanel";
+import { MenuClothesMarquee } from "../ui/MenuClothesMarquee";
 import { SettingsPanel } from "../ui/SettingsPanel";
+import {
+  fadeInCamera,
+  type SceneIntroFadeData,
+  startSceneWithFade,
+} from "./sceneFade";
 
+/** Vertical bands for the slow scrolling clothes (design px). */
+const MENU_MARQUEE_UPPER_TOP = 430;
+const MENU_MARQUEE_UPPER_HEIGHT = 330;
+const MENU_MARQUEE_LOWER_TOP = 1250;
+const MENU_MARQUEE_LOWER_HEIGHT = 340;
 export class MainMenuScene extends Phaser.Scene {
+  private introFade = false;
   private settingsPanel: SettingsPanel | null = null;
   private instructionsPanel: InstructionsPanel | null = null;
   private cheatPanel: CheatCodePanel | null = null;
-  private picker!: LevelPicker;
+  private playCard!: MenuPlayCard;
+  private marquees: MenuClothesMarquee[] = [];
 
   constructor() {
     super(SCENE_MENU);
   }
 
+  init(data: SceneIntroFadeData): void {
+    this.introFade = data.introFade ?? false;
+  }
+
   create(): void {
     resetProgressCache();
 
-    new WardrobeBackground(this, { dimOverlay: 0.35 });
+    new WardrobeBackground(this, { dimOverlay: 0.35, backOnly: true });
 
-    const title = this.add.text(DESIGN_WIDTH / 2, 280, "Clothes Sort", {
+    this.marquees = [
+      new MenuClothesMarquee(this, {
+        bandTop: MENU_MARQUEE_UPPER_TOP,
+        bandHeight: MENU_MARQUEE_UPPER_HEIGHT,
+        direction: "left",
+        clothingOffset: 0,
+      }),
+      new MenuClothesMarquee(this, {
+        bandTop: MENU_MARQUEE_LOWER_TOP,
+        bandHeight: MENU_MARQUEE_LOWER_HEIGHT,
+        direction: "right",
+        clothingOffset: 3,
+      }),
+    ];
+
+    new WardrobeFrameOverlay(this);
+
+    const title = this.add.text(DESIGN_WIDTH / 2, 268, "Clothes Sort", {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.title,
+      fontSize: theme.fontSize.menuTitle,
       color: theme.ui.text,
       stroke: "#5c3d28",
-      strokeThickness: 6,
+      strokeThickness: 8,
     });
     title.setOrigin(0.5);
 
-    const subtitle = this.add.text(DESIGN_WIDTH / 2, 380, "Tidy the wardrobe", {
+    const subtitle = this.add.text(DESIGN_WIDTH / 2, 388, "Tidy the wardrobe!", {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.body,
+      fontSize: theme.fontSize.menuTagline,
       color: theme.ui.textMuted,
     });
     subtitle.setOrigin(0.5);
 
-    this.picker = new LevelPicker(this, {
+    this.playCard = new MenuPlayCard(this, {
       x: DESIGN_WIDTH / 2,
-      y: DESIGN_HEIGHT / 2 - 40,
+      y: DESIGN_HEIGHT / 2 + 60,
       initialLevelId: getSelectedLevelId(),
-      onChange: () => {},
+      onPlay: () => this.startGame(),
       onLockedTap: (levelId) => this.openCheatCode(levelId),
-    });
-
-    const play = scaleButtonSize(420, 120);
-    new Button(this, {
-      x: DESIGN_WIDTH / 2,
-      y: DESIGN_HEIGHT / 2 + 200,
-      width: play.width,
-      height: play.height,
-      label: "Play",
-      fontSize: theme.fontSize.heading,
-      onClick: () => this.startGame(),
     });
 
     const secondary = scaleButtonSize(320, 88);
@@ -81,12 +105,24 @@ export class MainMenuScene extends Phaser.Scene {
       fontSize: theme.fontSize.body,
       onClick: () => this.openSettings(),
     });
+
+    if (this.introFade) {
+      fadeInCamera(this);
+      this.introFade = false;
+    }
+  }
+
+  shutdown(): void {
+    for (const m of this.marquees) {
+      m.destroy();
+    }
+    this.marquees = [];
   }
 
   private startGame(): void {
-    if (!this.picker.isSelectionPlayable()) return;
-    const levelId = this.picker.getSelectedLevelId();
-    this.scene.start(SCENE_GAME, { levelId });
+    if (!this.playCard.isSelectionPlayable()) return;
+    const levelId = this.playCard.getSelectedLevelId();
+    void startSceneWithFade(this, SCENE_GAME, { levelId });
   }
 
   private openCheatCode(levelId: string): void {
@@ -102,7 +138,7 @@ export class MainMenuScene extends Phaser.Scene {
       onCancel: () => this.closeCheatCode(),
       onSuccess: () => {
         this.closeCheatCode();
-        this.picker.refresh();
+        this.playCard.refresh();
       },
     });
   }
