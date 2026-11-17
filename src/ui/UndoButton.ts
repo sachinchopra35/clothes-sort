@@ -3,13 +3,17 @@ import { playUiKnock } from "../audio/uiSounds";
 import { GAME_HUD_DEPTH } from "../config/layout";
 import { theme } from "../config/theme";
 
+export const UNDO_ICON_KEY = "ui-undo";
+export const UNDO_ICON_USED_KEY = "ui-undo-used";
+
 const BTN_SIZE = 116;
 const BTN_RADIUS = 24;
 const BADGE_R = 22;
+const ICON_SIZE = 84;
 
 export class UndoButton extends Phaser.GameObjects.Container {
   private readonly bgGfx: Phaser.GameObjects.Graphics;
-  private readonly iconText: Phaser.GameObjects.Text;
+  private readonly icon: Phaser.GameObjects.Image;
   private readonly badgeBg: Phaser.GameObjects.Graphics;
   private readonly badge: Phaser.GameObjects.Text;
   private clickable = true;
@@ -45,15 +49,9 @@ export class UndoButton extends Phaser.GameObjects.Container {
     this.bgGfx = scene.add.graphics();
     this.add(this.bgGfx);
 
-    this.iconText = scene.add.text(0, 10, "↩", {
-      fontFamily: theme.fontFamily,
-      fontSize: "78px",
-      color: theme.ui.text,
-      stroke: "#a85f34",
-      strokeThickness: 7,
-    });
-    this.iconText.setOrigin(0.5);
-    this.add(this.iconText);
+    this.icon = scene.add.image(0, 0, UNDO_ICON_KEY);
+    this.icon.setDisplaySize(ICON_SIZE, ICON_SIZE);
+    this.add(this.icon);
 
     const badgeX = BTN_SIZE / 2 - 6;
     const badgeY = -BTN_SIZE / 2 + 6;
@@ -97,13 +95,7 @@ export class UndoButton extends Phaser.GameObjects.Container {
     g.lineStyle(3, theme.ui.buttonStroke, 1);
     g.strokeRoundedRect(-half, -half, BTN_SIZE, BTN_SIZE, BTN_RADIUS);
 
-    if (exhausted) {
-      this.iconText.setColor("#d4b896");
-      this.iconText.setStroke("#5c3d28", 5);
-    } else {
-      this.iconText.setColor(theme.ui.text);
-      this.iconText.setStroke("#8b4f28", 7);
-    }
-    this.iconText.setAlpha(1);
+    this.icon.setTexture(exhausted ? UNDO_ICON_USED_KEY : UNDO_ICON_KEY);
+    this.icon.setDisplaySize(ICON_SIZE, ICON_SIZE);
   }
 }

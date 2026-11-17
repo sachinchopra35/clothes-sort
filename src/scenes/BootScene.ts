@@ -3,6 +3,7 @@ import { SCENE_BOOT, SCENE_MENU } from "../config/gameConfig";
 import { ALL_CLOTHING } from "../game/clothing";
 import { fadeOutCamera } from "./sceneFade";
 import { LoadingScreen } from "../ui/LoadingScreen";
+import { UNDO_ICON_KEY, UNDO_ICON_USED_KEY } from "../ui/UndoButton";
 
 const SVG_RENDER = 192;
 const HOLD_AFTER_LOAD_MS = 280;
@@ -32,6 +33,11 @@ export class BootScene extends Phaser.Scene {
         height: SVG_RENDER,
       });
     }
+    this.load.svg(UNDO_ICON_KEY, "assets/ui/undo.svg", { width: SVG_RENDER, height: SVG_RENDER });
+    this.load.svg(UNDO_ICON_USED_KEY, "assets/ui/undo-used.svg", {
+      width: SVG_RENDER,
+      height: SVG_RENDER,
+    });
   }
 
   create(): void {
