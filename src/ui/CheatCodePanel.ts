@@ -7,7 +7,7 @@ import {
   PANEL_INSET,
   panelContentWidth,
 } from "../config/panelLayout";
-import { unlockLevel } from "../state/progress";
+import { unlockLevelAndPrior } from "../state/progress";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
 
@@ -194,7 +194,7 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
         this.focusInput();
         return;
       }
-      unlockLevel(options.levelId);
+      unlockLevelAndPrior(options.levelId);
       playUiKnock();
       options.onSuccess();
     };

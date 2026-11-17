@@ -54,6 +54,23 @@ export function unlockLevel(levelId: string): void {
   }
 }
 
+/** Unlock this level and every earlier level (cheat codes). */
+export function unlockLevelAndPrior(levelId: string): void {
+  const idx = getLevelIndex(levelId);
+  if (idx < 0) return;
+  let changed = false;
+  for (let i = 0; i <= idx; i++) {
+    const id = LEVELS[i]!.id;
+    if (!cached.unlockedLevelIds.includes(id)) {
+      cached.unlockedLevelIds.push(id);
+      changed = true;
+    }
+  }
+  if (changed) {
+    saveJson(KEY_UNLOCKED, cached.unlockedLevelIds);
+  }
+}
+
 /** Unlock the level after the one the player just finished. */
 export function unlockNextLevel(completedLevelId: string): void {
   const idx = getLevelIndex(completedLevelId);
