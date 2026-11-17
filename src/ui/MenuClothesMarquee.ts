@@ -9,16 +9,28 @@ import { CLOTHING_CATALOG, CLOTHING_IDS } from "../game/clothing";
 
 const TEXTURE_PX = 192;
 const ITEM_SCALE = ((SLOT_SIZE * CLOTHING_DISPLAY_SCALE) / TEXTURE_PX) * 0.86;
-/** Idle drift (px/s). */
+/** Idle drift (px/s) — +35% from the original 20 px/s. */
 const SPEED_PX_PER_SEC = 27;
 const ITEM_SPACING = 148;
 const EDGE_PAD = 80;
-/** Sanity cap only; fast flicks should not hit this on a phone. */
-const MAX_FLICK_SPEED = 4500;
-/** Time constant for flick momentum bleeding off (lower = stops sooner). ~iOS scroll feel. */
-const FLICK_DECAY_MS = 520;
-/** Smooth pointer velocity while dragging (0–1). */
-const DRAG_VEL_SMOOTH = 0.38;
+/** High sanity ceiling only (design px/s; 1080 = 1 screen width). */
+const MAX_FLICK_SPEED = 9000;
+/**
+ * Exponential momentum decay time constant (ms).
+ * Matches iOS UIScrollView.DecelerationRate.normal (~500 ms: -1 / ln(0.998)).
+ */
+const FLICK_DECAY_MS = 480;
+/** Recent pointer history window used to compute release velocity (ms). */
+const VELOCITY_WINDOW_MS = 90;
+/** If the finger rested longer than this before lifting, treat as a stop, not a flick (ms). */
+const STOP_PAUSE_MS = 100;
+/** Minimum opposite movement (design px) that resets velocity history on a reversal. */
+const DIRECTION_FLIP_PX = 8;
+
+interface DragSample {
+  x: number;
+  t: number;
+}
 
 export type MarqueeDirection = "left" | "right";
 
@@ -30,6 +42,10 @@ export interface MenuClothesMarqueeOptions {
   clothingOffset?: number;
 }
 
+function pointerTimestamp(pointer: Phaser.Input.Pointer): number {
+  return pointer.time > 0 ? pointer.time : performance.now();
+}
+
 export class MenuClothesMarquee extends Phaser.GameObjects.Container {
   private readonly items: Phaser.GameObjects.Image[] = [];
   private readonly baseSpeed: number;
@@ -38,11 +54,16 @@ export class MenuClothesMarquee extends Phaser.GameObjects.Container {
   private scrollPos = 0;
   private flickSpeed = 0;
   private dragging = false;
+  private activePointerId: number | null = null;
   private lastPointerX = 0;
-  private lastMoveAt = 0;
-  private smoothedDragVel = 0;
+  private dragDirection = 0;
+  private samples: DragSample[] = [];
   private readonly hitZone: Phaser.GameObjects.Zone;
   private readonly onUpdate = (_time: number, delta: number) => this.tick(delta);
+  private readonly onScenePointerMove = (pointer: Phaser.Input.Pointer) =>
+    this.handlePointerMove(pointer);
+  private readonly onScenePointerUp = (pointer: Phaser.Input.Pointer) =>
+    this.handlePointerUp(pointer);
 
   constructor(scene: Phaser.Scene, options: MenuClothesMarqueeOptions) {
     super(scene, 0, 0);
@@ -87,48 +108,99 @@ export class MenuClothesMarquee extends Phaser.GameObjects.Container {
     this.add(this.hitZone);
 
     this.hitZone.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      const now = pointerTimestamp(pointer);
       this.dragging = true;
+      this.activePointerId = pointer.id;
       this.flickSpeed = 0;
       this.lastPointerX = pointer.x;
-      this.lastMoveAt = pointer.time;
-      this.smoothedDragVel = 0;
+      this.dragDirection = 0;
+      this.samples = [{ x: pointer.x, t: now }];
     });
 
-    this.hitZone.on("pointermove", (pointer: Phaser.Input.Pointer) => {
-      if (!this.dragging || !pointer.isDown) return;
-      const dx = pointer.x - this.lastPointerX;
-      if (dx !== 0) {
-        this.scrollPos += dx;
-        this.layoutItems();
-        const dt = Math.max(pointer.time - this.lastMoveAt, 1);
-        const instant = (dx / dt) * 1000;
-        this.smoothedDragVel = Phaser.Math.Linear(
-          this.smoothedDragVel,
-          instant,
-          DRAG_VEL_SMOOTH,
-        );
-        this.lastPointerX = pointer.x;
-        this.lastMoveAt = pointer.time;
-      }
-    });
-
-    const endDrag = (pointer: Phaser.Input.Pointer) => {
-      if (!this.dragging) return;
-      this.dragging = false;
-      const pointerVx = pointer.velocity.x;
-      const release =
-        Math.abs(pointerVx) > 24 ? pointerVx : this.smoothedDragVel;
-      this.flickSpeed = Phaser.Math.Clamp(
-        release,
-        -MAX_FLICK_SPEED,
-        MAX_FLICK_SPEED,
-      );
-    };
-
-    this.hitZone.on("pointerup", endDrag);
-    this.hitZone.on("pointerupoutside", endDrag);
+    scene.input.on(Phaser.Input.Events.POINTER_MOVE, this.onScenePointerMove);
+    scene.input.on(Phaser.Input.Events.POINTER_UP, this.onScenePointerUp);
+    scene.input.on(Phaser.Input.Events.POINTER_UP_OUTSIDE, this.onScenePointerUp);
 
     scene.events.on(Phaser.Scenes.Events.UPDATE, this.onUpdate);
+  }
+
+  private recordSample(x: number, t: number, dx: number): void {
+    const dir = Math.sign(dx);
+    if (
+      dir !== 0 &&
+      this.dragDirection !== 0 &&
+      dir !== this.dragDirection &&
+      Math.abs(dx) >= DIRECTION_FLIP_PX
+    ) {
+      const prev = this.samples[this.samples.length - 1];
+      this.samples = prev ? [prev, { x, t }] : [{ x, t }];
+      this.dragDirection = dir;
+    } else {
+      if (dir !== 0 && Math.abs(dx) >= DIRECTION_FLIP_PX) {
+        this.dragDirection = dir;
+      }
+      this.samples.push({ x, t });
+    }
+
+    const cutoff = t - VELOCITY_WINDOW_MS * 2;
+    while (this.samples.length > 2 && this.samples[0]!.t < cutoff) {
+      this.samples.shift();
+    }
+  }
+
+  private handlePointerMove(pointer: Phaser.Input.Pointer): void {
+    if (!this.dragging || pointer.id !== this.activePointerId) return;
+    if (!pointer.isDown) {
+      this.handlePointerUp(pointer);
+      return;
+    }
+    const dx = pointer.x - this.lastPointerX;
+    if (dx === 0) return;
+
+    this.scrollPos += dx;
+    this.layoutItems();
+    this.lastPointerX = pointer.x;
+    this.recordSample(pointer.x, pointerTimestamp(pointer), dx);
+  }
+
+  private handlePointerUp(pointer: Phaser.Input.Pointer): void {
+    if (!this.dragging || pointer.id !== this.activePointerId) return;
+
+    const upTime = pointerTimestamp(pointer);
+    const finalDx = pointer.x - this.lastPointerX;
+    if (finalDx !== 0) {
+      this.scrollPos += finalDx;
+      this.layoutItems();
+      this.lastPointerX = pointer.x;
+      this.recordSample(pointer.x, upTime, finalDx);
+    }
+
+    this.dragging = false;
+    this.activePointerId = null;
+    this.flickSpeed = this.computeReleaseVelocity(upTime);
+    this.samples = [];
+  }
+
+  private computeReleaseVelocity(upTime: number): number {
+    if (this.samples.length < 2) return 0;
+    const newest = this.samples[this.samples.length - 1]!;
+    if (upTime - newest.t > STOP_PAUSE_MS) return 0;
+
+    const windowStart = newest.t - VELOCITY_WINDOW_MS;
+    let oldest = this.samples[0]!;
+    for (const s of this.samples) {
+      if (s.t >= windowStart) {
+        oldest = s;
+        break;
+      }
+    }
+    if (oldest === newest) {
+      oldest = this.samples[this.samples.length - 2]!;
+    }
+
+    const dtMs = Math.max(newest.t - oldest.t, 8);
+    const rawVx = ((newest.x - oldest.x) / dtMs) * 1000;
+    return Phaser.Math.Clamp(rawVx, -MAX_FLICK_SPEED, MAX_FLICK_SPEED);
   }
 
   /** Place every sprite on the infinite loop so the row always covers the band. */
@@ -148,15 +220,27 @@ export class MenuClothesMarquee extends Phaser.GameObjects.Container {
 
   private tick(delta: number): void {
     if (!this.dragging) {
-      const decay = 1 - Math.exp(-delta / FLICK_DECAY_MS);
-      this.flickSpeed = Phaser.Math.Linear(this.flickSpeed, 0, decay);
-      this.scrollPos += (this.baseSpeed + this.flickSpeed) * (delta / 1000);
+      const dtSec = delta / 1000;
+      const tauSec = FLICK_DECAY_MS / 1000;
+      const factor = Math.exp(-dtSec / tauSec);
+      const flickDelta = this.flickSpeed * tauSec * (1 - factor);
+      this.flickSpeed *= factor;
+      if (Math.abs(this.flickSpeed) < 0.5) {
+        this.flickSpeed = 0;
+      }
+      this.scrollPos += this.baseSpeed * dtSec + flickDelta;
     }
     this.layoutItems();
   }
 
   destroy(fromScene?: boolean): void {
     this.scene.events.off(Phaser.Scenes.Events.UPDATE, this.onUpdate);
+    this.scene.input.off(Phaser.Input.Events.POINTER_MOVE, this.onScenePointerMove);
+    this.scene.input.off(Phaser.Input.Events.POINTER_UP, this.onScenePointerUp);
+    this.scene.input.off(
+      Phaser.Input.Events.POINTER_UP_OUTSIDE,
+      this.onScenePointerUp,
+    );
     this.hitZone.removeAllListeners();
     super.destroy(fromScene);
   }
