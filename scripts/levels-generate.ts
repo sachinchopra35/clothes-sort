@@ -7,6 +7,7 @@
  *   npm run levels:generate:23           — append levels 23–40, never rewrites earlier levels
  *   npm run levels:generate:41           — append levels 41–60
  *   npm run levels:generate:61           — append levels 61–80
+ *   npm run levels:generate:81           — append levels 81–85 (then :86, :91, :96 for 86–100)
  *   npm run levels:generate -- --all    — full rewrite 4–20 (slow; rarely needed)
  */
 import { readFile, writeFile } from "node:fs/promises";
@@ -916,11 +917,324 @@ const SPECS_61_80: LevelSpec[] = [
   },
 ];
 
+const SPEC_81_100_BASE = {
+  emptyShelves: 2,
+  capacity: 5,
+  maxStartRun: 2,
+  attempts: 260,
+  pickStrategy: "nearestTarget" as const,
+};
+
+/** Slight bump over 61–80 bands. */
+const BAND_81_COZY: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 260,
+  scoreBand: [38, 48] as [number, number],
+};
+const BAND_81_MED: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 280,
+  scoreBand: [46, 54] as [number, number],
+};
+const BAND_81_FULL: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 300,
+  scoreBand: [54, 60] as [number, number],
+};
+const BAND_81_PEAK: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 320,
+  scoreBand: [56, 60] as [number, number],
+};
+const BAND_81_SCRAMBLE: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 340,
+  scoreBand: [34, 44] as [number, number],
+};
+/** When a type lineup rarely hits the med band (color-themed sets). */
+const BAND_81_FLEX: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 280,
+  scoreBand: [40, 52] as [number, number],
+};
+
+const SPECS_81_100: LevelSpec[] = [
+  {
+    ...SPEC_81_100_BASE,
+    number: 81,
+    seed: 81,
+    ...BAND_81_COZY,
+    types: ["green-tee", "green-scarf", "teal-kimono", "yellow-shorts", "white-tee", "purple-socks"],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 82,
+    seed: 82,
+    ...BAND_81_COZY,
+    types: ["red-trainers", "yellow-shorts", "purple-socks", "blue-cap", "white-tee", "orange-scarf"],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 83,
+    seed: 83,
+    ...BAND_81_FLEX,
+    types: [
+      "brown-leather-jacket",
+      "black-bootcut-jeans",
+      "light-blue-jeans",
+      "red-jeans",
+      "black-boots",
+      "white-tee",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 84,
+    seed: 84,
+    ...BAND_81_COZY,
+    types: [
+      "red-polka-dress",
+      "orange-dress",
+      "pink-gloves",
+      "purple-tee",
+      "yellow-sun-hat",
+      "black-boots",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 85,
+    seed: 85,
+    ...BAND_81_FULL,
+    types: [
+      "coral-swimsuit",
+      "teal-kimono",
+      "red-tee",
+      "light-blue-jeans",
+      "orange-scarf",
+      "purple-socks",
+      "blue-cap",
+      "yellow-sun-hat",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 86,
+    seed: 86,
+    ...BAND_81_FLEX,
+    types: ["blue-tee", "blue-cap", "light-blue-jeans", "teal-kimono", "purple-socks", "white-tee"],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 87,
+    seed: 87,
+    ...BAND_81_MED,
+    types: [
+      "brown-leather-jacket",
+      "pink-gloves",
+      "orange-scarf",
+      "green-scarf",
+      "yellow-sun-hat",
+      "red-trainers",
+      "blue-tee",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 88,
+    seed: 88,
+    ...BAND_81_FULL,
+    types: [
+      "red-trainers",
+      "black-boots",
+      "purple-socks",
+      "blue-cap",
+      "yellow-sun-hat",
+      "pink-gloves",
+      "orange-scarf",
+      "white-tee",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 89,
+    seed: 89,
+    maxStartRun: 1,
+    ...BAND_81_SCRAMBLE,
+    types: [
+      "orange-scarf",
+      "green-scarf",
+      "brown-leather-jacket",
+      "purple-socks",
+      "yellow-shorts",
+      "black-boots",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 90,
+    seed: 90,
+    ...BAND_81_COZY,
+    types: ["teal-kimono", "coral-swimsuit", "yellow-sun-hat", "yellow-shorts", "orange-scarf", "red-trainers"],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 91,
+    seed: 91,
+    ...BAND_81_FULL,
+    types: [
+      "white-tee",
+      "red-tee",
+      "green-tee",
+      "blue-tee",
+      "purple-tee",
+      "yellow-shorts",
+      "orange-scarf",
+      "light-blue-jeans",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 92,
+    seed: 92,
+    ...BAND_81_FULL,
+    types: [
+      "brown-leather-jacket",
+      "black-bootcut-jeans",
+      "green-scarf",
+      "purple-socks",
+      "red-polka-dress",
+      "orange-dress",
+      "black-boots",
+      "pink-gloves",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 93,
+    seed: 93,
+    ...BAND_81_FLEX,
+    types: ["purple-tee", "purple-socks", "pink-gloves", "red-polka-dress", "orange-dress", "blue-cap"],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 94,
+    seed: 94,
+    ...BAND_81_FULL,
+    types: [
+      "yellow-sun-hat",
+      "yellow-shorts",
+      "orange-dress",
+      "orange-scarf",
+      "green-tee",
+      "red-tee",
+      "coral-swimsuit",
+      "red-trainers",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 95,
+    seed: 95,
+    ...BAND_81_MED,
+    types: [
+      "brown-leather-jacket",
+      "green-scarf",
+      "orange-scarf",
+      "red-jeans",
+      "teal-kimono",
+      "blue-cap",
+      "white-tee",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 96,
+    seed: 96,
+    maxStartRun: 1,
+    ...BAND_81_SCRAMBLE,
+    types: [
+      "black-bootcut-jeans",
+      "black-boots",
+      "brown-leather-jacket",
+      "purple-socks",
+      "green-tee",
+      "red-trainers",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 97,
+    seed: 97,
+    ...BAND_81_PEAK,
+    types: [
+      "teal-kimono",
+      "coral-swimsuit",
+      "green-scarf",
+      "orange-scarf",
+      "red-polka-dress",
+      "pink-gloves",
+      "yellow-sun-hat",
+      "black-boots",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 98,
+    seed: 98,
+    ...BAND_81_PEAK,
+    types: [
+      "light-blue-jeans",
+      "red-jeans",
+      "black-bootcut-jeans",
+      "blue-tee",
+      "blue-cap",
+      "purple-socks",
+      "orange-scarf",
+      "red-trainers",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 99,
+    seed: 99,
+    ...BAND_81_PEAK,
+    types: [
+      "red-tee",
+      "red-jeans",
+      "red-trainers",
+      "red-polka-dress",
+      "teal-kimono",
+      "green-scarf",
+      "yellow-shorts",
+      "purple-socks",
+    ],
+  },
+  {
+    ...SPEC_81_100_BASE,
+    number: 100,
+    seed: 100,
+    ...BAND_81_PEAK,
+    types: [
+      "brown-leather-jacket",
+      "orange-dress",
+      "black-boots",
+      "yellow-sun-hat",
+      "green-tee",
+      "purple-tee",
+      "coral-swimsuit",
+      "orange-scarf",
+    ],
+  },
+];
+
+function specsInRange(from: number, to: number): LevelSpec[] {
+  return SPECS_81_100.filter((s) => s.number >= from && s.number <= to);
+}
+
 const APPEND_BATCHES: Record<number, LevelSpec[]> = {
   21: SPECS_21_22,
   23: SPECS_23_40,
   41: SPECS_41_60,
   61: SPECS_61_80,
+  81: specsInRange(81, 85),
+  86: specsInRange(86, 90),
+  91: specsInRange(91, 95),
+  96: specsInRange(96, 100),
 };
 
 type Mode = "4-10" | "11-20" | "append" | "all";
