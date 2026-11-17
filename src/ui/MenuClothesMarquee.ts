@@ -9,16 +9,16 @@ import { CLOTHING_CATALOG, CLOTHING_IDS } from "../game/clothing";
 
 const TEXTURE_PX = 192;
 const ITEM_SCALE = ((SLOT_SIZE * CLOTHING_DISPLAY_SCALE) / TEXTURE_PX) * 0.86;
-/** Pixels per second — intentionally very slow. */
-const SPEED_PX_PER_SEC = 20;
+/** Idle drift (px/s). */
+const SPEED_PX_PER_SEC = 27;
 const ITEM_SPACING = 148;
 const EDGE_PAD = 80;
-/** Swipe flick cap (px/s). */
-const MAX_FLICK_SPEED = 720;
-/** How quickly extra speed from a swipe returns to the natural drift (ms time constant). */
-const FLICK_DECAY_MS = 2400;
+/** Sanity cap only; fast flicks should not hit this on a phone. */
+const MAX_FLICK_SPEED = 4500;
+/** Time constant for flick momentum bleeding off (lower = stops sooner). ~iOS scroll feel. */
+const FLICK_DECAY_MS = 520;
 /** Smooth pointer velocity while dragging (0–1). */
-const DRAG_VEL_SMOOTH = 0.28;
+const DRAG_VEL_SMOOTH = 0.38;
 
 export type MarqueeDirection = "left" | "right";
 
@@ -112,17 +112,21 @@ export class MenuClothesMarquee extends Phaser.GameObjects.Container {
       }
     });
 
-    const endDrag = () => {
+    const endDrag = (pointer: Phaser.Input.Pointer) => {
       if (!this.dragging) return;
       this.dragging = false;
+      const pointerVx = pointer.velocity.x;
+      const release =
+        Math.abs(pointerVx) > 24 ? pointerVx : this.smoothedDragVel;
       this.flickSpeed = Phaser.Math.Clamp(
-        this.smoothedDragVel,
+        release,
         -MAX_FLICK_SPEED,
         MAX_FLICK_SPEED,
       );
     };
 
     this.hitZone.on("pointerup", endDrag);
+    this.hitZone.on("pointerupoutside", endDrag);
 
     scene.events.on(Phaser.Scenes.Events.UPDATE, this.onUpdate);
   }
