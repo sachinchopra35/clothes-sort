@@ -43,6 +43,8 @@ export const SHELF_WALL_INSET = 10;
 export const OPEN_END_INSET = 6;
 /** Max overlap between neighbors when the shelf is tight (future high-capacity levels). */
 export const SLOT_MAX_OVERLAP = 22;
+/** Overlap allowed on shelves holding 5+ items so the row still fits the plank. */
+export const SLOT_MAX_OVERLAP_CROWDED = 52;
 
 /**
  * Center-to-center spacing along the shelf. Uses full gap on wide shelves;
@@ -54,7 +56,8 @@ export function slotPitchForShelf(shelfWidth: number, capacity: number): number 
     (shelfWidth - SHELF_WALL_INSET - OPEN_END_INSET - SLOT_SIZE) /
     (capacity - 1);
   const roomyPitch = SLOT_SIZE + 4;
-  const tightPitch = SLOT_SIZE - SLOT_MAX_OVERLAP;
+  const tightPitch =
+    SLOT_SIZE - (capacity >= 5 ? SLOT_MAX_OVERLAP_CROWDED : SLOT_MAX_OVERLAP);
   return Math.min(roomyPitch, Math.max(tightPitch, fitPitch));
 }
 /** Display scale relative to SLOT_SIZE (game sprites, not hit box). */

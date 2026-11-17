@@ -12,7 +12,9 @@
     "build:icon": "node scripts/build-app-icon.mjs",
     "levels:analyze": "vite-node scripts/levels-analyze.ts",
     "levels:generate": "vite-node scripts/levels-generate.ts",
-    "levels:generate:more": "vite-node scripts/levels-generate.ts --more"
+    "levels:generate:more": "vite-node scripts/levels-generate.ts --more",
+    "levels:generate:21": "vite-node scripts/levels-generate.ts --from=21",
+    "levels:generate:23": "vite-node scripts/levels-generate.ts --from=23"
   },
   "dependencies": {
     "@capacitor/cli": "^8.6.2",

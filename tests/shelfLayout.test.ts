@@ -3,7 +3,10 @@ import { computeShelfLayout } from "../src/layout/shelfLayout";
 import {
   DEFAULT_LAYOUT_CONFIG,
   SHELF_ROW_STEP,
+  SHELF_WALL_INSET,
   SHELF_ZONE_TOP_INSET,
+  SLOT_SIZE,
+  slotPitchForShelf,
   playAreaBounds,
   shelfZoneBounds,
 } from "../src/config/layout";
@@ -59,6 +62,15 @@ describe("computeShelfLayout", () => {
         expect(entry.y, level.id).toBeLessThanOrEqual(zone.y + zone.height);
       }
     }
+  });
+
+  it("keeps a full 5-item shelf row clear of the opposite column", () => {
+    const layout = computeShelfLayout(LEVELS[0].shelves);
+    const left = layout.find((e) => e.side === "left")!;
+    const right = layout.find((e) => e.side === "right")!;
+    const span =
+      SHELF_WALL_INSET + SLOT_SIZE + 4 * slotPitchForShelf(left.width, 5);
+    expect(left.x + span).toBeLessThan(right.x);
   });
 
   it("anchors shelves to side panels", () => {

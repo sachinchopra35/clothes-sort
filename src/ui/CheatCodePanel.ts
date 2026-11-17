@@ -15,6 +15,12 @@ const PANEL_W = 640;
 const PANEL_H = 520;
 const BTN_GAP = 20;
 const INPUT_H = 72;
+/** Space for one-line validation copy between the input and button row. */
+const ERROR_LINE_H = 40;
+const ERROR_ABOVE_BUTTONS = 16;
+const INPUT_ABOVE_ERROR = 10;
+const LABEL_ABOVE_INPUT = 16;
+const BODY_ABOVE_LABEL = 48;
 
 export interface CheatCodePanelOptions {
   levelId: string;
@@ -57,7 +63,10 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
     const panelTop = cy - PANEL_H / 2;
     const contentW = panelContentWidth(PANEL_W);
     const halfW = (contentW - BTN_GAP) / 2;
-    const inputDesignY = panelTop + 318;
+    const btnY = panelTop + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2;
+    const btnRowTop = btnY - PANEL_BUTTON_H / 2;
+    const errorY = btnRowTop - ERROR_ABOVE_BUTTONS - ERROR_LINE_H;
+    const inputDesignY = errorY - INPUT_ABOVE_ERROR - INPUT_H / 2;
     const inputTop = inputDesignY - INPUT_H / 2;
 
     const close = () => {
@@ -107,9 +116,12 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
     title.setOrigin(0.5);
     this.add(title);
 
+    const inputLabelY = inputTop - LABEL_ABOVE_INPUT;
+    const bodyBottomY = inputLabelY - BODY_ABOVE_LABEL;
+
     const body = scene.add.text(
       cx,
-      panelTop + 124,
+      bodyBottomY,
       "Do you have the cheat code for this level?",
       {
         fontFamily: theme.fontFamily,
@@ -120,10 +132,10 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
         wordWrap: { width: contentW },
       },
     );
-    body.setOrigin(0.5, 0);
+    body.setOrigin(0.5, 1);
     this.add(body);
 
-    const inputLabel = scene.add.text(cx, inputTop - 24, "Enter code", {
+    const inputLabel = scene.add.text(cx, inputLabelY, "Enter code", {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.body,
       color: theme.ui.text,
@@ -206,19 +218,8 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
       }
     });
 
-    const btnY = panelTop + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2;
     const leftX = cx - BTN_GAP / 2 - halfW / 2;
     const rightX = cx + BTN_GAP / 2 + halfW / 2;
-
-    this.errorText = scene.add.text(cx, inputDesignY + INPUT_H / 2 + 16, "", {
-      fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.small,
-      color: "#f4a261",
-      align: "center",
-      wordWrap: { width: contentW },
-    });
-    this.errorText.setOrigin(0.5, 0);
-    this.add(this.errorText);
 
     new Button(
       scene,
@@ -247,6 +248,16 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
       },
       this,
     );
+
+    this.errorText = scene.add.text(cx, errorY, "", {
+      fontFamily: theme.fontFamily,
+      fontSize: theme.fontSize.small,
+      color: "#f4a261",
+      align: "center",
+      wordWrap: { width: contentW },
+    });
+    this.errorText.setOrigin(0.5, 0);
+    this.add(this.errorText);
 
     scene.input.once("pointerup", () => {
       this.focusInput();

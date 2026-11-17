@@ -19,6 +19,13 @@ const FLUENT = {
   shorts: `${BASE}/Shorts/Flat/shorts_flat.svg`,
   socks: `${BASE}/Socks/Flat/socks_flat.svg`,
   scarf: `${BASE}/Scarf/Flat/scarf_flat.svg`,
+  gloves: `${BASE}/Gloves/Flat/gloves_flat.svg`,
+  cap: `${BASE}/Billed%20cap/Flat/billed_cap_flat.svg`,
+  hat: `${BASE}/Womans%20hat/Flat/womans_hat_flat.svg`,
+  kimono: `${BASE}/Kimono/Flat/kimono_flat.svg`,
+  swimsuit: `${BASE}/One-piece%20swimsuit/Flat/one-piece_swimsuit_flat.svg`,
+  boot: `${BASE}/Womans%20boot/Flat/womans_boot_flat.svg`,
+  shoe: `${BASE}/Running%20shoe/Flat/running_shoe_flat.svg`,
 };
 
 function replaceColors(svg, map) {
@@ -152,6 +159,123 @@ const VARIANTS = [
       ["#990838", "#C2570C"],
       ["#CA0B4A", "#F07C14"],
       ["#F8312F", "#FFB347"],
+    ],
+  },
+  {
+    id: "red-jeans",
+    url: FLUENT.jeans,
+    colors: [
+      ["#0074BA", "#9B1B30"],
+      ["#00A6ED", "#D62839"],
+    ],
+  },
+  {
+    id: "green-tee",
+    url: FLUENT.tee,
+    colors: [],
+  },
+  {
+    id: "red-tee",
+    url: FLUENT.tee,
+    colors: [
+      ["#00D26A", "#C1121F"],
+      ["#44911B", "#9B1B30"],
+      ["#86D72F", "#E63946"],
+      ["#C3EF3C", "#FF6B6B"],
+    ],
+  },
+  {
+    id: "purple-tee",
+    url: FLUENT.tee,
+    colors: [
+      ["#00D26A", "#7B2CBF"],
+      ["#44911B", "#5A189A"],
+      ["#86D72F", "#9D4EDD"],
+      ["#C3EF3C", "#C77DFF"],
+    ],
+  },
+  {
+    id: "blue-tee",
+    url: FLUENT.tee,
+    colors: [
+      ["#00D26A", "#2563EB"],
+      ["#44911B", "#1D4ED8"],
+      ["#86D72F", "#3B82F6"],
+      ["#C3EF3C", "#93C5FD"],
+    ],
+  },
+  {
+    id: "orange-dress",
+    url: FLUENT.dress,
+    colors: [
+      ["#46A4FB", "#F77F00"],
+      ["#6B438B", "#B85400"],
+    ],
+  },
+  {
+    id: "green-scarf",
+    url: FLUENT.scarf,
+    colors: [
+      ["#990838", "#1B5E20"],
+      ["#CA0B4A", "#2E7D32"],
+      ["#F8312F", "#66BB6A"],
+    ],
+  },
+  {
+    id: "pink-gloves",
+    url: FLUENT.gloves,
+    colors: [
+      ["#6B438B", "#A8235F"],
+      ["#8C42B3", "#D9488A"],
+      ["#B859D3", "#FF7EB6"],
+    ],
+  },
+  {
+    id: "blue-cap",
+    url: FLUENT.cap,
+    colors: [],
+  },
+  {
+    id: "yellow-sun-hat",
+    url: FLUENT.hat,
+    colors: [
+      ["#F3AD61", "#F5C518"],
+      ["#F3C07B", "#FFE27A"],
+      ["#990838", "#234A9A"],
+      ["#CA0B4A", "#3A6FD8"],
+    ],
+  },
+  {
+    id: "teal-kimono",
+    url: FLUENT.kimono,
+    colors: [
+      ["#0074BA", "#0E7C7B"],
+      ["#00A6ED", "#2EC4B6"],
+    ],
+  },
+  {
+    id: "coral-swimsuit",
+    url: FLUENT.swimsuit,
+    colors: [
+      ["#F70A8D", "#FF6F59"],
+      ["#8D65C5", "#FFD166"],
+    ],
+  },
+  {
+    id: "black-boots",
+    url: FLUENT.boot,
+    colors: [
+      ["#CA0B4A", "#2B2B33"],
+      ["#F3C07B", "#D9B48F"],
+    ],
+  },
+  {
+    id: "red-trainers",
+    url: FLUENT.shoe,
+    colors: [
+      ["#9B9B9B", "#C1121F"],
+      ["#BEBEBE", "#E63946"],
+      ["#635994", "#1D3557"],
     ],
   },
 ];

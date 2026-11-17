@@ -78,7 +78,7 @@ export class UndoButton extends Phaser.GameObjects.Container {
 
   /** @param exhausted all undos used for this level */
   setRemaining(count: number, exhausted = false): void {
-    this.clickable = !exhausted;
+    this.clickable = true;
     this.badge.setText(String(count));
     this.badgeBg.setVisible(count > 0);
     this.badge.setVisible(count > 0);

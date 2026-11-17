@@ -3,9 +3,11 @@
  *
  *   npm run levels:generate              — levels 4–10 only (default; does not touch 11+)
  *   npm run levels:generate:more         — append levels 11–20, keeping 4–10 as-is
+ *   npm run levels:generate:21           — append levels 21–22 (capacity 5), never rewrites 4–20
+ *   npm run levels:generate:23           — append levels 23–40, never rewrites earlier levels
  *   npm run levels:generate -- --all    — full rewrite 4–20 (slow; rarely needed)
  */
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ClothingId } from "../src/game/clothing";
@@ -50,10 +52,326 @@ const SPECS_11_20: LevelSpec[] = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((n
   fastScore: true,
 }));
 
-type Mode = "4-10" | "11-20" | "all";
+const SPEC_21_22_BASE = {
+  emptyShelves: 2,
+  capacity: 5,
+  maxStartRun: 2,
+  scoreBand: [46, 52] as [number, number],
+  attempts: 150,
+  pickStrategy: "nearestTarget" as const,
+};
+
+const SPECS_21_22: LevelSpec[] = [
+  {
+    ...SPEC_21_22_BASE,
+    number: 21,
+    seed: 21,
+    types: [
+      "light-blue-jeans",
+      "red-jeans",
+      "green-tee",
+      "orange-dress",
+      "green-scarf",
+      "pink-gloves",
+      "blue-cap",
+      "yellow-sun-hat",
+    ],
+  },
+  {
+    ...SPEC_21_22_BASE,
+    number: 22,
+    seed: 22,
+    types: [
+      "white-tee",
+      "purple-tee",
+      "teal-kimono",
+      "coral-swimsuit",
+      "black-boots",
+      "red-trainers",
+      "blue-cap",
+      "orange-dress",
+    ],
+  },
+];
+
+const SPEC_VARIETY_BASE = {
+  emptyShelves: 2,
+  capacity: 5,
+  maxStartRun: 2,
+  scoreBand: [44, 58] as [number, number],
+  attempts: 180,
+  pickStrategy: "nearestTarget" as const,
+};
+
+const SPECS_23_40: LevelSpec[] = [
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 23,
+    seed: 23,
+    types: [
+      "red-tee",
+      "white-tee",
+      "green-tee",
+      "yellow-shorts",
+      "purple-socks",
+      "pink-gloves",
+      "light-blue-jeans",
+      "orange-scarf",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 24,
+    seed: 24,
+    types: [
+      "light-blue-jeans",
+      "black-bootcut-jeans",
+      "red-jeans",
+      "brown-leather-jacket",
+      "white-tee",
+      "red-polka-dress",
+      "yellow-shorts",
+      "purple-socks",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 25,
+    seed: 25,
+    attempts: 220,
+    scoreBand: [18, 36] as [number, number],
+    types: ["white-tee", "green-tee", "purple-tee", "blue-tee", "red-tee"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 26,
+    seed: 26,
+    types: [
+      "black-boots",
+      "red-trainers",
+      "coral-swimsuit",
+      "teal-kimono",
+      "blue-cap",
+      "orange-dress",
+      "purple-tee",
+      "green-scarf",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 27,
+    seed: 27,
+    types: [
+      "orange-scarf",
+      "green-scarf",
+      "brown-leather-jacket",
+      "black-bootcut-jeans",
+      "red-tee",
+      "blue-tee",
+      "yellow-sun-hat",
+      "yellow-shorts",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 28,
+    seed: 28,
+    attempts: 220,
+    scoreBand: [30, 50] as [number, number],
+    types: ["red-polka-dress", "orange-dress", "pink-gloves", "blue-cap", "green-tee", "red-jeans"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 29,
+    seed: 29,
+    types: [
+      "blue-cap",
+      "yellow-sun-hat",
+      "pink-gloves",
+      "green-scarf",
+      "red-jeans",
+      "green-tee",
+      "purple-socks",
+      "coral-swimsuit",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 30,
+    seed: 30,
+    types: [
+      "teal-kimono",
+      "coral-swimsuit",
+      "white-tee",
+      "purple-tee",
+      "black-boots",
+      "red-trainers",
+      "orange-scarf",
+      "light-blue-jeans",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 31,
+    seed: 31,
+    types: [
+      "purple-socks",
+      "yellow-shorts",
+      "blue-tee",
+      "red-tee",
+      "pink-gloves",
+      "orange-dress",
+      "black-bootcut-jeans",
+      "blue-cap",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 32,
+    seed: 32,
+    attempts: 220,
+    scoreBand: [30, 50] as [number, number],
+    types: [
+      "light-blue-jeans",
+      "black-bootcut-jeans",
+      "red-jeans",
+      "white-tee",
+      "blue-tee",
+      "green-tee",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 33,
+    seed: 33,
+    types: [
+      "pink-gloves",
+      "red-trainers",
+      "blue-cap",
+      "green-tee",
+      "orange-dress",
+      "light-blue-jeans",
+      "green-scarf",
+      "brown-leather-jacket",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 34,
+    seed: 34,
+    attempts: 220,
+    scoreBand: [28, 48] as [number, number],
+    types: [
+      "white-tee",
+      "green-tee",
+      "purple-tee",
+      "blue-tee",
+      "red-polka-dress",
+      "orange-dress",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 35,
+    seed: 35,
+    types: [
+      "white-tee",
+      "brown-leather-jacket",
+      "light-blue-jeans",
+      "black-bootcut-jeans",
+      "red-polka-dress",
+      "yellow-shorts",
+      "purple-socks",
+      "orange-scarf",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 36,
+    seed: 36,
+    types: [
+      "red-tee",
+      "red-jeans",
+      "teal-kimono",
+      "coral-swimsuit",
+      "yellow-sun-hat",
+      "black-boots",
+      "pink-gloves",
+      "green-scarf",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 37,
+    seed: 37,
+    attempts: 220,
+    scoreBand: [30, 50] as [number, number],
+    types: ["red-trainers", "black-boots", "purple-tee", "blue-tee", "red-tee", "orange-scarf"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 38,
+    seed: 38,
+    types: [
+      "purple-tee",
+      "blue-tee",
+      "green-tee",
+      "white-tee",
+      "red-trainers",
+      "black-boots",
+      "teal-kimono",
+      "yellow-sun-hat",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 39,
+    seed: 39,
+    types: [
+      "red-tee",
+      "orange-dress",
+      "teal-kimono",
+      "yellow-sun-hat",
+      "pink-gloves",
+      "red-jeans",
+      "yellow-shorts",
+      "orange-scarf",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 40,
+    seed: 40,
+    types: [
+      "blue-tee",
+      "red-tee",
+      "coral-swimsuit",
+      "blue-cap",
+      "black-boots",
+      "green-scarf",
+      "brown-leather-jacket",
+      "purple-socks",
+    ],
+  },
+];
+
+const APPEND_BATCHES: Record<number, LevelSpec[]> = {
+  21: SPECS_21_22,
+  23: SPECS_23_40,
+};
+
+type Mode = "4-10" | "11-20" | "append" | "all";
+
+function parseAppendFrom(): number | null {
+  const arg = process.argv.find((a) => /^--from=\d+$/.test(a));
+  if (!arg) return null;
+  const n = Number.parseInt(arg.split("=")[1]!, 10);
+  return Number.isFinite(n) && APPEND_BATCHES[n] ? n : null;
+}
 
 function parseMode(): Mode {
   const args = process.argv.slice(2);
+  if (parseAppendFrom() !== null) return "append";
   if (args.includes("--all")) return "all";
   if (args.includes("--more") || args.includes("--from=11")) return "11-20";
   return "4-10";
@@ -94,6 +412,7 @@ async function runSpecs(
   const levels: LevelDefinition[] = [];
   let floorFull = floors.full;
   let floorFast = floors.fast;
+  const monotonicScores = Number.isFinite(floors.full);
 
   for (const spec of specs) {
     const t0 = performance.now();
@@ -140,7 +459,7 @@ async function runSpecs(
       level = report.chosen.level;
       seed = report.chosen.seed;
       m = measureLevel(level, report.chosen.measurement.analysis);
-      if (m.score <= floorFull) {
+      if (monotonicScores && m.score <= floorFull) {
         throw new Error(
           `Level ${spec.number}: full score ${m.score.toFixed(1)} is not above ${floorFull.toFixed(1)}`,
         );
@@ -149,8 +468,10 @@ async function runSpecs(
 
     const a = m.analysis;
     level.solution = a.solution!;
-    floorFull = m.score;
-    floorFast = measureLevelFast(level, a).score;
+    if (monotonicScores) {
+      floorFull = m.score;
+      floorFast = measureLevelFast(level, a).score;
+    }
 
     const header =
       `Level ${spec.number}: ${m.typeCount} types, ${level.shelves.length} shelves, seed ${seed}. ` +
@@ -170,6 +491,26 @@ async function runSpecs(
 }
 
 const mode = parseMode();
+
+if (mode === "append") {
+  const from = parseAppendFrom()!;
+  const batch = APPEND_BATCHES[from]!;
+  const existing = await readFile(OUT, "utf8");
+  const have = new Set(GENERATED_LEVELS.map((l) => levelNumber(l.id)));
+  const todo = batch.filter((s) => !have.has(s.number));
+  if (todo.length === 0) {
+    console.log(`Append batch from ${from}: all levels already exist.`);
+    process.exit(0);
+  }
+  console.log(`Appending levels ${todo.map((s) => s.number).join(", ")}; earlier levels untouched`);
+  const { blocks } = await runSpecs(todo, { full: -Infinity, fast: -Infinity });
+  const closeAt = existing.lastIndexOf("\n];");
+  if (closeAt < 0) throw new Error("Could not find end of GENERATED_LEVELS array");
+  const next = `${existing.slice(0, closeAt)}\n${blocks.join("\n")}${existing.slice(closeAt)}`;
+  await writeFile(OUT, next, "utf8");
+  console.log(`Appended ${blocks.length} levels to ${OUT}`);
+  process.exit(0);
+}
 
 let prefixBlocks: string[] = [];
 let prefixLevels: LevelDefinition[] = [];

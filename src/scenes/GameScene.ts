@@ -139,11 +139,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleUndoTap(): void {
-    if (!this.board?.canAttemptUndo()) return;
+    if (!this.board) return;
+    if (this.board.areUndosExhausted()) {
+      showBriefMessage(this, "You've run out of undos for this level");
+      return;
+    }
     if (!this.board.hasMovesToUndo()) {
       showBriefMessage(this, "No moves to undo");
       return;
     }
+    if (!this.board.canAttemptUndo()) return;
     this.board.tryUndo();
   }
 

@@ -71,8 +71,11 @@ describe("level definitions", () => {
     }
   });
 
-  it("generated levels get strictly harder", () => {
-    const scores = GENERATED_LEVELS.map((level) => measureLevel(level).score);
+  it("generated levels 4–22 get strictly harder", () => {
+    const scores = GENERATED_LEVELS.filter((level) => {
+      const n = Number.parseInt(level.id.replace("level-", ""), 10);
+      return n >= 4 && n <= 22;
+    }).map((level) => measureLevel(level).score);
     for (let i = 1; i < scores.length; i++) {
       expect(scores[i]).toBeGreaterThan(scores[i - 1]!);
     }

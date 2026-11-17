@@ -226,6 +226,10 @@ export class BoardController {
     return this.undoAllowance > 0 && this.undosRemaining > 0;
   }
 
+  areUndosExhausted(): boolean {
+    return this.undoAllowance > 0 && this.undosRemaining <= 0;
+  }
+
   private emitUndoState(): void {
     const exhausted = this.undosRemaining <= 0;
     this.onUndoStateChange?.(this.undosRemaining, exhausted);
