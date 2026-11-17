@@ -7,28 +7,41 @@ import { Shelf } from "../objects/Shelf";
 import {
   applyMove,
   canMove,
+  cloneBoardState,
   createBoard,
   getMovableGroup,
   isWon,
   type BoardState,
 } from "./boardState";
 
+export type UndoStateListener = (remaining: number, exhausted: boolean) => void;
+
 export class BoardController {
   private state: BoardState;
   private readonly scene: Phaser.Scene;
+  private layout: ShelfLayoutEntry[] = [];
   private readonly shelfViews = new Map<string, Shelf>();
   /** Items wall → open per shelf id. */
   private readonly itemsByShelf = new Map<string, ClothingItem[]>();
+  private readonly shelfHomeX = new Map<string, number>();
   private selectedFromId: string | null = null;
   private busy = false;
+  private readonly undoAllowance: number;
+  private undosRemaining = 0;
+  private readonly undoSnapshots: BoardState[] = [];
   onWon: (() => void) | null = null;
+  onUndoStateChange: UndoStateListener | null = null;
 
   constructor(
     scene: Phaser.Scene,
     level: LevelDefinition,
     layout: ShelfLayoutEntry[],
+    undoAllowance = 0,
   ) {
     this.scene = scene;
+    this.layout = layout;
+    this.undoAllowance = undoAllowance;
+    this.undosRemaining = undoAllowance;
     this.state = createBoard(level);
 
     for (const entry of layout) {
@@ -46,6 +59,7 @@ export class BoardController {
       shelf.setTapHandler(() => void this.onShelfTap(entry.definition.id));
       shelf.setDepth(entry.y);
       this.shelfViews.set(entry.definition.id, shelf);
+      this.shelfHomeX.set(entry.definition.id, entry.x);
 
       const items: ClothingItem[] = [];
       boardShelf.items.forEach((clothingId, index) => {
@@ -56,6 +70,8 @@ export class BoardController {
       });
       this.itemsByShelf.set(entry.definition.id, items);
     }
+
+    this.emitUndoState();
   }
 
   private boardShelf(id: string) {
@@ -121,8 +137,13 @@ export class BoardController {
     const movingViews = fromItems.splice(fromItems.length - moveCount, moveCount);
     toItems.push(...movingViews);
 
+    if (this.undoAllowance > 0) {
+      this.undoSnapshots.push(cloneBoardState(this.state));
+    }
+
     const result = applyMove(this.state, fromId, shelfId);
     if (!result) {
+      this.undoSnapshots.pop();
       fromItems.push(...movingViews.splice(0));
       toItems.splice(toItems.length - moveCount, moveCount);
       this.busy = false;
@@ -130,6 +151,7 @@ export class BoardController {
     }
     this.state = result.state;
     this.busy = false;
+    this.emitUndoState();
 
     const destShelf = this.shelfViews.get(shelfId)!;
     void this.playMoveVisuals(
@@ -171,6 +193,102 @@ export class BoardController {
     }
   }
 
+  tryUndo(): boolean {
+    if (
+      this.undoAllowance <= 0 ||
+      this.undosRemaining <= 0 ||
+      this.undoSnapshots.length === 0 ||
+      this.busy
+    ) {
+      return false;
+    }
+
+    this.busy = true;
+    this.clearSelection();
+    const previous = this.undoSnapshots.pop();
+    if (!previous) {
+      this.busy = false;
+      return false;
+    }
+    this.state = cloneBoardState(previous);
+    this.undosRemaining -= 1;
+    this.resyncVisualsToState();
+    this.busy = false;
+    this.emitUndoState();
+    return true;
+  }
+
+  hasMovesToUndo(): boolean {
+    return this.undoSnapshots.length > 0;
+  }
+
+  canAttemptUndo(): boolean {
+    return this.undoAllowance > 0 && this.undosRemaining > 0;
+  }
+
+  private emitUndoState(): void {
+    const exhausted = this.undosRemaining <= 0;
+    this.onUndoStateChange?.(this.undosRemaining, exhausted);
+  }
+
+  private resyncVisualsToState(): void {
+    for (const entry of this.layout) {
+      const id = entry.definition.id;
+      const boardShelf = this.state.shelves.find((s) => s.id === id);
+      if (!boardShelf) continue;
+
+      const homeX = this.shelfHomeX.get(id) ?? entry.x;
+      let view = this.shelfViews.get(id);
+
+      if (boardShelf.cleared) {
+        if (view) {
+          view.setVisible(false);
+          view.setActive(false);
+        }
+        const existing = this.itemsByShelf.get(id);
+        existing?.forEach((item) => {
+          this.scene.tweens.killTweensOf(item);
+          item.destroy();
+        });
+        this.itemsByShelf.delete(id);
+        continue;
+      }
+
+      if (!view) {
+        view = new Shelf(this.scene, {
+          id: entry.definition.id,
+          x: homeX,
+          y: entry.y,
+          width: entry.width,
+          side: entry.definition.side,
+          capacity: entry.definition.capacity,
+        });
+        view.setTapHandler(() => void this.onShelfTap(id));
+        this.shelfViews.set(id, view);
+      } else {
+        view.resetFromSlide(homeX);
+        view.y = entry.y;
+        view.setDepth(entry.y);
+        view.setTapHandler(() => void this.onShelfTap(id));
+      }
+
+      const existing = this.itemsByShelf.get(id) ?? [];
+      existing.forEach((item) => {
+        this.scene.tweens.killTweensOf(item);
+        item.destroy();
+      });
+
+      const items: ClothingItem[] = [];
+      boardShelf.items.forEach((clothingId, index) => {
+        const pos = view!.getSlotWorldPosition(index);
+        const item = new ClothingItem(this.scene, pos.x, pos.y, clothingId);
+        item.setDepth(clothingDepthOnShelf(entry.y, index));
+        items.push(item);
+      });
+      this.itemsByShelf.set(id, items);
+    }
+  }
+
   restart(level: LevelDefinition, layout: ShelfLayoutEntry[]): void {
     for (const items of this.itemsByShelf.values()) {
       items.forEach((i) => i.destroy());
@@ -182,6 +300,9 @@ export class BoardController {
     this.itemsByShelf.clear();
     this.selectedFromId = null;
     this.busy = false;
+    this.undoSnapshots.length = 0;
+    this.undosRemaining = this.undoAllowance;
+    this.layout = layout;
 
     this.state = createBoard(level);
     for (const entry of layout) {
@@ -199,6 +320,7 @@ export class BoardController {
       shelf.setTapHandler(() => void this.onShelfTap(entry.definition.id));
       shelf.setDepth(entry.y);
       this.shelfViews.set(entry.definition.id, shelf);
+      this.shelfHomeX.set(entry.definition.id, entry.x);
 
       const items: ClothingItem[] = [];
       boardShelf.items.forEach((clothingId, index) => {
@@ -208,6 +330,9 @@ export class BoardController {
         items.push(item);
       });
       this.itemsByShelf.set(entry.definition.id, items);
+      this.shelfHomeX.set(entry.definition.id, entry.x);
     }
+
+    this.emitUndoState();
   }
 }

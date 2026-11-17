@@ -117,6 +117,14 @@ export class Shelf extends Phaser.GameObjects.Container {
     });
   }
 
+  resetFromSlide(homeX: number): void {
+    this.scene.tweens.killTweensOf(this);
+    this.x = homeX;
+    this.setAlpha(1);
+    this.setVisible(true);
+    this.setActive(true);
+  }
+
   slideOut(companions: Phaser.GameObjects.GameObject[] = []): Promise<void> {
     const targetX =
       this.side === "left" ? this.x - 700 : this.x + 700;

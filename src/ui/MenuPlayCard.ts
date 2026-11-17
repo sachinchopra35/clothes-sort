@@ -29,7 +29,7 @@ export class MenuPlayCard extends Phaser.GameObjects.Container {
     const contentW = panelContentWidth(PANEL_W);
 
     const panel = scene.add.graphics();
-    panel.fillStyle(theme.ui.panelFill, 0.9);
+    panel.fillStyle(0x695040, 0.76);
     panel.fillRoundedRect(-halfW, -halfH, PANEL_W, PANEL_H, PANEL_RADIUS);
     panel.lineStyle(4, theme.ui.panelStroke, 1);
     panel.strokeRoundedRect(-halfW, -halfH, PANEL_W, PANEL_H, PANEL_RADIUS);

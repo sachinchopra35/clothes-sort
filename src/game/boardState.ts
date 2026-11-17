@@ -21,7 +21,7 @@ export interface MoveResult {
   clearedShelfIds: string[];
 }
 
-function cloneState(state: BoardState): BoardState {
+export function cloneBoardState(state: BoardState): BoardState {
   return {
     levelId: state.levelId,
     shelves: state.shelves.map((s) => ({
@@ -126,7 +126,7 @@ export function applyMove(
 ): MoveResult | null {
   if (!canMove(state, fromId, toId)) return null;
 
-  const next = cloneState(state);
+  const next = cloneBoardState(state);
   const from = shelfById(next, fromId)!;
   const to = shelfById(next, toId)!;
   const group = getMovableGroup(from)!;

@@ -1,6 +1,12 @@
 import Phaser from "phaser";
 import { SCENE_GAME, SCENE_MENU } from "../config/gameConfig";
-import { DESIGN_WIDTH, GAME_HUD_DEPTH, TOP_BAR_HEIGHT } from "../config/layout";
+import {
+  DESIGN_HEIGHT,
+  DESIGN_WIDTH,
+  GAME_HUD_DEPTH,
+  TOP_BAR_HEIGHT,
+} from "../config/layout";
+import { undoAllowanceForLevel } from "../game/undoLimits";
 import { scaleButtonSize } from "../config/uiButtons";
 import { theme } from "../config/theme";
 import { BoardController } from "../game/BoardController";
@@ -10,7 +16,11 @@ import { WardrobeBackground } from "../objects/WardrobeBackground";
 import { completeLevel, unlockNextLevel } from "../state/progress";
 import { Button } from "../ui/Button";
 import { ConfirmPanel } from "../ui/ConfirmPanel";
+import { hasSeenUndoIntro, markUndoIntroSeen } from "../state/undoIntro";
 import { LevelCompletePanel } from "../ui/LevelCompletePanel";
+import { UndoButton } from "../ui/UndoButton";
+import { showBriefMessage } from "../ui/BriefMessage";
+import { UndoIntroPanel } from "../ui/UndoIntroPanel";
 import {
   fadeInCamera,
   type SceneIntroFadeData,
@@ -29,6 +39,8 @@ export class GameScene extends Phaser.Scene {
   private confirmPanel: ConfirmPanel | null = null;
   private backButton: Button | null = null;
   private restartButton: Button | null = null;
+  private undoButton: UndoButton | null = null;
+  private undoIntroPanel: UndoIntroPanel | null = null;
 
   constructor() {
     super(SCENE_GAME);
@@ -54,9 +66,14 @@ export class GameScene extends Phaser.Scene {
 
     new WardrobeBackground(this);
     const layout = computeShelfLayout(level.shelves);
+    const levelNum = getLevelIndex(this.levelId) + 1;
+    const undoAllowance = undoAllowanceForLevel(levelNum);
 
-    this.board = new BoardController(this, level, layout);
+    this.board = new BoardController(this, level, layout, undoAllowance);
     this.board.onWon = () => this.onLevelWon();
+    this.board.onUndoStateChange = (remaining, exhausted) => {
+      this.undoButton?.setRemaining(remaining, exhausted);
+    };
 
     const topBar = this.add.graphics();
     topBar.setDepth(GAME_HUD_DEPTH - 1);
@@ -90,7 +107,6 @@ export class GameScene extends Phaser.Scene {
     });
     this.restartButton.setDepth(GAME_HUD_DEPTH);
 
-    const levelNum = getLevelIndex(this.levelId) + 1;
     const title = this.add.text(DESIGN_WIDTH / 2, hudY, `Level ${levelNum}`, {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.heading,
@@ -99,10 +115,36 @@ export class GameScene extends Phaser.Scene {
     title.setOrigin(0.5);
     title.setDepth(GAME_HUD_DEPTH);
 
+    if (undoAllowance > 0) {
+      this.undoButton = new UndoButton(
+        this,
+        DESIGN_WIDTH / 2,
+        DESIGN_HEIGHT - 192,
+        () => this.handleUndoTap(),
+      );
+    }
+
+    if (levelNum === 11 && undoAllowance > 0 && !hasSeenUndoIntro()) {
+      this.undoIntroPanel = new UndoIntroPanel(this, () => {
+        markUndoIntroSeen();
+        this.undoIntroPanel?.destroy();
+        this.undoIntroPanel = null;
+      });
+    }
+
     if (this.introFade) {
       fadeInCamera(this);
       this.introFade = false;
     }
+  }
+
+  private handleUndoTap(): void {
+    if (!this.board?.canAttemptUndo()) return;
+    if (!this.board.hasMovesToUndo()) {
+      showBriefMessage(this, "No moves to undo");
+      return;
+    }
+    this.board.tryUndo();
   }
 
   private openBackConfirm(): void {
@@ -158,6 +200,9 @@ export class GameScene extends Phaser.Scene {
     const layout = computeShelfLayout(level.shelves);
     this.board.restart(level, layout);
     this.board.onWon = () => this.onLevelWon();
+    this.board.onUndoStateChange = (remaining, exhausted) => {
+      this.undoButton?.setRemaining(remaining, exhausted);
+    };
   }
 
   private onLevelWon(): void {
