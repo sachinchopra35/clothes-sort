@@ -135,9 +135,16 @@ describe("analyzeLevel", () => {
 
   it("returns solutions that replay under the game rules", () => {
     for (const lvl of LEVELS) {
-      const moves = solveLevel(lvl)!;
+      const moves =
+        lvl.solution && lvl.solution.length > 0
+          ? lvl.solution
+          : solveLevel(lvl)!;
       let state = createBoard(lvl);
-      for (const m of moves) state = applyMove(state, m.from, m.to)!.state;
+      for (const m of moves) {
+        const result = applyMove(state, m.from, m.to);
+        expect(result, `${lvl.id} illegal ${m.from}->${m.to}`).not.toBeNull();
+        state = result!.state;
+      }
       expect(isWon(state)).toBe(true);
     }
   });

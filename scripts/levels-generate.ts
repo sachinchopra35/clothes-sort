@@ -5,6 +5,7 @@
  *   npm run levels:generate:more         — append levels 11–20, keeping 4–10 as-is
  *   npm run levels:generate:21           — append levels 21–22 (capacity 5), never rewrites 4–20
  *   npm run levels:generate:23           — append levels 23–40, never rewrites earlier levels
+ *   npm run levels:generate:41           — append levels 41–60
  *   npm run levels:generate -- --all    — full rewrite 4–20 (slow; rarely needed)
  */
 import { readFile, writeFile } from "node:fs/promises";
@@ -355,9 +356,270 @@ const SPECS_23_40: LevelSpec[] = [
   },
 ];
 
+const BAND_LIGHT: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 220,
+  scoreBand: [18, 36] as [number, number],
+};
+const BAND_COZY: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 220,
+  scoreBand: [28, 48] as [number, number],
+};
+const BAND_MED: Pick<LevelSpec, "attempts" | "scoreBand"> = {
+  attempts: 220,
+  scoreBand: [30, 52] as [number, number],
+};
+
+/** Themed variety for levels 41–60 (capacity 5, flat difficulty). */
+const SPECS_41_60: LevelSpec[] = [
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 41,
+    seed: 41,
+    ...BAND_MED,
+    types: [
+      "red-trainers",
+      "black-boots",
+      "yellow-shorts",
+      "purple-socks",
+      "white-tee",
+      "green-tee",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 42,
+    seed: 42,
+    ...BAND_MED,
+    types: [
+      "coral-swimsuit",
+      "teal-kimono",
+      "yellow-sun-hat",
+      "orange-scarf",
+      "green-scarf",
+      "light-blue-jeans",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 43,
+    seed: 43,
+    ...BAND_LIGHT,
+    types: ["white-tee", "green-tee", "purple-tee", "blue-tee", "red-tee"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 44,
+    seed: 44,
+    ...BAND_COZY,
+    types: [
+      "light-blue-jeans",
+      "black-bootcut-jeans",
+      "red-jeans",
+      "blue-tee",
+      "white-tee",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 45,
+    seed: 45,
+    ...BAND_MED,
+    types: [
+      "brown-leather-jacket",
+      "red-polka-dress",
+      "black-boots",
+      "green-scarf",
+      "white-tee",
+      "orange-scarf",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 46,
+    seed: 46,
+    ...BAND_COZY,
+    types: ["red-polka-dress", "orange-dress", "teal-kimono", "coral-swimsuit", "pink-gloves"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 47,
+    seed: 47,
+    ...BAND_MED,
+    types: [
+      "blue-cap",
+      "yellow-sun-hat",
+      "pink-gloves",
+      "orange-scarf",
+      "purple-socks",
+      "green-tee",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 48,
+    seed: 48,
+    ...BAND_COZY,
+    types: ["yellow-shorts", "purple-socks", "coral-swimsuit", "red-tee", "blue-cap", "orange-scarf"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 49,
+    seed: 49,
+    ...BAND_MED,
+    types: [
+      "red-trainers",
+      "black-boots",
+      "blue-cap",
+      "red-tee",
+      "black-bootcut-jeans",
+      "purple-socks",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 50,
+    seed: 50,
+    types: [
+      "teal-kimono",
+      "coral-swimsuit",
+      "green-scarf",
+      "orange-dress",
+      "purple-tee",
+      "pink-gloves",
+      "yellow-sun-hat",
+      "red-polka-dress",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 51,
+    seed: 51,
+    types: [
+      "white-tee",
+      "brown-leather-jacket",
+      "light-blue-jeans",
+      "red-polka-dress",
+      "yellow-shorts",
+      "orange-scarf",
+      "purple-socks",
+      "black-bootcut-jeans",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 52,
+    seed: 52,
+    ...BAND_COZY,
+    types: ["orange-scarf", "green-scarf", "green-tee", "blue-tee", "purple-tee", "red-tee"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 53,
+    seed: 53,
+    ...BAND_MED,
+    types: [
+      "pink-gloves",
+      "yellow-sun-hat",
+      "teal-kimono",
+      "light-blue-jeans",
+      "white-tee",
+      "orange-dress",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 54,
+    seed: 54,
+    ...BAND_LIGHT,
+    types: ["blue-cap", "yellow-sun-hat", "blue-tee", "green-tee", "white-tee"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 55,
+    seed: 55,
+    ...BAND_MED,
+    types: [
+      "red-tee",
+      "red-jeans",
+      "red-trainers",
+      "red-polka-dress",
+      "orange-dress",
+      "black-bootcut-jeans",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 56,
+    seed: 56,
+    types: [
+      "blue-tee",
+      "blue-cap",
+      "light-blue-jeans",
+      "teal-kimono",
+      "purple-socks",
+      "green-scarf",
+      "white-tee",
+      "coral-swimsuit",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 57,
+    seed: 57,
+    types: [
+      "brown-leather-jacket",
+      "green-tee",
+      "green-scarf",
+      "yellow-shorts",
+      "black-bootcut-jeans",
+      "pink-gloves",
+      "yellow-sun-hat",
+      "red-jeans",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 58,
+    seed: 58,
+    ...BAND_COZY,
+    types: ["black-boots", "red-trainers", "purple-socks", "orange-scarf", "red-tee", "blue-tee"],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 59,
+    seed: 59,
+    types: [
+      "teal-kimono",
+      "coral-swimsuit",
+      "red-jeans",
+      "purple-tee",
+      "blue-cap",
+      "yellow-shorts",
+      "pink-gloves",
+      "orange-scarf",
+    ],
+  },
+  {
+    ...SPEC_VARIETY_BASE,
+    number: 60,
+    seed: 60,
+    types: [
+      "red-tee",
+      "teal-kimono",
+      "black-boots",
+      "yellow-sun-hat",
+      "green-scarf",
+      "red-polka-dress",
+      "red-trainers",
+      "blue-tee",
+    ],
+  },
+];
+
 const APPEND_BATCHES: Record<number, LevelSpec[]> = {
   21: SPECS_21_22,
   23: SPECS_23_40,
+  41: SPECS_41_60,
 };
 
 type Mode = "4-10" | "11-20" | "append" | "all";

@@ -14,7 +14,8 @@
     "levels:generate": "vite-node scripts/levels-generate.ts",
     "levels:generate:more": "vite-node scripts/levels-generate.ts --more",
     "levels:generate:21": "vite-node scripts/levels-generate.ts --from=21",
-    "levels:generate:23": "vite-node scripts/levels-generate.ts --from=23"
+    "levels:generate:23": "vite-node scripts/levels-generate.ts --from=23",
+    "levels:generate:41": "vite-node scripts/levels-generate.ts --from=41"
   },
   "dependencies": {
     "@capacitor/cli": "^8.6.2",
