@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { MUSIC_TRACKS } from "./musicCatalog";
 import { getSettings, setMusicTrackIndex } from "../state/settings";
+import { effectiveMusicPlaybackVolume } from "./volumeBalance";
 
 type BgmSound = Phaser.Sound.BaseSound & {
   setVolume?(volume: number): void;
@@ -12,7 +13,7 @@ let currentIndex = -1;
 let unlocked = false;
 
 function effectiveMusicVolume(): number {
-  return getSettings().musicVolume;
+  return effectiveMusicPlaybackVolume(getSettings().musicVolume);
 }
 
 function shouldPlay(): boolean {

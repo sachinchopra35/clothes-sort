@@ -1,7 +1,7 @@
 import { getLevelIndex } from "../levels/levelData";
 
 export function cheatCodeForLevelNumber(levelNumber: number): string {
-  return `clothes${levelNumber}`;
+  return `cleanclothes${levelNumber}`;
 }
 
 export function verifyLevelCheatCode(levelId: string, attempt: string): boolean {

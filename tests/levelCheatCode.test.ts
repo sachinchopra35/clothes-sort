@@ -6,13 +6,13 @@ import {
 
 describe("levelCheatCode", () => {
   it("builds clothes + level number", () => {
-    expect(cheatCodeForLevelNumber(3)).toBe("clothes3");
-    expect(cheatCodeForLevelNumber(19)).toBe("clothes19");
+    expect(cheatCodeForLevelNumber(3)).toBe("cleanclothes3");
+    expect(cheatCodeForLevelNumber(19)).toBe("cleanclothes19");
   });
 
   it("accepts matching codes case-insensitively", () => {
-    expect(verifyLevelCheatCode("level-3", "clothes3")).toBe(true);
-    expect(verifyLevelCheatCode("level-3", "  CLOTHES3  ")).toBe(true);
-    expect(verifyLevelCheatCode("level-3", "clothes2")).toBe(false);
+    expect(verifyLevelCheatCode("level-3", "cleanclothes3")).toBe(true);
+    expect(verifyLevelCheatCode("level-3", "  CLEANCLOTHES3  ")).toBe(true);
+    expect(verifyLevelCheatCode("level-3", "cleanclothes2")).toBe(false);
   });
 });

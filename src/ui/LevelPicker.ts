@@ -132,11 +132,13 @@ export class LevelPicker extends Phaser.GameObjects.Container {
       color: theme.ui.textMuted,
     });
     this.lockHint.setOrigin(0.5);
-    this.lockHint.setInteractive({ useHandCursor: true });
-    this.lockHint.on("pointerdown", () => {
+    const openIfLocked = () => {
       if (isLevelUnlocked(this.levelId)) return;
       this.onLockedTap?.(this.levelId);
-    });
+    };
+    this.lockHint.setInteractive({ useHandCursor: true });
+    this.lockHint.on("pointerdown", openIfLocked);
+    this.levelLabel.on("pointerdown", openIfLocked);
 
     this.add([this.completeTick, this.levelLabel, this.lockHint]);
     this.setSize(LABEL_MAX_WIDTH, 200);
@@ -188,8 +190,10 @@ export class LevelPicker extends Phaser.GameObjects.Container {
     this.lockHint.setText(unlocked ? "" : "🔒 Locked");
     if (unlocked) {
       this.lockHint.disableInteractive();
+      this.levelLabel.disableInteractive();
     } else {
       this.lockHint.setInteractive({ useHandCursor: true });
+      this.levelLabel.setInteractive({ useHandCursor: true });
     }
   }
 }

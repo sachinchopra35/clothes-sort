@@ -1,4 +1,5 @@
 import { getSettings, isSoundEnabled } from "../state/settings";
+import { effectiveSfxGain } from "./volumeBalance";
 
 let ctx: AudioContext | null = null;
 
@@ -13,7 +14,7 @@ function audioContext(): AudioContext | null {
  */
 export function playUiKnock(): void {
   if (!isSoundEnabled()) return;
-  const sfxGain = getSettings().soundVolume;
+  const sfxGain = effectiveSfxGain(getSettings().soundVolume);
   const ac = audioContext();
   if (!ac) return;
 
@@ -62,7 +63,7 @@ export function playUiKnock(): void {
  */
 export function playClothesMove(): void {
   if (!isSoundEnabled()) return;
-  const sfxGain = getSettings().soundVolume;
+  const sfxGain = effectiveSfxGain(getSettings().soundVolume);
   const ac = audioContext();
   if (!ac) return;
 
@@ -113,7 +114,7 @@ const LEVEL_COMPLETE_CHORD = [155.56, 233.08, 293.66, 392.0, 466.16, 698.46];
  */
 export function playLevelComplete(): void {
   if (!isSoundEnabled()) return;
-  const sfxGain = getSettings().soundVolume;
+  const sfxGain = effectiveSfxGain(getSettings().soundVolume);
   const ac = audioContext();
   if (!ac) return;
 
@@ -188,7 +189,7 @@ export function playLevelComplete(): void {
  */
 export function playShelfSlideWhoosh(side: "left" | "right"): void {
   if (!isSoundEnabled()) return;
-  const sfxGain = getSettings().soundVolume;
+  const sfxGain = effectiveSfxGain(getSettings().soundVolume);
   const ac = audioContext();
   if (!ac) return;
 
