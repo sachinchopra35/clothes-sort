@@ -27,11 +27,16 @@ export class BoardController {
   private readonly shelfHomeX = new Map<string, number>();
   private selectedFromId: string | null = null;
   private busy = false;
+  private moveToken = 0;
   private readonly undoAllowance: number;
   private undosRemaining = 0;
   private readonly undoSnapshots: BoardState[] = [];
   onWon: (() => void) | null = null;
   onUndoStateChange: UndoStateListener | null = null;
+  /** When set, taps on shelves it rejects are ignored (tutorial). */
+  tapFilter: ((shelfId: string) => boolean) | null = null;
+  onSelect: ((shelfId: string) => void) | null = null;
+  onMove: ((fromId: string, toId: string) => void) | null = null;
 
   constructor(
     scene: Phaser.Scene,
@@ -99,10 +104,21 @@ export class BoardController {
     for (let i = start; i < items.length; i++) {
       items[i].setLifted(true);
     }
+    this.onSelect?.(shelfId);
+  }
+
+  /** World position of a slot on a shelf (index 0 = wall side). */
+  getSlotWorldPosition(shelfId: string, index: number): { x: number; y: number } | null {
+    return this.shelfViews.get(shelfId)?.getSlotWorldPosition(index) ?? null;
+  }
+
+  getItemCount(shelfId: string): number {
+    return this.itemsByShelf.get(shelfId)?.length ?? 0;
   }
 
   private onShelfTap(shelfId: string): void {
     if (this.busy) return;
+    if (this.tapFilter && !this.tapFilter(shelfId)) return;
     const shelf = this.boardShelf(shelfId);
     const view = this.shelfViews.get(shelfId);
     if (!shelf || !view || !view.visible) return;
@@ -151,18 +167,23 @@ export class BoardController {
       return;
     }
     this.state = result.state;
-    this.busy = false;
     this.emitUndoState();
+    this.onMove?.(fromId, shelfId);
 
     const destShelf = this.shelfViews.get(shelfId)!;
     playClothesMove();
+    // Stay busy until the animation finishes: a tap mid-flight would lift the moving
+    // items, kill their tweens, and leave the move (and any shelf clear) stuck forever.
+    const token = ++this.moveToken;
     void this.playMoveVisuals(
       movingViews,
       moveCount,
       destShelf,
       toItems,
       result.clearedShelfIds,
-    );
+    ).finally(() => {
+      if (token === this.moveToken) this.busy = false;
+    });
   }
 
   private async playMoveVisuals(
@@ -306,6 +327,7 @@ export class BoardController {
     this.itemsByShelf.clear();
     this.selectedFromId = null;
     this.busy = false;
+    this.moveToken++;
     this.undoSnapshots.length = 0;
     this.undosRemaining = this.undoAllowance;
     this.layout = layout;

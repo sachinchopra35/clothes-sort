@@ -27,10 +27,12 @@ export class Shelf extends Phaser.GameObjects.Container {
   readonly shelfWidth: number;
   private readonly plankGfx: Phaser.GameObjects.Graphics;
   private readonly hitZone: Phaser.GameObjects.Zone;
+  private homeX: number;
 
   constructor(scene: Phaser.Scene, options: ShelfOptions) {
     super(scene, options.x, options.y);
     scene.add.existing(this);
+    this.homeX = options.x;
 
     this.shelfId = options.id;
     this.side = options.side;
@@ -104,21 +106,24 @@ export class Shelf extends Phaser.GameObjects.Container {
   }
 
   shake(): void {
-    const baseX = this.x;
+    // Restart from home so a shake during a shake can't leave the shelf offset.
+    this.scene.tweens.killTweensOf(this);
+    this.x = this.homeX;
     this.scene.tweens.add({
       targets: this,
-      x: baseX + 14,
+      x: this.homeX + 14,
       duration: 50,
       yoyo: true,
       repeat: 3,
       onComplete: () => {
-        this.x = baseX;
+        this.x = this.homeX;
       },
     });
   }
 
   resetFromSlide(homeX: number): void {
     this.scene.tweens.killTweensOf(this);
+    this.homeX = homeX;
     this.x = homeX;
     this.setAlpha(1);
     this.setVisible(true);

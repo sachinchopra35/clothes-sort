@@ -16,6 +16,8 @@ const FAST_ARROW_OFFSET = 345;
 const ARROW_GAP = 14;
 const ARROW_OFFSET = FAST_ARROW_OFFSET - ARROW_SIZE - ARROW_GAP;
 const LABEL_MAX_WIDTH = 2 * (ARROW_OFFSET - ARROW_SIZE / 2) - 24;
+/** Shared by single and double arrows so every triangle is the same size. */
+const ARROW_FONT = "40px";
 
 export interface LevelPickerOptions {
   x: number;
@@ -57,7 +59,7 @@ export class LevelPicker extends Phaser.GameObjects.Container {
         width: ARROW_SIZE,
         height: ARROW_SIZE,
         label: "◀◀",
-        fontSize: theme.fontSize.body,
+        fontSize: ARROW_FONT,
         onClick: () => this.jumpFast(-1),
       },
       this,
@@ -71,7 +73,7 @@ export class LevelPicker extends Phaser.GameObjects.Container {
         width: ARROW_SIZE,
         height: ARROW_SIZE,
         label: "▶▶",
-        fontSize: theme.fontSize.body,
+        fontSize: ARROW_FONT,
         onClick: () => this.jumpFast(1),
       },
       this,
@@ -85,7 +87,7 @@ export class LevelPicker extends Phaser.GameObjects.Container {
         width: ARROW_SIZE,
         height: ARROW_SIZE,
         label: "◀",
-        fontSize: theme.fontSize.heading,
+        fontSize: ARROW_FONT,
         onClick: () => this.shift(-1),
       },
       this,
@@ -99,7 +101,7 @@ export class LevelPicker extends Phaser.GameObjects.Container {
         width: ARROW_SIZE,
         height: ARROW_SIZE,
         label: "▶",
-        fontSize: theme.fontSize.heading,
+        fontSize: ARROW_FONT,
         onClick: () => this.shift(1),
       },
       this,

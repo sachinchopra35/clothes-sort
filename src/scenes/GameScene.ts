@@ -30,6 +30,7 @@ import { playConfetti } from "../ui/playConfetti";
 import { UndoButton } from "../ui/UndoButton";
 import { showBriefMessage } from "../ui/BriefMessage";
 import { UndoIntroPanel } from "../ui/UndoIntroPanel";
+import { Level1Tutorial } from "../ui/Level1Tutorial";
 import {
   fadeInCamera,
   type SceneIntroFadeData,
@@ -55,6 +56,7 @@ export class GameScene extends Phaser.Scene {
   private settingsPanel: SettingsPanel | null = null;
   private undoButton: UndoButton | null = null;
   private undoIntroPanel: UndoIntroPanel | null = null;
+  private tutorial: Level1Tutorial | null = null;
 
   constructor() {
     super(SCENE_GAME);
@@ -76,6 +78,7 @@ export class GameScene extends Phaser.Scene {
     this.settingsPanel?.destroy();
     this.settingsPanel = null;
     if (this.board) this.board.onWon = null;
+    this.tutorial = null;
 
     const level = getLevelById(this.levelId);
     if (!level) {
@@ -93,6 +96,7 @@ export class GameScene extends Phaser.Scene {
     this.board.onUndoStateChange = (remaining, exhausted) => {
       this.undoButton?.setRemaining(remaining, exhausted);
     };
+    this.startTutorialIfNeeded();
 
     const topBar = this.add.graphics();
     topBar.setDepth(GAME_HUD_DEPTH - 1);
@@ -228,6 +232,14 @@ export class GameScene extends Phaser.Scene {
     this.settingsButton?.setInputEnabled(enabled);
   }
 
+  private startTutorialIfNeeded(): void {
+    this.tutorial?.destroy();
+    this.tutorial = null;
+    if (this.board && getLevelIndex(this.levelId) === 0) {
+      this.tutorial = new Level1Tutorial(this, this.board);
+    }
+  }
+
   private restartLevel(): void {
     const level = getLevelById(this.levelId);
     if (!level || !this.board) return;
@@ -237,6 +249,7 @@ export class GameScene extends Phaser.Scene {
     this.board.onUndoStateChange = (remaining, exhausted) => {
       this.undoButton?.setRemaining(remaining, exhausted);
     };
+    this.startTutorialIfNeeded();
   }
 
   private onLevelWon(): void {
