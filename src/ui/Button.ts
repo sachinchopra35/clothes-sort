@@ -82,6 +82,10 @@ export class Button extends Phaser.GameObjects.Container {
     this.hitZone.on("pointerout", () => this.releasePress());
   }
 
+  setLabel(label: string): void {
+    this.labelText.setText(label);
+  }
+
   setInputEnabled(enabled: boolean): void {
     if (enabled) {
       this.hitZone.setInteractive({ useHandCursor: true });

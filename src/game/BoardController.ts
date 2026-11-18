@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { playClothesMove } from "../audio/uiSounds";
 import { clothingDepthOnShelf } from "../config/layout";
 import type { LevelDefinition } from "../levels/levelTypes";
 import type { ShelfLayoutEntry } from "../layout/shelfLayout";
@@ -154,6 +155,7 @@ export class BoardController {
     this.emitUndoState();
 
     const destShelf = this.shelfViews.get(shelfId)!;
+    playClothesMove();
     void this.playMoveVisuals(
       movingViews,
       moveCount,

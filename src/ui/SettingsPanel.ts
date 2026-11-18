@@ -1,29 +1,45 @@
 import Phaser from "phaser";
-import { DESIGN_HEIGHT, DESIGN_WIDTH } from "../config/layout";
+import { applyMusicSettings } from "../audio/musicManager";
+import { DESIGN_HEIGHT, DESIGN_WIDTH, MODAL_UI_DEPTH } from "../config/layout";
 import {
   PANEL_BUTTON_H,
   PANEL_INSET,
   panelContentWidth,
 } from "../config/panelLayout";
-import { getSettings, setMusicEnabled, setSoundEnabled } from "../state/settings";
+import {
+  getSettings,
+  setMusicVolume,
+  setSoundVolume,
+} from "../state/settings";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
-import { ToggleSwitch } from "./ToggleSwitch";
+import { MusicTrackPicker } from "./MusicTrackPicker";
 import { playModalPopIn } from "./modalPopIn";
+import { VolumeSlider } from "./VolumeSlider";
 
 const PANEL_W = 680;
-const PANEL_H = 480;
 const CX = DESIGN_WIDTH / 2;
 const CY = DESIGN_HEIGHT / 2;
-/** Vertical gap between toggle row centres. */
-const TOGGLE_ROW_STEP = 108;
-const TOGGLE_TOP = 156;
+
+/** Offsets from the panel top (design px). */
+const SOUND_ROW_Y = 166;
+const MUSIC_ROW_Y = 316;
+const DIVIDER_Y = 400;
+const NOW_PLAYING_Y = 440;
+const PICKER_Y = 520;
+/** Lowest point of the picker text block (two piece lines) below PICKER_Y. */
+const PICKER_BOTTOM = 112;
+const PICKER_TO_DONE = 36;
+const PANEL_H =
+  PICKER_Y + PICKER_BOTTOM + PICKER_TO_DONE + PANEL_BUTTON_H + PANEL_INSET;
 
 export class SettingsPanel extends Phaser.GameObjects.Container {
+  private trackPicker: MusicTrackPicker | null = null;
+
   constructor(scene: Phaser.Scene, onClose: () => void) {
     super(scene, 0, 0);
     scene.add.existing(this);
-    this.setDepth(1000);
+    this.setDepth(MODAL_UI_DEPTH);
 
     const backdrop = scene.add.rectangle(
       CX,
@@ -36,6 +52,11 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     backdrop.setInteractive();
     backdrop.on("pointerdown", onClose);
     this.add(backdrop);
+
+    // Swallows taps inside the panel so only taps outside it dismiss.
+    const panelBlocker = scene.add.rectangle(CX, CY, PANEL_W, PANEL_H, 0x000000, 0);
+    panelBlocker.setInteractive();
+    this.add(panelBlocker);
 
     const panelLeft = CX - PANEL_W / 2;
     const panelTop = CY - PANEL_H / 2;
@@ -58,31 +79,32 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
 
     const settings = getSettings();
 
-    const soundY = panelTop + TOGGLE_TOP;
-    const musicY = soundY + TOGGLE_ROW_STEP;
-
-    new ToggleSwitch(
+    new VolumeSlider(
       scene,
       {
         x: CX,
-        y: soundY,
+        y: panelTop + SOUND_ROW_Y,
         rowWidth: rowW,
         label: "Sound effects",
-        value: settings.soundEnabled,
-        onChange: (enabled) => setSoundEnabled(enabled),
+        value: settings.soundVolume,
+        onChange: (v) => setSoundVolume(v),
       },
       this,
     );
 
-    new ToggleSwitch(
+    new VolumeSlider(
       scene,
       {
         x: CX,
-        y: musicY,
+        y: panelTop + MUSIC_ROW_Y,
         rowWidth: rowW,
         label: "Music",
-        value: settings.musicEnabled,
-        onChange: (enabled) => setMusicEnabled(enabled),
+        value: settings.musicVolume,
+        onChange: (v) => {
+          setMusicVolume(v);
+          applyMusicSettings();
+          this.trackPicker?.refresh();
+        },
       },
       this,
     );
@@ -90,18 +112,30 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     const divider = scene.add.graphics();
     divider.lineStyle(1, theme.ui.panelStroke, 0.6);
     divider.beginPath();
-    divider.moveTo(panelLeft + PANEL_INSET, soundY + TOGGLE_ROW_STEP / 2);
-    divider.lineTo(panelLeft + PANEL_W - PANEL_INSET, soundY + TOGGLE_ROW_STEP / 2);
+    divider.moveTo(panelLeft + PANEL_INSET, panelTop + DIVIDER_Y);
+    divider.lineTo(panelLeft + PANEL_W - PANEL_INSET, panelTop + DIVIDER_Y);
     divider.strokePath();
     this.add(divider);
 
-    const doneY = panelTop + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2;
+    const nowPlayingLabel = scene.add.text(CX, panelTop + NOW_PLAYING_Y, "Now playing", {
+      fontFamily: theme.fontFamily,
+      fontSize: theme.fontSize.small,
+      color: theme.ui.textMuted,
+    });
+    nowPlayingLabel.setOrigin(0.5);
+    this.add(nowPlayingLabel);
+
+    this.trackPicker = new MusicTrackPicker(
+      scene,
+      { x: CX, y: panelTop + PICKER_Y },
+      this,
+    );
 
     new Button(
       scene,
       {
         x: CX,
-        y: doneY,
+        y: panelTop + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2,
         width: rowW,
         height: PANEL_BUTTON_H,
         label: "Done",

@@ -7,15 +7,23 @@ import {
   TOP_BAR_HEIGHT,
 } from "../config/layout";
 import { undoAllowanceForLevel } from "../game/undoLimits";
-import { scaleButtonSize } from "../config/uiButtons";
 import { theme } from "../config/theme";
 import { BoardController } from "../game/BoardController";
 import { computeShelfLayout } from "../layout/shelfLayout";
 import { getLevelById, getLevelIndex, LEVELS } from "../levels/levelData";
+import { ensureMusicPlaying, registerMusicScene } from "../audio/musicManager";
+import { playLevelComplete } from "../audio/uiSounds";
 import { WardrobeBackground } from "../objects/WardrobeBackground";
 import { completeLevel, unlockNextLevel } from "../state/progress";
-import { Button } from "../ui/Button";
 import { ConfirmPanel } from "../ui/ConfirmPanel";
+import {
+  BACK_ICON_KEY,
+  ICON_BUTTON_SIZE,
+  IconButton,
+  RESTART_ICON_KEY,
+  SETTINGS_ICON_KEY,
+} from "../ui/IconButton";
+import { SettingsPanel } from "../ui/SettingsPanel";
 import { hasSeenUndoIntro, markUndoIntroSeen } from "../state/undoIntro";
 import { LevelCompletePanel } from "../ui/LevelCompletePanel";
 import { playConfetti } from "../ui/playConfetti";
@@ -28,6 +36,9 @@ import {
   startSceneWithFade,
 } from "./sceneFade";
 
+const HUD_EDGE = 28;
+const HUD_GAP = 20;
+
 interface GameSceneData extends SceneIntroFadeData {
   levelId?: string;
 }
@@ -38,8 +49,10 @@ export class GameScene extends Phaser.Scene {
   private introFade = false;
   private completePanel: LevelCompletePanel | null = null;
   private confirmPanel: ConfirmPanel | null = null;
-  private backButton: Button | null = null;
-  private restartButton: Button | null = null;
+  private backButton: IconButton | null = null;
+  private restartButton: IconButton | null = null;
+  private settingsButton: IconButton | null = null;
+  private settingsPanel: SettingsPanel | null = null;
   private undoButton: UndoButton | null = null;
   private undoIntroPanel: UndoIntroPanel | null = null;
 
@@ -53,10 +66,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    registerMusicScene(this);
+    ensureMusicPlaying();
+
     this.completePanel?.destroy();
     this.completePanel = null;
     this.confirmPanel?.destroy();
     this.confirmPanel = null;
+    this.settingsPanel?.destroy();
+    this.settingsPanel = null;
     if (this.board) this.board.onWon = null;
 
     const level = getLevelById(this.levelId);
@@ -84,29 +102,24 @@ export class GameScene extends Phaser.Scene {
     topBar.lineBetween(0, TOP_BAR_HEIGHT, DESIGN_WIDTH, TOP_BAR_HEIGHT);
 
     const hudY = TOP_BAR_HEIGHT / 2;
-    const hud = scaleButtonSize(184, 92);
-    const hudWide = scaleButtonSize(228, 92);
-    this.backButton = new Button(this, {
-      x: 28 + hud.width / 2,
-      y: hudY,
-      width: hud.width,
-      height: hud.height,
-      label: "Back",
-      fontSize: theme.fontSize.body,
-      onClick: () => this.openBackConfirm(),
-    });
-    this.backButton.setDepth(GAME_HUD_DEPTH);
-
-    this.restartButton = new Button(this, {
-      x: DESIGN_WIDTH - 28 - hudWide.width / 2,
-      y: hudY,
-      width: hudWide.width,
-      height: hudWide.height,
-      label: "Restart",
-      fontSize: theme.fontSize.body,
-      onClick: () => this.openRestartConfirm(),
-    });
-    this.restartButton.setDepth(GAME_HUD_DEPTH);
+    const edgeX = HUD_EDGE + ICON_BUTTON_SIZE / 2;
+    this.backButton = new IconButton(this, edgeX, hudY, BACK_ICON_KEY, () =>
+      this.openBackConfirm(),
+    );
+    this.settingsButton = new IconButton(
+      this,
+      DESIGN_WIDTH - edgeX,
+      hudY,
+      SETTINGS_ICON_KEY,
+      () => this.openSettings(),
+    );
+    this.restartButton = new IconButton(
+      this,
+      DESIGN_WIDTH - edgeX - ICON_BUTTON_SIZE - HUD_GAP,
+      hudY,
+      RESTART_ICON_KEY,
+      () => this.openRestartConfirm(),
+    );
 
     const title = this.add.text(DESIGN_WIDTH / 2, hudY, `Level ${levelNum}`, {
       fontFamily: theme.fontFamily,
@@ -154,10 +167,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private openBackConfirm(): void {
-    if (this.completePanel || this.confirmPanel) return;
+    if (this.isModalOpen()) return;
 
-    this.backButton?.setInputEnabled(false);
-    this.restartButton?.setInputEnabled(false);
+    this.setHudEnabled(false);
 
     this.confirmPanel = new ConfirmPanel(this, {
       title: "Leave level?",
@@ -173,10 +185,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private openRestartConfirm(): void {
-    if (this.completePanel || this.confirmPanel) return;
+    if (this.isModalOpen()) return;
 
-    this.backButton?.setInputEnabled(false);
-    this.restartButton?.setInputEnabled(false);
+    this.setHudEnabled(false);
 
     this.confirmPanel = new ConfirmPanel(this, {
       title: "Restart level?",
@@ -194,10 +205,27 @@ export class GameScene extends Phaser.Scene {
   private closeConfirmPanel(): void {
     this.confirmPanel?.destroy();
     this.confirmPanel = null;
-    if (!this.completePanel) {
-      this.backButton?.setInputEnabled(true);
-      this.restartButton?.setInputEnabled(true);
-    }
+    if (!this.completePanel) this.setHudEnabled(true);
+  }
+
+  private openSettings(): void {
+    if (this.isModalOpen()) return;
+    this.setHudEnabled(false);
+    this.settingsPanel = new SettingsPanel(this, () => {
+      this.settingsPanel?.destroy();
+      this.settingsPanel = null;
+      if (!this.completePanel) this.setHudEnabled(true);
+    });
+  }
+
+  private isModalOpen(): boolean {
+    return Boolean(this.completePanel || this.confirmPanel || this.settingsPanel);
+  }
+
+  private setHudEnabled(enabled: boolean): void {
+    this.backButton?.setInputEnabled(enabled);
+    this.restartButton?.setInputEnabled(enabled);
+    this.settingsButton?.setInputEnabled(enabled);
   }
 
   private restartLevel(): void {
@@ -219,8 +247,7 @@ export class GameScene extends Phaser.Scene {
     const idx = getLevelIndex(this.levelId);
     const hasNext = idx >= 0 && idx < LEVELS.length - 1;
 
-    this.backButton?.setInputEnabled(false);
-    this.restartButton?.setInputEnabled(false);
+    this.setHudEnabled(false);
 
     this.completePanel = new LevelCompletePanel(this, {
       levelNumber: idx + 1,
@@ -232,6 +259,7 @@ export class GameScene extends Phaser.Scene {
       onMenu: () => void startSceneWithFade(this, SCENE_MENU),
     });
 
+    playLevelComplete();
     requestAnimationFrame(() => {
       playConfetti();
     });

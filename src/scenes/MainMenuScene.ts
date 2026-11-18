@@ -5,6 +5,12 @@ import { DESIGN_HEIGHT, DESIGN_WIDTH } from "../config/layout";
 import { theme } from "../config/theme";
 import { WardrobeBackground } from "../objects/WardrobeBackground";
 import { WardrobeFrameOverlay } from "../objects/wardrobeFrame";
+import {
+  applyMusicSettings,
+  ensureMusicPlaying,
+  registerMusicScene,
+  unlockMusicFromGesture,
+} from "../audio/musicManager";
 import { getSelectedLevelId, resetProgressCache } from "../state/progress";
 import { Button } from "../ui/Button";
 import { MenuPlayCard } from "../ui/MenuPlayCard";
@@ -41,6 +47,7 @@ export class MainMenuScene extends Phaser.Scene {
 
   create(): void {
     resetProgressCache();
+    registerMusicScene(this);
 
     new WardrobeBackground(this, { dimOverlay: 0.35, backOnly: true });
 
@@ -110,6 +117,17 @@ export class MainMenuScene extends Phaser.Scene {
       fadeInCamera(this);
       this.introFade = false;
     }
+
+    applyMusicSettings();
+    if (!this.sound.locked) {
+      ensureMusicPlaying();
+    }
+
+    this.input.once("pointerdown", () => {
+      unlockMusicFromGesture();
+      applyMusicSettings();
+      ensureMusicPlaying();
+    });
   }
 
   shutdown(): void {

@@ -1,0 +1,29 @@
+{
+  "tracks": [
+    {
+      "id": "chopin-nocturne-1",
+      "source": "chopin_9_1_CC_PD.mp3",
+      "title": "Chopin — Nocturne 1"
+    },
+    {
+      "id": "chopin-nocturne-2",
+      "source": "chopin_9_2_CC_PD.mp3",
+      "title": "Chopin — Nocturne 2"
+    },
+    {
+      "id": "chopin-tristesse",
+      "source": "chopin_tristesse_CC_PD.mp3",
+      "title": "Chopin — Tristesse"
+    },
+    {
+      "id": "beethoven-sonata",
+      "source": "beethoven_1_2_CC_PD.mp3",
+      "title": "Beethoven — Sonata 1, Adagio"
+    },
+    {
+      "id": "bach-goldberg-22",
+      "source": "goldberg_22_CC_PD.mp3",
+      "title": "Bach — Goldberg Variation 22"
+    }
+  ]
+}

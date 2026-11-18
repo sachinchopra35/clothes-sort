@@ -8,11 +8,14 @@ import {
 import { scaleButtonSize } from "../config/uiButtons";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
+import { fastJumpLevel } from "./levelJump";
 
-/** Half-width from center to each arrow button centre */
-const ARROW_OFFSET = 270;
 const ARROW_SIZE = scaleButtonSize(96, 96).width;
-const LABEL_MAX_WIDTH = 520;
+/** Centre offsets for the single-step and ten-step arrows. */
+const FAST_ARROW_OFFSET = 345;
+const ARROW_GAP = 14;
+const ARROW_OFFSET = FAST_ARROW_OFFSET - ARROW_SIZE - ARROW_GAP;
+const LABEL_MAX_WIDTH = 2 * (ARROW_OFFSET - ARROW_SIZE / 2) - 24;
 
 export interface LevelPickerOptions {
   x: number;
@@ -45,6 +48,34 @@ export class LevelPicker extends Phaser.GameObjects.Container {
     this.levelId = options.initialLevelId;
     this.onChange = options.onChange;
     this.onLockedTap = options.onLockedTap;
+
+    new Button(
+      scene,
+      {
+        x: -FAST_ARROW_OFFSET,
+        y: 0,
+        width: ARROW_SIZE,
+        height: ARROW_SIZE,
+        label: "◀◀",
+        fontSize: theme.fontSize.body,
+        onClick: () => this.jumpFast(-1),
+      },
+      this,
+    );
+
+    new Button(
+      scene,
+      {
+        x: FAST_ARROW_OFFSET,
+        y: 0,
+        width: ARROW_SIZE,
+        height: ARROW_SIZE,
+        label: "▶▶",
+        fontSize: theme.fontSize.body,
+        onClick: () => this.jumpFast(1),
+      },
+      this,
+    );
 
     new Button(
       scene,
@@ -125,7 +156,19 @@ export class LevelPicker extends Phaser.GameObjects.Container {
   private shift(delta: number): void {
     let idx = getLevelIndex(this.levelId);
     if (idx < 0) idx = 0;
-    idx = (idx + delta + LEVELS.length) % LEVELS.length;
+    this.selectIndex((idx + delta + LEVELS.length) % LEVELS.length);
+  }
+
+  private jumpFast(direction: 1 | -1): void {
+    const current = Math.max(0, getLevelIndex(this.levelId)) + 1;
+    const latest = LEVELS.reduce(
+      (best, level, i) => (isLevelUnlocked(level.id) ? i + 1 : best),
+      1,
+    );
+    this.selectIndex(fastJumpLevel(current, direction, LEVELS.length, latest) - 1);
+  }
+
+  private selectIndex(idx: number): void {
     this.levelId = LEVELS[idx].id;
     setSelectedLevelId(this.levelId);
     this.onChange(this.levelId);

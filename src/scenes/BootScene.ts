@@ -3,6 +3,8 @@ import { SCENE_BOOT, SCENE_MENU } from "../config/gameConfig";
 import { ALL_CLOTHING } from "../game/clothing";
 import { fadeOutCamera } from "./sceneFade";
 import { LoadingScreen } from "../ui/LoadingScreen";
+import { MUSIC_TRACKS } from "../audio/musicCatalog";
+import { BACK_ICON_KEY, RESTART_ICON_KEY, SETTINGS_ICON_KEY } from "../ui/IconButton";
 import { UNDO_ICON_KEY, UNDO_ICON_USED_KEY } from "../ui/UndoButton";
 
 const SVG_RENDER = 192;
@@ -38,6 +40,18 @@ export class BootScene extends Phaser.Scene {
       width: SVG_RENDER,
       height: SVG_RENDER,
     });
+
+    for (const [key, file] of [
+      [BACK_ICON_KEY, "back"],
+      [RESTART_ICON_KEY, "restart"],
+      [SETTINGS_ICON_KEY, "settings"],
+    ] as const) {
+      this.load.svg(key, `assets/ui/${file}.svg`, { width: SVG_RENDER, height: SVG_RENDER });
+    }
+
+    for (const track of MUSIC_TRACKS) {
+      this.load.audio(track.audioKey, track.assetPath);
+    }
   }
 
   create(): void {

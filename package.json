@@ -10,6 +10,7 @@
     "test": "vitest run",
     "build:clothes": "node scripts/build-clothes-assets.mjs",
     "build:icon": "node scripts/build-app-icon.mjs",
+    "build:music": "node scripts/build-music.mjs",
     "levels:analyze": "vite-node scripts/levels-analyze.ts",
     "levels:generate": "vite-node scripts/levels-generate.ts",
     "levels:generate:more": "vite-node scripts/levels-generate.ts --more",
