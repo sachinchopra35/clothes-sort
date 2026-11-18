@@ -8,12 +8,15 @@ export interface GameSettings {
   soundVolume: number;
   musicVolume: number;
   musicTrackIndex: number;
+  /** iPhone: keep playing audio when the ring/silent switch is on silent. */
+  playInSilentMode: boolean;
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
   soundVolume: 1,
   musicVolume: 0.85,
   musicTrackIndex: 0,
+  playInSilentMode: false,
 };
 
 type StoredSettings = Partial<GameSettings> & {
@@ -45,6 +48,7 @@ function normalizeStored(raw: StoredSettings): GameSettings {
     soundVolume: clamp01(soundVolume),
     musicVolume: clamp01(musicVolume),
     musicTrackIndex,
+    playInSilentMode: raw.playInSilentMode === true,
   };
 }
 
@@ -65,6 +69,11 @@ export function setSoundVolume(volume: number): void {
 
 export function setMusicVolume(volume: number): void {
   cached = { ...cached, musicVolume: clamp01(volume) };
+  persist();
+}
+
+export function setPlayInSilentMode(enabled: boolean): void {
+  cached = { ...cached, playInSilentMode: enabled };
   persist();
 }
 
