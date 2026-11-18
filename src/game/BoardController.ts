@@ -27,7 +27,8 @@ export class BoardController {
   private readonly shelfHomeX = new Map<string, number>();
   private selectedFromId: string | null = null;
   private busy = false;
-  private moveToken = 0;
+  /** Bumped by undo/restart so in-flight move animations stop touching the rebuilt board. */
+  private boardEpoch = 0;
   private readonly undoAllowance: number;
   private undosRemaining = 0;
   private readonly undoSnapshots: BoardState[] = [];
@@ -148,7 +149,6 @@ export class BoardController {
     const space = shelf.capacity - shelf.items.length;
     const moveCount = Math.min(group.count, space);
 
-    this.busy = true;
     this.clearSelection();
 
     const movingViews = fromItems.splice(fromItems.length - moveCount, moveCount);
@@ -163,7 +163,6 @@ export class BoardController {
       this.undoSnapshots.pop();
       fromItems.push(...movingViews.splice(0));
       toItems.splice(toItems.length - moveCount, moveCount);
-      this.busy = false;
       return;
     }
     this.state = result.state;
@@ -172,18 +171,13 @@ export class BoardController {
 
     const destShelf = this.shelfViews.get(shelfId)!;
     playClothesMove();
-    // Stay busy until the animation finishes: a tap mid-flight would lift the moving
-    // items, kill their tweens, and leave the move (and any shelf clear) stuck forever.
-    const token = ++this.moveToken;
     void this.playMoveVisuals(
       movingViews,
       moveCount,
       destShelf,
       toItems,
       result.clearedShelfIds,
-    ).finally(() => {
-      if (token === this.moveToken) this.busy = false;
-    });
+    );
   }
 
   private async playMoveVisuals(
@@ -193,6 +187,7 @@ export class BoardController {
     toItems: ClothingItem[],
     clearedShelfIds: string[],
   ): Promise<void> {
+    const epoch = this.boardEpoch;
     const animPromises = movingViews.map((item, i) => {
       const slotIndex = toItems.length - moveCount + i;
       const pos = destShelf.getSlotWorldPosition(slotIndex);
@@ -200,6 +195,8 @@ export class BoardController {
       return item.animateTo(pos.x, pos.y);
     });
     await Promise.all(animPromises);
+    // Undo/restart rebuilt the board while this move was in flight.
+    if (epoch !== this.boardEpoch) return;
 
     for (const clearedId of clearedShelfIds) {
       const clearedShelf = this.shelfViews.get(clearedId);
@@ -207,6 +204,7 @@ export class BoardController {
       if (clearedShelf) {
         await clearedShelf.slideOut(clearedItems);
       }
+      if (epoch !== this.boardEpoch) return;
       clearedItems.forEach((item) => item.destroy());
       this.itemsByShelf.delete(clearedId);
     }
@@ -235,6 +233,7 @@ export class BoardController {
     }
     this.state = cloneBoardState(previous);
     this.undosRemaining -= 1;
+    this.boardEpoch++;
     this.resyncVisualsToState();
     this.busy = false;
     this.emitUndoState();
@@ -327,7 +326,7 @@ export class BoardController {
     this.itemsByShelf.clear();
     this.selectedFromId = null;
     this.busy = false;
-    this.moveToken++;
+    this.boardEpoch++;
     this.undoSnapshots.length = 0;
     this.undosRemaining = this.undoAllowance;
     this.layout = layout;

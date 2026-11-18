@@ -12,6 +12,8 @@ export class ClothingItem extends Phaser.GameObjects.Container {
   private readonly image: Phaser.GameObjects.Image;
   private lifted = false;
   private baseY: number;
+  private moveTween: Phaser.Tweens.Tween | null = null;
+  private resolveMove: (() => void) | null = null;
 
   constructor(
     scene: Phaser.Scene,
@@ -35,12 +37,18 @@ export class ClothingItem extends Phaser.GameObjects.Container {
   setLifted(lift: boolean): void {
     if (this.lifted === lift) return;
     this.lifted = lift;
+    // Mid-flight: let the move land, then apply the lift (killing it would strand the move).
+    if (this.moveTween) return;
+    this.tweenLift();
+  }
+
+  private tweenLift(): void {
     this.scene.tweens.killTweensOf(this);
     this.rotation = 0;
     this.scene.tweens.add({
       targets: this,
-      y: this.baseY + (lift ? -22 : 0),
-      scale: lift ? 1.06 : 1,
+      y: this.baseY + (this.lifted ? -22 : 0),
+      scale: this.lifted ? 1.06 : 1,
       duration: 120,
       ease: "Quad.out",
     });
@@ -58,11 +66,16 @@ export class ClothingItem extends Phaser.GameObjects.Container {
         : 0;
 
     this.lifted = false;
+    // Re-moved before landing: settle the previous move's promise so its awaiter continues.
+    this.resolveMove?.();
+    this.resolveMove = null;
+    this.moveTween = null;
     this.scene.tweens.killTweensOf(this);
     this.rotation = 0;
     this.baseY = y;
     return new Promise((resolve) => {
-      this.scene.tweens.add({
+      this.resolveMove = resolve;
+      this.moveTween = this.scene.tweens.add({
         targets: this,
         x,
         y,
@@ -79,10 +92,20 @@ export class ClothingItem extends Phaser.GameObjects.Container {
         },
         onComplete: () => {
           this.rotation = 0;
+          this.moveTween = null;
+          this.resolveMove = null;
+          if (this.lifted) this.tweenLift();
           resolve();
         },
       });
     });
+  }
+
+  destroy(fromScene?: boolean): void {
+    this.resolveMove?.();
+    this.resolveMove = null;
+    this.moveTween = null;
+    super.destroy(fromScene);
   }
 
 }

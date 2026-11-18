@@ -12,6 +12,17 @@ export interface ButtonOptions {
   onClick: () => void;
 }
 
+const MAX_TAP_TRAVEL = 64;
+
+/** A cancelled touch, or one that travelled like a swipe, isn't a tap. */
+export function isSwipeOrCancel(pointer: Phaser.Input.Pointer): boolean {
+  if (pointer.wasCanceled) return true;
+  return (
+    Phaser.Math.Distance.Between(pointer.downX, pointer.downY, pointer.upX, pointer.upY) >
+    MAX_TAP_TRAVEL
+  );
+}
+
 function parsePx(size: string): number {
   return Number.parseInt(size, 10) || 36;
 }
@@ -75,8 +86,11 @@ export class Button extends Phaser.GameObjects.Container {
         this.pressNudge = 4;
       }
     });
-    this.hitZone.on("pointerup", () => {
+    this.hitZone.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      const wasPressed = this.pressNudge !== 0;
       this.releasePress();
+      // iOS cancels the touch when the home-swipe takes over; Phaser reports that as pointerup.
+      if (!wasPressed || isSwipeOrCancel(pointer)) return;
       options.onClick();
     });
     this.hitZone.on("pointerout", () => this.releasePress());

@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { playUiKnock } from "../audio/uiSounds";
 import { GAME_HUD_DEPTH } from "../config/layout";
 import { theme } from "../config/theme";
+import { isSwipeOrCancel } from "./Button";
 
 export const BACK_ICON_KEY = "ui-back";
 export const RESTART_ICON_KEY = "ui-restart";
@@ -39,9 +40,10 @@ export class IconButton extends Phaser.GameObjects.Container {
       playUiKnock();
       this.setPressed(true);
     });
-    this.hit.on("pointerup", () => {
+    this.hit.on("pointerup", (pointer: Phaser.Input.Pointer) => {
       if (!this.pressed) return;
       this.setPressed(false);
+      if (isSwipeOrCancel(pointer)) return;
       onClick();
     });
     this.hit.on("pointerout", () => this.setPressed(false));
