@@ -8,9 +8,23 @@ type BgmSound = Phaser.Sound.BaseSound & {
 };
 
 let sceneRef: Phaser.Scene | null = null;
+let watchScene: Phaser.Scene | null = null;
 let current: BgmSound | null = null;
 let currentIndex = -1;
 let unlocked = false;
+let advancing = false;
+
+function getPlaybackState(sound: BgmSound): { duration: number; seek: number } {
+  const s = sound as Phaser.Sound.WebAudioSound;
+  return { duration: s.duration ?? 0, seek: s.seek ?? 0 };
+}
+
+/** True when playback stopped at (or just before) the end — not merely paused. */
+function playbackReachedEnd(sound: BgmSound): boolean {
+  const { duration, seek } = getPlaybackState(sound);
+  if (duration <= 0.5) return false;
+  return seek >= duration - 0.35;
+}
 
 function effectiveMusicVolume(): number {
   return effectiveMusicPlaybackVolume(getSettings().musicVolume);
@@ -28,13 +42,29 @@ function detachCurrent(): void {
 }
 
 function onTrackEnded(): void {
-  if (!sceneRef || !shouldPlay()) return;
-  const next = (currentIndex + 1) % MUSIC_TRACKS.length;
-  playIndex(next, true);
+  if (advancing || !sceneRef || !shouldPlay()) return;
+  advancing = true;
+  try {
+    const next = (currentIndex + 1) % MUSIC_TRACKS.length;
+    playIndex(next, true);
+  } finally {
+    advancing = false;
+  }
+}
+
+function onMusicUpdate(): void {
+  if (!current || advancing || !shouldPlay()) return;
+  if (current.isPlaying || current.isPaused) return;
+  if (playbackReachedEnd(current)) onTrackEnded();
 }
 
 export function registerMusicScene(scene: Phaser.Scene): void {
   sceneRef = scene;
+  if (watchScene !== scene) {
+    watchScene?.events.off(Phaser.Scenes.Events.UPDATE, onMusicUpdate);
+    watchScene = scene;
+    scene.events.on(Phaser.Scenes.Events.UPDATE, onMusicUpdate);
+  }
 }
 
 export function unlockMusicFromGesture(): void {
@@ -104,9 +134,12 @@ export function ensureMusicPlaying(): void {
     playIndex(settings.musicTrackIndex, false);
     return;
   }
-  if (!current.isPlaying && !current.isPaused) {
-    current.play();
+  if (current.isPlaying || current.isPaused) return;
+  if (playbackReachedEnd(current)) {
+    onTrackEnded();
+    return;
   }
+  current.play();
 }
 
 export function playNextTrack(): void {
@@ -121,11 +154,13 @@ export function playPreviousTrack(): void {
 }
 
 export function getPlayingTrackIndex(): number {
+  if (currentIndex >= 0) return currentIndex;
   return getSettings().musicTrackIndex;
 }
 
 export function getPlayingTrackTitle(): string {
-  return MUSIC_TRACKS[getSettings().musicTrackIndex]?.title ?? "";
+  const idx = getPlayingTrackIndex();
+  return MUSIC_TRACKS[idx]?.title ?? "";
 }
 
 export function stopMusic(): void {
