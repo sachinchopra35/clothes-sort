@@ -53,9 +53,7 @@ Repo must be **public** for free Pages unless your account allows Pages on priva
 
 ## Step 4 — Export compliance flag (saves a question on every upload)
 
-In `ios/App/App/Info.plist`, add `ITSAppUsesNonExemptEncryption` = `NO` (Boolean). The app uses no
-custom encryption, so this is the honest answer, and Apple stops asking the export-compliance question
-on every upload. (I can make this change for you.)
+Done: `ITSAppUsesNonExemptEncryption` = `NO` in `ios/App/App/Info.plist` (app uses no custom encryption beyond standard iOS/HTTPS).
 
 ## Step 5 — Screenshots and icon
 

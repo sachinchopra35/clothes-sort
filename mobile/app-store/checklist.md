@@ -15,8 +15,8 @@ Tick items as you go. Details: [docs/release-steps.md](../../docs/release-steps.
 - [ ] Before submit: `npm run music:attribution:check` passes
 - [ ] Draft store copy → [listing.md](listing.md)
 - [x] `docs/index.html` built from privacy + support (keep in sync when editing `.md`)
-- [ ] Push `docs/` to `main`; enable GitHub Pages — [github-pages-setup.md](../../docs/github-pages-setup.md)
-- [ ] Verify `https://sachinchopra35.github.io/clothes-sort/` on phone (private Safari tab)
+- [x] Push `docs/` to `main`; enable GitHub Pages — [github-pages-setup.md](../../docs/github-pages-setup.md)
+- [x] Verify `https://sachinchopra35.github.io/clothes-sort/` on phone (private Safari tab)
 - [ ] Screenshots (6.9" iPhone; see shot list in listing.md)
 - [ ] `npm run build:icon`; icon looks correct in Xcode
 - [ ] Device QA: tutorial, play, win, settings, music advance, undo, cheat unlock, offline
@@ -43,7 +43,7 @@ npx cap open ios
 
 - [ ] Team = paid developer account (`3WCP3D9KXB`)
 - [ ] Bundle Identifier = `com.sachinchopra35.clothessort`
-- [ ] `ITSAppUsesNonExemptEncryption` = NO in `ios/App/App/Info.plist`
+- [x] `ITSAppUsesNonExemptEncryption` = NO in `ios/App/App/Info.plist`
 - [ ] **Version** = `1.0.0`, **Build** = `1` (increment build on each re-upload)
 - [ ] Run on physical device; delete old sideload if bundle ID differed
 - [ ] **Product → Archive** → **Distribute App** → App Store Connect → Upload
