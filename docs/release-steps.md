@@ -25,35 +25,31 @@ Because nothing leaves the device, the privacy side is the easy case: **"Data No
 1. Download the remaining Musopen tracks into `music/source/`.
 2. Add each one to `music/manifest.json` with a friendly `"Composer — Piece"` title.
 3. Run `npm run build:music` to make the normalised `.m4a` files.
-4. **Check the licence of each recording on its Musopen page.** The *composition* being public domain isn't enough — the *recording* must be public domain or CC0 (some Musopen recordings are CC BY, which needs credit). Write the licence of each track down in `music/README.md`.
-5. If any track is CC BY, add a short credits line on the support page (step 3).
+4. For each track, fill **`music/manifest.json`**: `musopenUrl`, `recordingLicense` (`public-domain` | `cc0` | `cc-by-4.0`), and `attribution` if CC BY. Run `npm run music:attribution` and paste `music/support-credits.snippet.md` into the support page (step 3).
+5. Before submit: `npm run music:attribution:check` must pass (or set `MUSIC_ATTRIBUTION_STRICT=1` when running tests).
 
 You can do every step below in parallel while you wait.
 
 ## Step 2 — Release folder (admin paperwork)
 
-Create `mobile/app-store/` with these files (ask me and I'll draft them):
+Done: [`mobile/app-store/`](../mobile/app-store/) — start at [README.md](../mobile/app-store/README.md).
 
-- `listing.md` — the public App Store text: subtitle (30 chars), promotional text (170), description, keywords (100 chars total), "What's New" for 1.0.0.
-- `privacy-policy.md` — short: no data collected, progress stored locally, no third parties.
-- `support.md` — how to play, contact email, FAQ (e.g. "how do I reset progress?", music credits).
-- `review-notes.md` — private notes for Apple's reviewer (see step 8).
-- `checklist.md` — tick-box copy of this file.
+- `listing.md`, `privacy-policy.md`, `support.md`, `review-notes.md`, `checklist.md`
+- Replace the music placeholder in `support.md` after `npm run music:attribution`
+- Review contact phone/email in `review-notes.md` before you submit
 
 ## Step 3 — Privacy + support web page (GitHub Pages)
 
-Apple requires a **Privacy Policy URL** and a **Support URL**. Use one page for both, like Simple Punjabi.
+**Site file ready:** [`docs/index.html`](index.html) (synced from `mobile/app-store/privacy-policy.md` + `support.md`).
 
-1. Build `docs/index.html` from `privacy-policy.md` + `support.md` (copy the styling from
-   `/Users/sachinchopra/Projects/Quizlet App/docs/index.html`).
-2. Push to `main`.
-3. GitHub → repo **Settings → Pages** → Source: *Deploy from a branch* → `main` / `/docs` → Save.
-4. Wait a minute, then open `https://sachinchopra35.github.io/clothes-sort/` on your phone.
-5. The repo must be **public** for free GitHub Pages. If you'd rather keep the code private, make a
-   tiny separate public repo just for the page.
+**You do this once in the browser + Terminal** — full walkthrough: **[github-pages-setup.md](github-pages-setup.md)**
 
-Note: everything in `docs/` becomes public on that site — including these release notes. That's harmless
-(no secrets), but move them to `mobile/app-store/` if you'd prefer they weren't published.
+1. Commit and `git push` `docs/index.html` to `main`.
+2. GitHub → repo **Settings → Pages** → branch `main`, folder **`/docs`** → Save.
+3. Open `https://sachinchopra35.github.io/clothes-sort/` on your phone (private tab).
+4. Paste that URL into App Store Connect as **both** Privacy Policy and Support URLs.
+
+Repo must be **public** for free Pages unless your account allows Pages on private repos.
 
 ## Step 4 — Export compliance flag (saves a question on every upload)
 

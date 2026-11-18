@@ -11,6 +11,8 @@
     "build:clothes": "node scripts/build-clothes-assets.mjs",
     "build:icon": "node scripts/build-app-icon.mjs",
     "build:music": "node scripts/build-music.mjs",
+    "music:attribution": "node scripts/render-music-attribution.mjs",
+    "music:attribution:check": "node scripts/render-music-attribution.mjs --strict",
     "levels:analyze": "vite-node scripts/levels-analyze.ts",
     "levels:generate": "vite-node scripts/levels-generate.ts",
     "levels:generate:more": "vite-node scripts/levels-generate.ts --more",

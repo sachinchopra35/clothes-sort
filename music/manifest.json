@@ -3,27 +3,42 @@
     {
       "id": "chopin-nocturne-1",
       "source": "chopin_9_1_CC_PD.mp3",
-      "title": "Chopin — Nocturne 1"
+      "title": "Chopin — Nocturne 1",
+      "musopenUrl": "",
+      "recordingLicense": "pending",
+      "attribution": ""
     },
     {
       "id": "chopin-nocturne-2",
       "source": "chopin_9_2_CC_PD.mp3",
-      "title": "Chopin — Nocturne 2"
+      "title": "Chopin — Nocturne 2",
+      "musopenUrl": "",
+      "recordingLicense": "pending",
+      "attribution": ""
     },
     {
       "id": "chopin-tristesse",
       "source": "chopin_tristesse_CC_PD.mp3",
-      "title": "Chopin — Tristesse"
+      "title": "Chopin — Tristesse",
+      "musopenUrl": "",
+      "recordingLicense": "pending",
+      "attribution": ""
     },
     {
       "id": "beethoven-sonata",
       "source": "beethoven_1_2_CC_PD.mp3",
-      "title": "Beethoven — Sonata 1, Adagio"
+      "title": "Beethoven — Sonata 1, Adagio",
+      "musopenUrl": "",
+      "recordingLicense": "pending",
+      "attribution": ""
     },
     {
       "id": "bach-goldberg-22",
       "source": "goldberg_22_CC_PD.mp3",
-      "title": "Bach — Goldberg Variation 22"
+      "title": "Bach — Goldberg Variation 22",
+      "musopenUrl": "",
+      "recordingLicense": "pending",
+      "attribution": ""
     }
   ]
 }
