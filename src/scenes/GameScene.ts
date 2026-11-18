@@ -14,7 +14,7 @@ import { getLevelById, getLevelIndex, LEVELS } from "../levels/levelData";
 import { ensureMusicPlaying, registerMusicScene } from "../audio/musicManager";
 import { playLevelComplete } from "../audio/uiSounds";
 import { WardrobeBackground } from "../objects/WardrobeBackground";
-import { completeLevel, unlockNextLevel } from "../state/progress";
+import { completeLevel, setSelectedLevelId, unlockNextLevel } from "../state/progress";
 import { ConfirmPanel } from "../ui/ConfirmPanel";
 import {
   BACK_ICON_KEY,
@@ -65,6 +65,7 @@ export class GameScene extends Phaser.Scene {
   init(data: GameSceneData): void {
     this.levelId = data.levelId ?? "level-1";
     this.introFade = data.introFade ?? false;
+    setSelectedLevelId(this.levelId);
   }
 
   create(): void {
@@ -78,7 +79,11 @@ export class GameScene extends Phaser.Scene {
     this.settingsPanel?.destroy();
     this.settingsPanel = null;
     if (this.board) this.board.onWon = null;
+    // Phaser reuses this scene instance; anything not rebuilt below must be cleared here,
+    // or levels without an undo button keep calling into the previous level's destroyed one.
     this.tutorial = null;
+    this.undoButton = null;
+    this.undoIntroPanel = null;
 
     const level = getLevelById(this.levelId);
     if (!level) {
