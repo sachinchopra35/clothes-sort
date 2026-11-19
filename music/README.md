@@ -6,7 +6,7 @@
 
 The script loudness-normalises to about **−16 LUFS**, strips cover art video streams, and writes AAC **`.m4a`** files to `public/assets/music/<id>.m4a` for in-app playback.
 
-Do not commit large source MP3s if you prefer; keep them locally and ship only the built `.m4a` assets.
+**Do not commit WAV/MP3 masters** — they are gitignored. Keep them in `music/source/` on your machine only; commit the built `public/assets/music/*.m4a` files.
 
 ## Attribution (required before App Store)
 
