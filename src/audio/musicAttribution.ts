@@ -16,13 +16,13 @@ export interface MusicAttributionRecord {
   attribution: string;
 }
 
-type ManifestTrack = (typeof manifest.tracks)[number];
+type ManifestTrack = (typeof manifest.tracks)[number] & { musopenUrl?: string };
 
 export function getMusicAttributions(): MusicAttributionRecord[] {
   return manifest.tracks.map((track: ManifestTrack) => ({
     id: track.id,
     title: track.title,
-    musopenUrl: track.musopenUrl ?? "",
+    musopenUrl: track.musopenUrl?.trim() ?? "",
     recordingLicense: (track.recordingLicense ?? "pending") as RecordingLicense,
     attribution: track.attribution ?? "",
   }));
