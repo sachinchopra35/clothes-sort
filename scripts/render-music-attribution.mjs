@@ -22,6 +22,7 @@ const tracks = manifest.tracks ?? [];
 
 const licenseLabels = {
   pending: "_Fill in from Musopen recording page_",
+  original: "Original performance (app developer)",
   "public-domain": "Public domain (recording)",
   cc0: "CC0 1.0",
   "cc-by-4.0": "CC BY 4.0 (attribution required)",
@@ -34,7 +35,8 @@ function licenseCell(license) {
   return licenseLabels[key] ?? key;
 }
 
-function urlCell(url, id) {
+function urlCell(url, id, license) {
+  if (license === "original") return "—";
   if (!url?.trim()) {
     problems.push(`${id}: missing musopenUrl`);
     return "_TBD_";
@@ -45,11 +47,16 @@ function urlCell(url, id) {
 const tableRows = tracks
   .map((t) => {
     const license = t.recordingLicense || "pending";
-    if (strict && (license === "pending" || !t.musopenUrl?.trim())) {
+    const needsUrl =
+      license !== "original" && license !== "pending" && !t.musopenUrl?.trim();
+    if (strict && (license === "pending" || needsUrl)) {
       problems.push(`${t.id}: incomplete attribution (strict mode)`);
     }
+    if (strict && license === "original" && !t.attribution?.trim()) {
+      problems.push(`${t.id}: original recording needs attribution line`);
+    }
     const credit = t.attribution?.trim() || "—";
-    return `| ${t.title} | ${urlCell(t.musopenUrl, t.id)} | ${licenseCell(license)} | ${credit} |`;
+    return `| ${t.title} | ${urlCell(t.musopenUrl, t.id, license)} | ${licenseCell(license)} | ${credit} |`;
   })
   .join("\n");
 
@@ -97,28 +104,29 @@ Paste the block below into the public support / credits section (also written to
 
 `;
 
+const originals = tracks.filter((t) => t.recordingLicense === "original");
 const ccByTracks = tracks.filter((t) => t.recordingLicense === "cc-by-4.0");
+const musopenTracks = tracks.filter(
+  (t) => t.recordingLicense && !["original", "pending"].includes(t.recordingLicense),
+);
 
-let snippet = `### Music
-
-Instrumental background music is provided by recordings from [Musopen](https://musopen.org). `;
-snippet +=
-  ccByTracks.length > 0
-    ? "Some recordings are used under Creative Commons licences; credits are listed below.\n\n"
-    : "Recordings used in this app are public domain or CC0 on Musopen.\n\n";
-
-let anyUrl = false;
-for (const t of tracks) {
-  const url = t.musopenUrl?.trim();
-  if (!url) continue;
-  anyUrl = true;
-  const line = `- **${t.title}** — ${url}`;
-  snippet += t.attribution?.trim() ? `${line} (${t.attribution.trim()})\n` : `${line}\n`;
-}
-
-if (!anyUrl) {
+let snippet = "### Music\n\n";
+if (originals.length > 0) {
   snippet +=
-    "\n_(Links will appear here after you fill `musopenUrl` in the manifest and re-run `npm run music:attribution`.)_\n";
+    "Background piano music: original performances recorded for this app.\n\n";
+  for (const t of originals) {
+    const credit = t.attribution?.trim() || "Performed and recorded by Sachin Chopra";
+    snippet += `- **${t.title}** — ${credit}\n`;
+  }
+}
+if (musopenTracks.length > 0 || ccByTracks.length > 0) {
+  snippet += "\nAdditional recordings from [Musopen](https://musopen.org) where noted.\n";
+  for (const t of [...musopenTracks, ...ccByTracks]) {
+    const url = t.musopenUrl?.trim();
+    if (!url) continue;
+    const line = `- **${t.title}** — ${url}`;
+    snippet += t.attribution?.trim() ? `${line} (${t.attribution.trim()})\n` : `${line}\n`;
+  }
 }
 
 const fullDoc = `${body}\n\`\`\`markdown\n${snippet.trimEnd()}\n\`\`\`\n`;

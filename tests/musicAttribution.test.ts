@@ -8,7 +8,6 @@ import {
 describe("musicAttribution", () => {
   it("manifest tracks define attribution fields", () => {
     for (const track of manifest.tracks) {
-      expect(track).toHaveProperty("musopenUrl");
       expect(track).toHaveProperty("recordingLicense");
       expect(track).toHaveProperty("attribution");
     }

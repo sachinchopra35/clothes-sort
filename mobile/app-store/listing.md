@@ -57,7 +57,7 @@ HOW TO PLAY
 FEATURES
 • 100 handcrafted levels with a gentle difficulty curve
 • Cosy wardrobe look and feel, with wooden shelves and cheerful clothes
-• Classical piano background music (public-domain recordings), with volume controls and track selection in Settings
+• Original classical piano recordings, with volume controls and track selection in Settings
 • Progress, settings, and unlocked levels saved on your device
 • No account, no ads, no internet needed after install
 
@@ -126,4 +126,4 @@ Capture on the largest iPhone simulator (6.9" class); Apple scales for smaller s
 
 ## Content rights (App Information)
 
-The game art and levels are original. **Background music** uses third-party **recordings** from Musopen used under public domain / CC licences — declare **contains third-party content** and that you have rights to use it.
+The game art and levels are original. **Background music** is your own piano performances — declare **contains third-party content** only for the **musical compositions** (public-domain works; you own the recordings).

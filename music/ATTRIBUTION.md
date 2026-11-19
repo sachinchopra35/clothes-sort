@@ -23,11 +23,15 @@ Compositions may be public domain; the **recording licence** on each Musopen pag
 
 | In-app title | Musopen | Recording licence | Credit line |
 |--------------|---------|-------------------|-------------|
-| Chopin — Nocturne 1 | _TBD_ | _Fill in from Musopen recording page_ | — |
-| Chopin — Nocturne 2 | _TBD_ | _Fill in from Musopen recording page_ | — |
-| Chopin — Tristesse | _TBD_ | _Fill in from Musopen recording page_ | — |
-| Beethoven — Sonata 1, Adagio | _TBD_ | _Fill in from Musopen recording page_ | — |
-| Bach — Goldberg Variation 22 | _TBD_ | _Fill in from Musopen recording page_ | — |
+| Chopin — Nocturne No. 2 | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Bach — Prelude in C major | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Satie — Gymnopédie No. 1 | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Debussy — Arabesque No. 1 | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Chopin — Prelude in E minor | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Debussy — Clair de lune | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Mendelssohn — Shepherd's Complaint | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Bach — French Suite No. 5, Sarabande | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Bach — French Suite No. 1, Sarabande | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 
 ### `recordingLicense` values (in manifest)
 
@@ -46,8 +50,15 @@ Paste the block below into the public support / credits section (also written to
 ```markdown
 ### Music
 
-Instrumental background music is provided by recordings from [Musopen](https://musopen.org). Recordings used in this app are public domain or CC0 on Musopen.
+Background piano music: original performances recorded for this app.
 
-
-_(Links will appear here after you fill `musopenUrl` in the manifest and re-run `npm run music:attribution`.)_
+- **Chopin — Nocturne No. 2** — Performed and recorded by Sachin Chopra
+- **Bach — Prelude in C major** — Performed and recorded by Sachin Chopra
+- **Satie — Gymnopédie No. 1** — Performed and recorded by Sachin Chopra
+- **Debussy — Arabesque No. 1** — Performed and recorded by Sachin Chopra
+- **Chopin — Prelude in E minor** — Performed and recorded by Sachin Chopra
+- **Debussy — Clair de lune** — Performed and recorded by Sachin Chopra
+- **Mendelssohn — Shepherd's Complaint** — Performed and recorded by Sachin Chopra
+- **Bach — French Suite No. 5, Sarabande** — Performed and recorded by Sachin Chopra
+- **Bach — French Suite No. 1, Sarabande** — Performed and recorded by Sachin Chopra
 ```

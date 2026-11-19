@@ -38,9 +38,17 @@ Open **Settings** from the main menu or the gear icon during play. Use the **Mus
 
 ## Music
 
-Instrumental background music uses recordings from [Musopen](https://musopen.org). Recordings are used under public domain or Creative Commons licences as documented in the app repository.
+Background piano music: original performances recorded for this app.
 
-*(When you finish Musopen documentation, run `npm run music:attribution` and replace this section with the contents of `music/support-credits.snippet.md`.)*
+- **Chopin — Nocturne No. 2** — Performed and recorded by Sachin Chopra
+- **Bach — Prelude in C major** — Performed and recorded by Sachin Chopra
+- **Satie — Gymnopédie No. 1** — Performed and recorded by Sachin Chopra
+- **Debussy — Arabesque No. 1** — Performed and recorded by Sachin Chopra
+- **Chopin — Prelude in E minor** — Performed and recorded by Sachin Chopra
+- **Debussy — Clair de lune** — Performed and recorded by Sachin Chopra
+- **Mendelssohn — Shepherd's Complaint** — Performed and recorded by Sachin Chopra
+- **Bach — French Suite No. 5, Sarabande** — Performed and recorded by Sachin Chopra
+- **Bach — French Suite No. 1, Sarabande** — Performed and recorded by Sachin Chopra
 
 ## Contact
 

@@ -1,7 +1,7 @@
 /**
  * Normalise loudness (EBU R128 ~−16 LUFS) and encode AAC .m4a for in-app playback.
  *
- * Put source MP3s in music/source/ (see music/manifest.json).
+ * Put source WAV/MP3 in music/source/ (see music/manifest.json).
  * Writes public/assets/music/<id>.m4a
  *
  * Requires ffmpeg on PATH. Run: npm run build:music

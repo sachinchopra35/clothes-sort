@@ -1,6 +1,6 @@
 # Game music
 
-1. Drop source **MP3** files in `music/source/`.
+1. Drop source **WAV** or **MP3** files in `music/source/` (see `source` filenames in `manifest.json`).
 2. Add an entry to `music/manifest.json` (`id`, `source`, friendly `title`, plus attribution fields below).
 3. Run `npm run build:music` (requires **ffmpeg**).
 

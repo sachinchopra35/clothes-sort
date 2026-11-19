@@ -1,44 +1,67 @@
 {
   "tracks": [
     {
-      "id": "chopin-nocturne-1",
-      "source": "chopin_9_1_CC_PD.mp3",
-      "title": "Chopin — Nocturne 1",
-      "musopenUrl": "",
-      "recordingLicense": "pending",
-      "attribution": ""
-    },
-    {
       "id": "chopin-nocturne-2",
-      "source": "chopin_9_2_CC_PD.mp3",
-      "title": "Chopin — Nocturne 2",
-      "musopenUrl": "",
-      "recordingLicense": "pending",
-      "attribution": ""
+      "source": "Sachin Chopin Nocturne 2.wav",
+      "title": "Chopin — Nocturne No. 2",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
     },
     {
-      "id": "chopin-tristesse",
-      "source": "chopin_tristesse_CC_PD.mp3",
-      "title": "Chopin — Tristesse",
-      "musopenUrl": "",
-      "recordingLicense": "pending",
-      "attribution": ""
+      "id": "bach-prelude-cmaj",
+      "source": "Sachin Bach Cmaj.wav",
+      "title": "Bach — Prelude in C major",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
     },
     {
-      "id": "beethoven-sonata",
-      "source": "beethoven_1_2_CC_PD.mp3",
-      "title": "Beethoven — Sonata 1, Adagio",
-      "musopenUrl": "",
-      "recordingLicense": "pending",
-      "attribution": ""
+      "id": "satie-gymnopedie-1",
+      "source": "Satie Gymnopedie.wav",
+      "title": "Satie — Gymnopédie No. 1",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
     },
     {
-      "id": "bach-goldberg-22",
-      "source": "goldberg_22_CC_PD.mp3",
-      "title": "Bach — Goldberg Variation 22",
-      "musopenUrl": "",
-      "recordingLicense": "pending",
-      "attribution": ""
+      "id": "debussy-arabesque-1",
+      "source": "Sachin Debussy Arabesque 1.wav",
+      "title": "Debussy — Arabesque No. 1",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
+    },
+    {
+      "id": "chopin-prelude-em",
+      "source": "Sachin Chopin Em.wav",
+      "title": "Chopin — Prelude in E minor",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
+    },
+    {
+      "id": "debussy-clair-de-lune",
+      "source": "Sachin Clair de Lune.wav",
+      "title": "Debussy — Clair de lune",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
+    },
+    {
+      "id": "mendelssohn-shepherds-complaint",
+      "source": "Sachin Mendelssohn Shepherd.wav",
+      "title": "Mendelssohn — Shepherd's Complaint",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
+    },
+    {
+      "id": "bach-french-suite-5-sarabande",
+      "source": "Sachin Bach 5 Sarabande.wav",
+      "title": "Bach — French Suite No. 5, Sarabande",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
+    },
+    {
+      "id": "bach-french-suite-1-sarabande",
+      "source": "Sachin Bach 1 Sarabande.wav",
+      "title": "Bach — French Suite No. 1, Sarabande",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
     }
   ]
 }
