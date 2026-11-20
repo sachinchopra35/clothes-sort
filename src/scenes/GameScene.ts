@@ -11,6 +11,7 @@ import { theme } from "../config/theme";
 import { BoardController } from "../game/BoardController";
 import { computeShelfLayout } from "../layout/shelfLayout";
 import { getLevelById, getLevelIndex, LEVELS } from "../levels/levelData";
+import { isMusicLikelyInaudible } from "../audio/musicAudibility";
 import { ensureMusicPlaying, registerMusicScene } from "../audio/musicManager";
 import { playLevelComplete } from "../audio/uiSounds";
 import { WardrobeBackground } from "../objects/WardrobeBackground";
@@ -24,6 +25,10 @@ import {
   SETTINGS_ICON_KEY,
 } from "../ui/IconButton";
 import { SettingsPanel } from "../ui/SettingsPanel";
+import {
+  hasSeenMusicVolumeHint,
+  markMusicVolumeHintSeen,
+} from "../state/musicVolumeHint";
 import { hasSeenUndoIntro, markUndoIntroSeen } from "../state/undoIntro";
 import { LevelCompletePanel } from "../ui/LevelCompletePanel";
 import { playConfetti } from "../ui/playConfetti";
@@ -152,6 +157,20 @@ export class GameScene extends Phaser.Scene {
         markUndoIntroSeen();
         this.undoIntroPanel?.destroy();
         this.undoIntroPanel = null;
+      });
+    }
+
+    if (levelNum === 5 && !hasSeenMusicVolumeHint()) {
+      this.time.delayedCall(800, () => {
+        if (!this.scene.isActive()) return;
+        if (hasSeenMusicVolumeHint()) return;
+        if (!isMusicLikelyInaudible()) return;
+        markMusicVolumeHintSeen();
+        showBriefMessage(
+          this,
+          "Turn your phone off mute and turn up the volume to hear some nice piano music",
+          { wrapWidth: DESIGN_WIDTH - 80, holdMs: 3500 },
+        );
       });
     }
 

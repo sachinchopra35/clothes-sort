@@ -13,6 +13,18 @@ let current: BgmSound | null = null;
 let currentIndex = -1;
 let unlocked = false;
 let advancing = false;
+const trackChangeListeners = new Set<() => void>();
+
+export function subscribeMusicTrackChange(listener: () => void): () => void {
+  trackChangeListeners.add(listener);
+  return () => trackChangeListeners.delete(listener);
+}
+
+function notifyMusicTrackChange(): void {
+  for (const listener of trackChangeListeners) {
+    listener();
+  }
+}
 
 function getPlaybackState(sound: BgmSound): { duration: number; seek: number } {
   const s = sound as Phaser.Sound.WebAudioSound;
@@ -119,6 +131,7 @@ function playIndex(index: number, persistIndex: boolean): void {
 
   if (persistIndex) {
     setMusicTrackIndex(index);
+    notifyMusicTrackChange();
   }
 
   if (shouldPlay()) {
@@ -161,6 +174,33 @@ export function getPlayingTrackIndex(): number {
 export function getPlayingTrackTitle(): string {
   const idx = getPlayingTrackIndex();
   return MUSIC_TRACKS[idx]?.title ?? "";
+}
+
+/** For UI hints: whether background music ought to be audible right now. */
+export function getMusicPlaybackSnapshot(): {
+  shouldPlay: boolean;
+  isPlaying: boolean;
+  isPaused: boolean;
+  audioLocked: boolean;
+  betweenTracks: boolean;
+  trackLoaded: boolean;
+} {
+  const scene = sceneRef;
+  return {
+    shouldPlay: shouldPlay(),
+    isPlaying: current?.isPlaying ?? false,
+    isPaused: current?.isPaused ?? false,
+    audioLocked: scene?.sound.locked ?? false,
+    trackLoaded: current !== null,
+    betweenTracks: Boolean(
+      advancing ||
+        (current &&
+          shouldPlay() &&
+          !current.isPlaying &&
+          !current.isPaused &&
+          playbackReachedEnd(current)),
+    ),
+  };
 }
 
 export function stopMusic(): void {

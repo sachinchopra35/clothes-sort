@@ -1,5 +1,9 @@
 import Phaser from "phaser";
-import { playNextTrack, playPreviousTrack } from "../audio/musicManager";
+import {
+  playNextTrack,
+  playPreviousTrack,
+  subscribeMusicTrackChange,
+} from "../audio/musicManager";
 import { MUSIC_TRACKS } from "../audio/musicCatalog";
 import { getSettings } from "../state/settings";
 import { scaleButtonSize } from "../config/uiButtons";
@@ -31,6 +35,7 @@ function splitTitle(title: string): { composer: string; piece: string } {
 export class MusicTrackPicker extends Phaser.GameObjects.Container {
   private readonly composerText: Phaser.GameObjects.Text;
   private readonly pieceText: Phaser.GameObjects.Text;
+  private readonly unsubTrackChange: () => void;
 
   constructor(
     scene: Phaser.Scene,
@@ -93,6 +98,12 @@ export class MusicTrackPicker extends Phaser.GameObjects.Container {
 
     this.add([this.composerText, this.pieceText]);
     this.refresh();
+    this.unsubTrackChange = subscribeMusicTrackChange(() => this.refresh());
+  }
+
+  destroy(fromScene?: boolean): void {
+    this.unsubTrackChange();
+    super.destroy(fromScene);
   }
 
   refresh(): void {

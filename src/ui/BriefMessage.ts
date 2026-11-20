@@ -5,15 +5,28 @@ import { theme } from "../config/theme";
 const PAD_X = 28;
 const PAD_Y = 16;
 
-export function showBriefMessage(scene: Phaser.Scene, message: string): void {
+export interface BriefMessageOptions {
+  /** Design-pixel width for word wrap; defaults to no wrap. */
+  wrapWidth?: number;
+  /** How long the message stays fully visible before fading (ms). */
+  holdMs?: number;
+}
+
+export function showBriefMessage(
+  scene: Phaser.Scene,
+  message: string,
+  options?: BriefMessageOptions,
+): void {
   const cx = DESIGN_WIDTH / 2;
   const y = DESIGN_HEIGHT - 300;
+  const holdMs = options?.holdMs ?? 1500;
 
   const label = scene.add.text(0, 0, message, {
     fontFamily: theme.fontFamily,
     fontSize: theme.fontSize.body,
     color: theme.ui.text,
     align: "center",
+    wordWrap: options?.wrapWidth ? { width: options.wrapWidth } : undefined,
   });
   label.setOrigin(0.5);
 
@@ -37,7 +50,7 @@ export function showBriefMessage(scene: Phaser.Scene, message: string): void {
     ease: "Quad.out",
   });
 
-  scene.time.delayedCall(1500, () => {
+  scene.time.delayedCall(holdMs, () => {
     scene.tweens.add({
       targets: root,
       alpha: 0,

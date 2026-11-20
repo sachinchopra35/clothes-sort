@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { applyMusicSettings } from "../audio/musicManager";
+import { playUiKnock } from "../audio/uiSounds";
 import { DESIGN_HEIGHT, DESIGN_WIDTH, MODAL_UI_DEPTH } from "../config/layout";
 import {
   PANEL_BUTTON_H,
@@ -13,6 +14,7 @@ import {
 } from "../state/settings";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
+import { MusicAboutPanel } from "./MusicAboutPanel";
 import { MusicTrackPicker } from "./MusicTrackPicker";
 import { playModalPopIn } from "./modalPopIn";
 import { VolumeSlider } from "./VolumeSlider";
@@ -29,12 +31,44 @@ const NOW_PLAYING_Y = 440;
 const PICKER_Y = 520;
 /** Lowest point of the picker text block (two piece lines) below PICKER_Y. */
 const PICKER_BOTTOM = 112;
-const PICKER_TO_DONE = 36;
+const ABOUT_BELOW_PICKER = 28;
+const ABOUT_LINK_H = 48;
+const ABOUT_ABOVE_DONE = 28;
 const PANEL_H =
-  PICKER_Y + PICKER_BOTTOM + PICKER_TO_DONE + PANEL_BUTTON_H + PANEL_INSET;
+  PICKER_Y +
+  PICKER_BOTTOM +
+  ABOUT_BELOW_PICKER +
+  ABOUT_LINK_H +
+  ABOUT_ABOVE_DONE +
+  PANEL_BUTTON_H +
+  PANEL_INSET;
+
+const INFO_ICON_SIZE = 30;
+const INFO_ICON_COLOR = 0xf4a261;
+
+function createInfoIcon(scene: Phaser.Scene, diameter: number, color: number): Phaser.GameObjects.Graphics {
+  const g = scene.add.graphics();
+  const r = diameter / 2;
+  const stroke = Math.max(2, Math.round(diameter * 0.11));
+  g.lineStyle(stroke, color, 1);
+  g.strokeCircle(0, 0, r - stroke);
+
+  const dotR = Math.max(2, Math.round(diameter * 0.1));
+  g.fillStyle(color, 1);
+  g.fillCircle(0, -r * 0.38, dotR);
+
+  g.lineStyle(stroke + 1, color, 1);
+  g.beginPath();
+  g.moveTo(0, -r * 0.12);
+  g.lineTo(0, r * 0.38);
+  g.strokePath();
+
+  return g;
+}
 
 export class SettingsPanel extends Phaser.GameObjects.Container {
   private trackPicker: MusicTrackPicker | null = null;
+  private aboutMusicPanel: MusicAboutPanel | null = null;
 
   constructor(scene: Phaser.Scene, onClose: () => void) {
     super(scene, 0, 0);
@@ -131,6 +165,42 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
       this,
     );
 
+    const aboutY =
+      panelTop +
+      PICKER_Y +
+      PICKER_BOTTOM +
+      ABOUT_BELOW_PICKER +
+      ABOUT_LINK_H / 2;
+    const aboutRow = scene.add.container(CX, aboutY);
+    const infoIcon = createInfoIcon(scene, INFO_ICON_SIZE, INFO_ICON_COLOR);
+    const aboutLabel = scene.add.text(0, 0, "About the Music", {
+      fontFamily: theme.fontFamily,
+      fontSize: theme.fontSize.small,
+      color: theme.ui.textMuted,
+    });
+    aboutLabel.setOrigin(0, 0.5);
+    const aboutGap = 12;
+    const aboutRowW = INFO_ICON_SIZE + aboutGap + aboutLabel.width;
+    infoIcon.x = -aboutRowW / 2 + INFO_ICON_SIZE / 2;
+    aboutLabel.x = -aboutRowW / 2 + INFO_ICON_SIZE + aboutGap;
+    aboutRow.add([infoIcon, aboutLabel]);
+
+    aboutRow.setSize(aboutRowW, ABOUT_LINK_H);
+    aboutRow.setInteractive(
+      new Phaser.Geom.Rectangle(-aboutRowW / 2, -ABOUT_LINK_H / 2, aboutRowW, ABOUT_LINK_H),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    aboutRow.input!.cursor = "pointer";
+    aboutRow.on("pointerup", () => {
+      playUiKnock();
+      if (this.aboutMusicPanel) return;
+      this.aboutMusicPanel = new MusicAboutPanel(scene, () => {
+        this.aboutMusicPanel?.destroy();
+        this.aboutMusicPanel = null;
+      });
+    });
+    this.add(aboutRow);
+
     new Button(
       scene,
       {
@@ -146,5 +216,10 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     );
 
     playModalPopIn(scene, this, backdrop, { pivotX: CX, pivotY: CY });
+
+    this.on(Phaser.GameObjects.Events.DESTROY, () => {
+      this.aboutMusicPanel?.destroy();
+      this.aboutMusicPanel = null;
+    });
   }
 }
