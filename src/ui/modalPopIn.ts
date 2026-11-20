@@ -9,6 +9,13 @@ export interface ModalPopInOptions {
   pivotY: number;
   /** Left at the root and faded only (default: backdrop). */
   fadeOnly?: Phaser.GameObjects.GameObject[];
+  popDuration?: number;
+  fadeDuration?: number;
+  startScale?: number;
+  /** Phaser ease id, e.g. `Back.easeOut` or `Cubic.easeOut`. */
+  popEase?: string;
+  /** Overshoot for `Back.easeOut` only (default 1.15). */
+  backOvershoot?: number;
   onComplete?: () => void;
 }
 
@@ -22,11 +29,21 @@ export function playModalPopIn(
   backdrop: Phaser.GameObjects.GameObject,
   options: ModalPopInOptions,
 ): void {
-  const { pivotX, pivotY, fadeOnly = [], onComplete } = options;
+  const {
+    pivotX,
+    pivotY,
+    fadeOnly = [],
+    popDuration = POP_MS,
+    fadeDuration = FADE_MS,
+    startScale = START_SCALE,
+    popEase = "Back.easeOut",
+    backOvershoot = 1.15,
+    onComplete,
+  } = options;
   const skip = new Set([backdrop, ...fadeOnly]);
 
   const popup = scene.add.container(pivotX, pivotY);
-  popup.setScale(START_SCALE);
+  popup.setScale(startScale);
   popup.setAlpha(0);
 
   const toMove = modal.list.filter((child) => !skip.has(child));
@@ -50,18 +67,21 @@ export function playModalPopIn(
   scene.tweens.add({
     targets: backdrop,
     alpha: dimAlpha,
-    duration: FADE_MS,
+    duration: fadeDuration,
     ease: "Quad.Out",
   });
 
-  scene.tweens.add({
+  const popTween: Phaser.Types.Tweens.TweenBuilderConfig = {
     targets: popup,
     scaleX: 1,
     scaleY: 1,
     alpha: 1,
-    duration: POP_MS,
-    ease: "Back.easeOut",
-    easeParams: [1.15],
+    duration: popDuration,
+    ease: popEase,
     onComplete: () => onComplete?.(),
-  });
+  };
+  if (popEase === "Back.easeOut") {
+    popTween.easeParams = [backOvershoot];
+  }
+  scene.tweens.add(popTween);
 }

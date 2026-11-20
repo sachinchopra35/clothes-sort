@@ -19,8 +19,8 @@ const DECOR_SCALE = 1.78;
 const DECOR: { id: ClothingId; x: number; y: number; rotationDeg: number; scale?: number }[] = [
   { id: "red-polka-dress", x: 318, y: 560, rotationDeg: -13 },
   { id: "brown-leather-jacket", x: 762, y: 598, rotationDeg: 15 },
-  { id: "purple-socks", x: 332, y: 1368, rotationDeg: 11 },
-  { id: "white-tee", x: 748, y: 1332, rotationDeg: -17 },
+  { id: "yellow-shorts", x: 332, y: 1368, rotationDeg: 11 },
+  { id: "purple-tee", x: 748, y: 1332, rotationDeg: -17 },
 ];
 
 function clothingDisplayScale(extra = 1): number {

@@ -19,8 +19,8 @@ import { Button } from "./Button";
 import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = DESIGN_WIDTH - 96;
-/** Tall sheet on phone — more room for the essay before scrolling. */
-const PANEL_VERTICAL_MARGIN = 72;
+/** Tall sheet on phone — room for the essay before scrolling. */
+const PANEL_VERTICAL_MARGIN = 112;
 const PANEL_H = DESIGN_HEIGHT - PANEL_VERTICAL_MARGIN * 2;
 const PANEL_TOP = PANEL_VERTICAL_MARGIN;
 const CX = DESIGN_WIDTH / 2;
@@ -35,7 +35,7 @@ const FOOTER = PANEL_INSET + PANEL_BUTTON_H + 28;
 const SCROLL_HINT_RESERVE = 68;
 const BODY_FONT_PX = 40;
 const LINE_HEIGHT = 56;
-const PARAGRAPH_GAP = 40;
+const PARAGRAPH_GAP = 56;
 const LINK_COLOR = "#f4a261";
 const LINK_COLOR_NUM = 0xf4a261;
 const TAP_SLOP = 16;
@@ -318,6 +318,10 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
     playModalPopIn(scene, this, backdrop, {
       pivotX: CX,
       pivotY: PANEL_PIVOT_Y,
+      popDuration: 420,
+      fadeDuration: 280,
+      startScale: 0.94,
+      popEase: "Cubic.easeOut",
     });
   }
 }

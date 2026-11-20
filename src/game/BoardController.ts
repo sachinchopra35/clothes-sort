@@ -2,9 +2,13 @@ import Phaser from "phaser";
 import { playClothesMove } from "../audio/uiSounds";
 import { clothingDepthOnShelf } from "../config/layout";
 import type { LevelDefinition } from "../levels/levelTypes";
+import {
+  computeShelfHitSlops,
+  type ShelfHitSlop,
+} from "../layout/shelfHitSlop";
 import type { ShelfLayoutEntry } from "../layout/shelfLayout";
 import { ClothingItem } from "../objects/ClothingItem";
-import { Shelf } from "../objects/Shelf";
+import { Shelf, type ShelfOptions } from "../objects/Shelf";
 import {
   applyMove,
   canMove,
@@ -21,6 +25,7 @@ export class BoardController {
   private state: BoardState;
   private readonly scene: Phaser.Scene;
   private layout: ShelfLayoutEntry[] = [];
+  private hitSlops = new Map<string, ShelfHitSlop>();
   private readonly shelfViews = new Map<string, Shelf>();
   /** Items wall → open per shelf id. */
   private readonly itemsByShelf = new Map<string, ClothingItem[]>();
@@ -47,6 +52,7 @@ export class BoardController {
   ) {
     this.scene = scene;
     this.layout = layout;
+    this.hitSlops = computeShelfHitSlops(layout);
     this.undoAllowance = undoAllowance;
     this.undosRemaining = undoAllowance;
     this.state = createBoard(level);
@@ -55,14 +61,7 @@ export class BoardController {
       const boardShelf = this.state.shelves.find((s) => s.id === entry.definition.id);
       if (!boardShelf || boardShelf.cleared) continue;
 
-      const shelf = new Shelf(scene, {
-        id: entry.definition.id,
-        x: entry.x,
-        y: entry.y,
-        width: entry.width,
-        side: entry.definition.side,
-        capacity: entry.definition.capacity,
-      });
+      const shelf = new Shelf(scene, this.shelfOptions(entry));
       shelf.setTapHandler(() => void this.onShelfTap(entry.definition.id));
       shelf.setDepth(entry.y);
       this.shelfViews.set(entry.definition.id, shelf);
@@ -252,6 +251,18 @@ export class BoardController {
     return this.undoAllowance > 0 && this.undosRemaining <= 0;
   }
 
+  private shelfOptions(entry: ShelfLayoutEntry, x = entry.x): ShelfOptions {
+    return {
+      id: entry.definition.id,
+      x,
+      y: entry.y,
+      width: entry.width,
+      side: entry.definition.side,
+      capacity: entry.definition.capacity,
+      hitSlop: this.hitSlops.get(entry.definition.id),
+    };
+  }
+
   private emitUndoState(): void {
     const exhausted = this.undosRemaining <= 0;
     this.onUndoStateChange?.(this.undosRemaining, exhausted);
@@ -281,14 +292,7 @@ export class BoardController {
       }
 
       if (!view) {
-        view = new Shelf(this.scene, {
-          id: entry.definition.id,
-          x: homeX,
-          y: entry.y,
-          width: entry.width,
-          side: entry.definition.side,
-          capacity: entry.definition.capacity,
-        });
+        view = new Shelf(this.scene, this.shelfOptions(entry, homeX));
         view.setTapHandler(() => void this.onShelfTap(id));
         this.shelfViews.set(id, view);
       } else {
@@ -330,20 +334,14 @@ export class BoardController {
     this.undoSnapshots.length = 0;
     this.undosRemaining = this.undoAllowance;
     this.layout = layout;
+    this.hitSlops = computeShelfHitSlops(layout);
 
     this.state = createBoard(level);
     for (const entry of layout) {
       const boardShelf = this.state.shelves.find((s) => s.id === entry.definition.id);
       if (!boardShelf) continue;
 
-      const shelf = new Shelf(this.scene, {
-        id: entry.definition.id,
-        x: entry.x,
-        y: entry.y,
-        width: entry.width,
-        side: entry.definition.side,
-        capacity: entry.definition.capacity,
-      });
+      const shelf = new Shelf(this.scene, this.shelfOptions(entry));
       shelf.setTapHandler(() => void this.onShelfTap(entry.definition.id));
       shelf.setDepth(entry.y);
       this.shelfViews.set(entry.definition.id, shelf);

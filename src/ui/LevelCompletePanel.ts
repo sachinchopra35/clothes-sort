@@ -1,17 +1,14 @@
 import Phaser from "phaser";
 import { DESIGN_HEIGHT, DESIGN_WIDTH, MODAL_UI_DEPTH } from "../config/layout";
-import {
-  PANEL_BUTTON_H,
-  PANEL_INSET,
-  panelContentWidth,
-} from "../config/panelLayout";
+import { PANEL_INSET, panelContentWidth } from "../config/panelLayout";
 import { theme } from "../config/theme";
 import { pickLevelCompleteSubtitle } from "./levelCompleteMessages";
 import { Button } from "./Button";
 import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = 680;
-const PANEL_H = 460;
+const PANEL_H = 508;
+const LEVEL_BTN_H = 116;
 const BTN_GAP = 20;
 
 export interface LevelCompletePanelOptions {
@@ -76,10 +73,10 @@ export class LevelCompletePanel extends Phaser.GameObjects.Container {
     subtitle.setOrigin(0.5, 0);
     this.add(subtitle);
 
-    const mainMenuY = panelTop + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2;
+    const mainMenuY = panelTop + PANEL_H - PANEL_INSET - LEVEL_BTN_H / 2;
 
     if (options.hasNextLevel) {
-      const nextButtonY = mainMenuY - PANEL_BUTTON_H - BTN_GAP;
+      const nextButtonY = mainMenuY - LEVEL_BTN_H - BTN_GAP;
 
       new Button(
         scene,
@@ -87,9 +84,10 @@ export class LevelCompletePanel extends Phaser.GameObjects.Container {
           x: cx,
           y: nextButtonY,
           width: btnW,
-          height: PANEL_BUTTON_H,
-          label: "Next level",
+          height: LEVEL_BTN_H,
+          label: "Next Level",
           fontSize: theme.fontSize.body,
+          trailingGlyph: "→",
           onClick: options.onNext,
         },
         this,
@@ -102,8 +100,8 @@ export class LevelCompletePanel extends Phaser.GameObjects.Container {
         x: cx,
         y: mainMenuY,
         width: btnW,
-        height: PANEL_BUTTON_H,
-        label: "Main menu",
+        height: LEVEL_BTN_H,
+        label: "Main Menu",
         fontSize: theme.fontSize.body,
         onClick: options.onMenu,
       },

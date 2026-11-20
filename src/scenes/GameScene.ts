@@ -29,11 +29,13 @@ import {
   hasSeenMusicVolumeHint,
   markMusicVolumeHintSeen,
 } from "../state/musicVolumeHint";
+import { hasSeenLevel21Intro, markLevel21IntroSeen } from "../state/level21Intro";
 import { hasSeenUndoIntro, markUndoIntroSeen } from "../state/undoIntro";
 import { LevelCompletePanel } from "../ui/LevelCompletePanel";
 import { playConfetti } from "../ui/playConfetti";
 import { UndoButton } from "../ui/UndoButton";
 import { showBriefMessage } from "../ui/BriefMessage";
+import { Level21IntroPanel } from "../ui/Level21IntroPanel";
 import { UndoIntroPanel } from "../ui/UndoIntroPanel";
 import { Level1Tutorial } from "../ui/Level1Tutorial";
 import {
@@ -61,6 +63,7 @@ export class GameScene extends Phaser.Scene {
   private settingsPanel: SettingsPanel | null = null;
   private undoButton: UndoButton | null = null;
   private undoIntroPanel: UndoIntroPanel | null = null;
+  private level21IntroPanel: Level21IntroPanel | null = null;
   private tutorial: Level1Tutorial | null = null;
 
   constructor() {
@@ -89,6 +92,7 @@ export class GameScene extends Phaser.Scene {
     this.tutorial = null;
     this.undoButton = null;
     this.undoIntroPanel = null;
+    this.level21IntroPanel = null;
 
     const level = getLevelById(this.levelId);
     if (!level) {
@@ -157,6 +161,14 @@ export class GameScene extends Phaser.Scene {
         markUndoIntroSeen();
         this.undoIntroPanel?.destroy();
         this.undoIntroPanel = null;
+      });
+    }
+
+    if (levelNum === 21 && !hasSeenLevel21Intro()) {
+      this.level21IntroPanel = new Level21IntroPanel(this, () => {
+        markLevel21IntroSeen();
+        this.level21IntroPanel?.destroy();
+        this.level21IntroPanel = null;
       });
     }
 

@@ -10,6 +10,9 @@ import {
 } from "../config/layout";
 import { theme } from "../config/theme";
 import type { ShelfSide } from "../levels/levelTypes";
+import type { ShelfHitSlop } from "../layout/shelfHitSlop";
+
+const HIT_H_BASE = 40;
 
 export interface ShelfOptions {
   id: string;
@@ -18,6 +21,7 @@ export interface ShelfOptions {
   width: number;
   side: ShelfSide;
   capacity: number;
+  hitSlop?: ShelfHitSlop;
 }
 
 export class Shelf extends Phaser.GameObjects.Container {
@@ -43,13 +47,12 @@ export class Shelf extends Phaser.GameObjects.Container {
     this.add(this.plankGfx);
     this.drawShelf(options.width, options.side);
 
-    const hitH = SLOT_SIZE + SHELF_PLANK_HEIGHT + 40;
-    this.hitZone = scene.add.zone(
-      options.width / 2,
-      -SLOT_SIZE / 2,
-      options.width,
-      hitH,
-    );
+    const slop = options.hitSlop ?? { wall: 0, open: 0, above: 0, below: 0 };
+    const hitW = options.width + slop.wall + slop.open;
+    const hitH = SLOT_SIZE + SHELF_PLANK_HEIGHT + HIT_H_BASE + slop.above + slop.below;
+    const hitX = (options.width + slop.open - slop.wall) / 2;
+    const hitY = -SLOT_SIZE / 2 + (slop.below - slop.above) / 2;
+    this.hitZone = scene.add.zone(hitX, hitY, hitW, hitH);
     this.hitZone.setInteractive({ useHandCursor: true });
     this.add(this.hitZone);
   }

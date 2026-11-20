@@ -25,13 +25,10 @@ const BODY_LINE_SPACING = 20;
 
 const INSTRUCTIONS = [
   "Tap a shelf to pick up the clothes at its open end.",
-  "You only take matching items in a row (for example several white tees together).",
   "Tap another shelf to place them:",
-  "  • An empty shelf is always OK",
-  "  • Or the open end must already show the same type",
-  "Tap the same shelf again to put them back down.",
-  "When a shelf is full and every item matches, it slides away.",
-  "Win by clearing every shelf!",
+  "  • The new shelf must already show the same type",
+  "  • Or, the new shelf must be empty",
+  "When the shelves are full of matching clothes, you win!",
 ].join("\n");
 
 export class InstructionsPanel extends Phaser.GameObjects.Container {

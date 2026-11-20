@@ -17,10 +17,10 @@ const LABEL_Y = -40;
 const CONTROL_Y = 26;
 const MUTE_W = 168;
 const MUTE_H = 64;
-const MUTE_GAP = 36;
+const MUTE_GAP = 52;
 const DEFAULT_UNMUTE = 0.85;
 
-/** Label on top; mute button + draggable track below. Value is 0–1. */
+/** Label on top; draggable track with mute button on the right. Value is 0–1. */
 export class VolumeSlider extends Phaser.GameObjects.Container {
   private value: number;
   private lastAudible: number;
@@ -52,8 +52,10 @@ export class VolumeSlider extends Phaser.GameObjects.Container {
     this.onChange = options.onChange;
 
     const left = -options.rowWidth / 2;
-    this.trackLeft = left + MUTE_W + MUTE_GAP;
-    this.trackW = options.rowWidth / 2 - KNOB_R - this.trackLeft;
+    const right = options.rowWidth / 2;
+    this.trackLeft = left + 4;
+    const muteCenterX = right - MUTE_W / 2;
+    this.trackW = muteCenterX - MUTE_W / 2 - MUTE_GAP - this.trackLeft;
 
     const labelText = scene.add.text(left + 4, LABEL_Y, options.label, {
       fontFamily: theme.fontFamily,
@@ -66,7 +68,7 @@ export class VolumeSlider extends Phaser.GameObjects.Container {
     this.muteButton = new Button(
       scene,
       {
-        x: left + MUTE_W / 2,
+        x: muteCenterX,
         y: CONTROL_Y,
         width: MUTE_W,
         height: MUTE_H,

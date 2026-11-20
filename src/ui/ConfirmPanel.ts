@@ -1,16 +1,13 @@
 import Phaser from "phaser";
 import { DESIGN_HEIGHT, DESIGN_WIDTH, MODAL_UI_DEPTH } from "../config/layout";
-import {
-  PANEL_BUTTON_H,
-  PANEL_INSET,
-  panelContentWidth,
-} from "../config/panelLayout";
+import { PANEL_INSET, panelContentWidth } from "../config/panelLayout";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
 import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = 640;
-const PANEL_H = 400;
+const PANEL_H = 424;
+const CONFIRM_BTN_H = 116;
 const BTN_GAP = 20;
 /** Clear band between body copy and the button row. */
 const BODY_ABOVE_BUTTONS = 40;
@@ -68,8 +65,8 @@ export class ConfirmPanel extends Phaser.GameObjects.Container {
     title.setOrigin(0.5);
     this.add(title);
 
-    const btnY = panelTop + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2;
-    const bodyBottom = btnY - PANEL_BUTTON_H / 2 - BODY_ABOVE_BUTTONS;
+    const btnY = panelTop + PANEL_H - PANEL_INSET - CONFIRM_BTN_H / 2;
+    const bodyBottom = btnY - CONFIRM_BTN_H / 2 - BODY_ABOVE_BUTTONS;
 
     const body = scene.add.text(cx, panelTop + 120, options.message, {
       fontFamily: theme.fontFamily,
@@ -93,7 +90,7 @@ export class ConfirmPanel extends Phaser.GameObjects.Container {
         x: leftX,
         y: btnY,
         width: halfW,
-        height: PANEL_BUTTON_H,
+        height: CONFIRM_BTN_H,
         label: options.cancelLabel ?? "Cancel",
         fontSize: theme.fontSize.body,
         onClick: close,
@@ -107,7 +104,7 @@ export class ConfirmPanel extends Phaser.GameObjects.Container {
         x: rightX,
         y: btnY,
         width: halfW,
-        height: PANEL_BUTTON_H,
+        height: CONFIRM_BTN_H,
         label: options.confirmLabel,
         fontSize: theme.fontSize.body,
         onClick: () => options.onConfirm(),

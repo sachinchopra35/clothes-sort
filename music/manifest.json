@@ -1,6 +1,13 @@
 {
   "tracks": [
     {
+      "id": "satie-gymnopedie-1",
+      "source": "Satie Gymnopedie.wav",
+      "title": "Satie — Gymnopédie No. 1",
+      "recordingLicense": "original",
+      "attribution": "Performed and recorded by Sachin Chopra"
+    },
+    {
       "id": "chopin-nocturne-2",
       "source": "Sachin Chopin Nocturne 2.wav",
       "title": "Chopin — Nocturne No. 2",
@@ -11,13 +18,6 @@
       "id": "bach-prelude-cmaj",
       "source": "Sachin Bach Cmaj.wav",
       "title": "Bach — Prelude in C major",
-      "recordingLicense": "original",
-      "attribution": "Performed and recorded by Sachin Chopra"
-    },
-    {
-      "id": "satie-gymnopedie-1",
-      "source": "Satie Gymnopedie.wav",
-      "title": "Satie — Gymnopédie No. 1",
       "recordingLicense": "original",
       "attribution": "Performed and recorded by Sachin Chopra"
     },

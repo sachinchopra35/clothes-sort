@@ -2,6 +2,10 @@ import Phaser from "phaser";
 import { playUiKnock } from "../audio/uiSounds";
 import { theme } from "../config/theme";
 
+/** Renders arrows/glyphs bolder than Fredoka (iOS system / UI symbol fonts). */
+const TRAILING_GLYPH_FONT =
+  'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI Symbol", "Apple Symbols", sans-serif';
+
 export interface ButtonOptions {
   x: number;
   y: number;
@@ -9,10 +13,15 @@ export interface ButtonOptions {
   height: number;
   label: string;
   fontSize?: string;
+  /** Extra character after the label, drawn in {@link TRAILING_GLYPH_FONT}. */
+  trailingGlyph?: string;
+  trailingFont?: string;
   onClick: () => void;
 }
 
 const MAX_TAP_TRAVEL = 64;
+const GLYPH_GAP = 10;
+const GLYPH_SIZE_SCALE = 1.18;
 
 /** A cancelled touch, or one that travelled like a swipe, isn't a tap. */
 export function isSwipeOrCancel(pointer: Phaser.Input.Pointer): boolean {
@@ -27,9 +36,24 @@ function parsePx(size: string): number {
   return Number.parseInt(size, 10) || 36;
 }
 
+function layoutLabelRow(
+  label: Phaser.GameObjects.Text,
+  glyph: Phaser.GameObjects.Text | null,
+  gap: number,
+): void {
+  if (!glyph) {
+    label.setX(0);
+    return;
+  }
+  const total = label.width + gap + glyph.width;
+  label.setX(-total / 2 + label.width / 2);
+  glyph.setX(total / 2 - glyph.width / 2);
+}
+
 export class Button extends Phaser.GameObjects.Container {
   private bg: Phaser.GameObjects.Graphics;
   private labelText: Phaser.GameObjects.Text;
+  private glyphText: Phaser.GameObjects.Text | null = null;
   private hitZone: Phaser.GameObjects.Zone;
   private readonly btnW: number;
   private readonly btnH: number;
@@ -52,6 +76,7 @@ export class Button extends Phaser.GameObjects.Container {
     const innerW = Math.max(48, options.width - 28);
     const innerH = Math.max(32, options.height - 16);
     let fontPx = parsePx(options.fontSize ?? theme.fontSize.body);
+    const glyphFont = options.trailingFont ?? TRAILING_GLYPH_FONT;
 
     this.bg = scene.add.graphics();
     this.labelText = scene.add.text(0, 0, options.label, {
@@ -63,19 +88,38 @@ export class Button extends Phaser.GameObjects.Container {
     });
     this.labelText.setOrigin(0.5);
 
-    while (
-      (this.labelText.width > innerW || this.labelText.height > innerH) &&
-      fontPx > 18
-    ) {
+    if (options.trailingGlyph) {
+      this.glyphText = scene.add.text(0, 0, options.trailingGlyph, {
+        fontFamily: glyphFont,
+        fontSize: `${Math.round(fontPx * GLYPH_SIZE_SCALE)}px`,
+        color: theme.ui.text,
+      });
+      this.glyphText.setOrigin(0.5);
+    }
+
+    const contentWidth = () => {
+      const g = this.glyphText?.width ?? 0;
+      return this.labelText.width + (this.glyphText ? GLYPH_GAP + g : 0);
+    };
+
+    while ((contentWidth() > innerW || this.labelText.height > innerH) && fontPx > 18) {
       fontPx -= 2;
       this.labelText.setFontSize(fontPx);
       this.labelText.setWordWrapWidth(innerW, true);
+      if (this.glyphText) {
+        this.glyphText.setFontSize(Math.round(fontPx * GLYPH_SIZE_SCALE));
+      }
     }
+
+    layoutLabelRow(this.labelText, this.glyphText, GLYPH_GAP);
 
     this.hitZone = scene.add.zone(0, 0, options.width, options.height);
     this.hitZone.setInteractive({ useHandCursor: true });
 
-    this.add([this.bg, this.labelText, this.hitZone]);
+    const parts: Phaser.GameObjects.GameObject[] = [this.bg, this.labelText];
+    if (this.glyphText) parts.push(this.glyphText);
+    parts.push(this.hitZone);
+    this.add(parts);
     this.redraw(options.width, options.height, false);
 
     this.hitZone.on("pointerdown", () => {
@@ -98,6 +142,7 @@ export class Button extends Phaser.GameObjects.Container {
 
   setLabel(label: string): void {
     this.labelText.setText(label);
+    layoutLabelRow(this.labelText, this.glyphText, GLYPH_GAP);
   }
 
   setInputEnabled(enabled: boolean): void {
