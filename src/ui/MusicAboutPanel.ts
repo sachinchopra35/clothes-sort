@@ -54,7 +54,7 @@ const PARAGRAPHS: Segment[][] = [
   [{ text: "I think piano music is seriously good for the soul." }],
   [
     {
-      text: "But how comes so many of us don’t listen to it? Maybe, people might think it’s too posh or too complicated. I disagree, I just think it’s all really lovely music.",
+      text: "But how comes so many of us don’t listen to it? Maybe people might think it’s too posh or too complicated. I disagree, I just think it’s all really lovely music.",
     },
   ],
   [

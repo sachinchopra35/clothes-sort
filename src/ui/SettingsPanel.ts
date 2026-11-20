@@ -35,6 +35,8 @@ const ABOUT_BELOW_PICKER = 8;
 /** Generous touch target (visual row is smaller, centered in this zone). */
 const ABOUT_LINK_H = 96;
 const ABOUT_ABOVE_DONE = 20;
+/** Touch zone only; extends past the row into the gaps above and below. */
+const ABOUT_HIT_H = 150;
 const PANEL_H =
   PICKER_Y +
   PICKER_BOTTOM +
@@ -186,14 +188,11 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     aboutLabel.x = -aboutRowW / 2 + INFO_ICON_SIZE + aboutGap;
     aboutRow.add([infoIcon, aboutLabel]);
 
-    const aboutHitW = rowW;
-    aboutRow.setSize(aboutHitW, ABOUT_LINK_H);
-    aboutRow.setInteractive(
-      new Phaser.Geom.Rectangle(-aboutHitW / 2, -ABOUT_LINK_H / 2, aboutHitW, ABOUT_LINK_H),
-      Phaser.Geom.Rectangle.Contains,
-    );
-    aboutRow.input!.cursor = "pointer";
-    aboutRow.on("pointerdown", () => {
+    this.add(aboutRow);
+
+    const aboutHit = scene.add.zone(CX, aboutY, rowW, ABOUT_HIT_H);
+    aboutHit.setInteractive({ useHandCursor: true });
+    aboutHit.on("pointerdown", () => {
       playUiKnock();
       if (this.aboutMusicPanel) return;
       this.aboutMusicPanel = new MusicAboutPanel(scene, () => {
@@ -201,7 +200,7 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
         this.aboutMusicPanel = null;
       });
     });
-    this.add(aboutRow);
+    this.add(aboutHit);
 
     new Button(
       scene,
