@@ -31,9 +31,10 @@ const NOW_PLAYING_Y = 440;
 const PICKER_Y = 520;
 /** Lowest point of the picker text block (two piece lines) below PICKER_Y. */
 const PICKER_BOTTOM = 112;
-const ABOUT_BELOW_PICKER = 28;
-const ABOUT_LINK_H = 48;
-const ABOUT_ABOVE_DONE = 28;
+const ABOUT_BELOW_PICKER = 8;
+/** Generous touch target (visual row is smaller, centered in this zone). */
+const ABOUT_LINK_H = 96;
+const ABOUT_ABOVE_DONE = 20;
 const PANEL_H =
   PICKER_Y +
   PICKER_BOTTOM +
@@ -185,13 +186,14 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     aboutLabel.x = -aboutRowW / 2 + INFO_ICON_SIZE + aboutGap;
     aboutRow.add([infoIcon, aboutLabel]);
 
-    aboutRow.setSize(aboutRowW, ABOUT_LINK_H);
+    const aboutHitW = rowW;
+    aboutRow.setSize(aboutHitW, ABOUT_LINK_H);
     aboutRow.setInteractive(
-      new Phaser.Geom.Rectangle(-aboutRowW / 2, -ABOUT_LINK_H / 2, aboutRowW, ABOUT_LINK_H),
+      new Phaser.Geom.Rectangle(-aboutHitW / 2, -ABOUT_LINK_H / 2, aboutHitW, ABOUT_LINK_H),
       Phaser.Geom.Rectangle.Contains,
     );
     aboutRow.input!.cursor = "pointer";
-    aboutRow.on("pointerup", () => {
+    aboutRow.on("pointerdown", () => {
       playUiKnock();
       if (this.aboutMusicPanel) return;
       this.aboutMusicPanel = new MusicAboutPanel(scene, () => {

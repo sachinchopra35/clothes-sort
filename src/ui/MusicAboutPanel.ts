@@ -19,8 +19,10 @@ import { Button } from "./Button";
 import { playModalPopIn } from "./modalPopIn";
 
 const PANEL_W = DESIGN_WIDTH - 96;
-const PANEL_H = 1020;
-const PANEL_TOP = Math.round((DESIGN_HEIGHT - PANEL_H) / 2);
+/** Tall sheet on phone — more room for the essay before scrolling. */
+const PANEL_VERTICAL_MARGIN = 72;
+const PANEL_H = DESIGN_HEIGHT - PANEL_VERTICAL_MARGIN * 2;
+const PANEL_TOP = PANEL_VERTICAL_MARGIN;
 const CX = DESIGN_WIDTH / 2;
 const PANEL_PIVOT_Y = PANEL_TOP + PANEL_H / 2;
 const PADDING = 44;
