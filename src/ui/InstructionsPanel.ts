@@ -15,21 +15,38 @@ const PANEL_TOP = Math.round((DESIGN_HEIGHT - PANEL_H) / 2);
 const CX = DESIGN_WIDTH / 2;
 const PANEL_PIVOT_Y = PANEL_TOP + PANEL_H / 2;
 const PADDING = 40;
-const HEADER = 92;
+const TITLE_Y = 52;
+const TITLE_TO_BODY = 44;
+const HEADER = TITLE_Y + 56 + TITLE_TO_BODY;
 const FOOTER = PANEL_INSET + PANEL_BUTTON_H + 28;
 /** Cleared between the scroll clip and the “read more” hint when content scrolls. */
 const SCROLL_HINT_RESERVE = 68;
 const INSTRUCTION_FONT = "42px";
-/** Extra space between wrapped lines (on top of font size). */
 const BODY_LINE_SPACING = 20;
+const PARA_GAP = 52;
+/** Tight gap from a lead-in line into its bullet list. */
+const PARA_TO_BULLETS = 10;
+const BULLET_GAP = 14;
+const BULLET_R = 7;
+const BULLET_TEXT_INDENT = 34;
+const BULLET_COLOR = 0xfff8ef;
 
-const INSTRUCTIONS = [
-  "Tap a shelf to pick up the clothes at its open end.",
-  "Tap another shelf to place them:",
-  "  • The new shelf must already show the same type",
-  "  • Or, the new shelf must be empty",
-  "When the shelves are full of matching clothes, you win!",
-].join("\n");
+type InstructionBlock =
+  | { kind: "para"; text: string }
+  | { kind: "bullets"; items: string[] };
+
+const INSTRUCTION_BLOCKS: InstructionBlock[] = [
+  { kind: "para", text: "Tap a shelf to pick up the clothes at its open end." },
+  { kind: "para", text: "Tap another shelf to place them:" },
+  {
+    kind: "bullets",
+    items: [
+      "The new shelf must already show the same type",
+      "Or, the new shelf must be empty",
+    ],
+  },
+  { kind: "para", text: "When the shelves are full of matching clothes, you win!" },
+];
 
 export class InstructionsPanel extends Phaser.GameObjects.Container {
   private wheelHandler?: (
@@ -65,7 +82,7 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
     panel.strokeRoundedRect(panelLeft, PANEL_TOP, PANEL_W, PANEL_H, 24);
     this.add(panel);
 
-    const title = scene.add.text(CX, PANEL_TOP + 52, "How to play", {
+    const title = scene.add.text(CX, PANEL_TOP + TITLE_Y, "How to play", {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.heading,
       color: theme.ui.text,
@@ -78,22 +95,62 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
     const viewHeightFull = PANEL_H - HEADER - FOOTER;
     const textX = panelLeft + PADDING;
 
-    const body = scene.add.text(0, 0, INSTRUCTIONS, {
+    const bodyStyle: Phaser.Types.GameObjects.Text.TextStyle = {
       fontFamily: theme.fontFamily,
       fontSize: INSTRUCTION_FONT,
       color: theme.ui.text,
       align: "left",
       lineSpacing: BODY_LINE_SPACING,
       wordWrap: { width: textWidth },
-    });
+    };
+    const bulletTextStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      ...bodyStyle,
+      wordWrap: { width: textWidth - BULLET_TEXT_INDENT },
+    };
 
-    const scrollable = body.height > viewHeightFull + 4;
+    const scrollContent = scene.add.container(textX, viewTop);
+    let cursorY = 0;
+
+    const addPara = (text: string, gapAfter: number) => {
+      const block = scene.add.text(0, cursorY, text, bodyStyle);
+      block.setOrigin(0, 0);
+      scrollContent.add(block);
+      cursorY += block.height + gapAfter;
+    };
+
+    const addBullets = (items: string[], gapAfterList: number) => {
+      items.forEach((item, index) => {
+        const line = scene.add.text(BULLET_TEXT_INDENT, cursorY, item, bulletTextStyle);
+        line.setOrigin(0, 0);
+        const bulletY = cursorY + 22;
+        const dot = scene.add.graphics();
+        dot.fillStyle(BULLET_COLOR, 1);
+        dot.fillCircle(BULLET_R + 5, bulletY, BULLET_R);
+        scrollContent.add(dot);
+        scrollContent.add(line);
+        const gap = index < items.length - 1 ? BULLET_GAP : gapAfterList;
+        cursorY += line.height + gap;
+      });
+    };
+
+    for (let i = 0; i < INSTRUCTION_BLOCKS.length; i++) {
+      const block = INSTRUCTION_BLOCKS[i];
+      const next = INSTRUCTION_BLOCKS[i + 1];
+      if (block.kind === "para") {
+        const gapAfter = next?.kind === "bullets" ? PARA_TO_BULLETS : PARA_GAP;
+        addPara(block.text, gapAfter);
+      } else {
+        addBullets(block.items, PARA_GAP);
+      }
+    }
+
+    const bodyHeight = cursorY - PARA_GAP;
+
+    const scrollable = bodyHeight > viewHeightFull + 4;
     const viewHeight = scrollable
       ? viewHeightFull - SCROLL_HINT_RESERVE
       : viewHeightFull;
 
-    const scrollContent = scene.add.container(textX, viewTop);
-    scrollContent.add(body);
     this.add(scrollContent);
 
     const maskGraphics = scene.add.graphics();
@@ -102,7 +159,7 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
     maskGraphics.fillRect(textX, viewTop, textWidth, viewHeight);
     scrollContent.setMask(maskGraphics.createGeometryMask());
 
-    const maxScroll = Math.max(0, body.height - viewHeight);
+    const maxScroll = Math.max(0, bodyHeight - viewHeight);
     let scrollOffset = 0;
     /** Local Y inside the pop-in container (see modalPopIn). */
     const scrollHomeY = viewTop - PANEL_PIVOT_Y;
