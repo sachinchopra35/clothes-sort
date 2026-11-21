@@ -15,6 +15,8 @@ export interface LevelCompletePanelOptions {
   levelNumber: number;
   hasNextLevel: boolean;
   onNext: () => void;
+  /** Final level: fills the slot where “Next Level” would be; usually confetti. */
+  onGameComplete?: () => void;
   onMenu: () => void;
 }
 
@@ -75,20 +77,34 @@ export class LevelCompletePanel extends Phaser.GameObjects.Container {
 
     const mainMenuY = panelTop + PANEL_H - PANEL_INSET - LEVEL_BTN_H / 2;
 
-    if (options.hasNextLevel) {
-      const nextButtonY = mainMenuY - LEVEL_BTN_H - BTN_GAP;
+    const primaryButtonY = mainMenuY - LEVEL_BTN_H - BTN_GAP;
 
+    if (options.hasNextLevel) {
       new Button(
         scene,
         {
           x: cx,
-          y: nextButtonY,
+          y: primaryButtonY,
           width: btnW,
           height: LEVEL_BTN_H,
           label: "Next Level",
           fontSize: theme.fontSize.body,
           trailingGlyph: "→",
           onClick: options.onNext,
+        },
+        this,
+      );
+    } else {
+      new Button(
+        scene,
+        {
+          x: cx,
+          y: primaryButtonY,
+          width: btnW,
+          height: LEVEL_BTN_H,
+          label: "Game Complete!!",
+          fontSize: theme.fontSize.body,
+          onClick: () => options.onGameComplete?.(),
         },
         this,
       );

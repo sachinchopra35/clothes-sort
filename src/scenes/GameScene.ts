@@ -40,6 +40,7 @@ import { UndoIntroPanel } from "../ui/UndoIntroPanel";
 import { Level1Tutorial } from "../ui/Level1Tutorial";
 import {
   fadeInCamera,
+  fadeOutCamera,
   type SceneIntroFadeData,
   startSceneWithFade,
 } from "./sceneFade";
@@ -237,7 +238,7 @@ export class GameScene extends Phaser.Scene {
       onCancel: () => this.closeConfirmPanel(),
       onConfirm: () => {
         this.closeConfirmPanel();
-        this.restartLevel();
+        void this.restartLevelWithFade();
       },
     });
   }
@@ -276,6 +277,16 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private async restartLevelWithFade(): Promise<void> {
+    this.setHudEnabled(false);
+    this.input.enabled = false;
+    await fadeOutCamera(this);
+    this.restartLevel();
+    fadeInCamera(this);
+    this.input.enabled = true;
+    if (!this.isModalOpen()) this.setHudEnabled(true);
+  }
+
   private restartLevel(): void {
     const level = getLevelById(this.levelId);
     if (!level || !this.board) return;
@@ -304,6 +315,9 @@ export class GameScene extends Phaser.Scene {
       onNext: () => {
         const next = LEVELS[idx + 1];
         if (next) this.scene.restart({ levelId: next.id });
+      },
+      onGameComplete: () => {
+        playConfetti();
       },
       onMenu: () => void startSceneWithFade(this, SCENE_MENU),
     });
