@@ -23,13 +23,13 @@ Compositions may be public domain; the **recording licence** on each Musopen pag
 
 | In-app title | Musopen | Recording licence | Credit line |
 |--------------|---------|-------------------|-------------|
+| Satie — Gymnopédie No. 1 | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 | Chopin — Nocturne No. 2 | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 | Bach — Prelude in C major | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
-| Satie — Gymnopédie No. 1 | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 | Debussy — Arabesque No. 1 | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 | Chopin — Prelude in E minor | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 | Debussy — Clair de lune | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
-| Mendelssohn — Shepherd's Complaint | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
+| Mendelssohn — The Shepherd's Complaint | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 | Bach — French Suite No. 5, Sarabande | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 | Bach — French Suite No. 1, Sarabande | — | Original performance (app developer) | Performed and recorded by Sachin Chopra |
 
@@ -52,13 +52,13 @@ Paste the block below into the public support / credits section (also written to
 
 Background piano music: original performances recorded for this app.
 
+- **Satie — Gymnopédie No. 1** — Performed and recorded by Sachin Chopra
 - **Chopin — Nocturne No. 2** — Performed and recorded by Sachin Chopra
 - **Bach — Prelude in C major** — Performed and recorded by Sachin Chopra
-- **Satie — Gymnopédie No. 1** — Performed and recorded by Sachin Chopra
 - **Debussy — Arabesque No. 1** — Performed and recorded by Sachin Chopra
 - **Chopin — Prelude in E minor** — Performed and recorded by Sachin Chopra
 - **Debussy — Clair de lune** — Performed and recorded by Sachin Chopra
-- **Mendelssohn — Shepherd's Complaint** — Performed and recorded by Sachin Chopra
+- **Mendelssohn — The Shepherd's Complaint** — Performed and recorded by Sachin Chopra
 - **Bach — French Suite No. 5, Sarabande** — Performed and recorded by Sachin Chopra
 - **Bach — French Suite No. 1, Sarabande** — Performed and recorded by Sachin Chopra
 ```

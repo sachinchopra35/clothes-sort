@@ -33,7 +33,7 @@ Sort clothes, clear shelves
 ## Promotional text (170 characters, editable without new version)
 
 ```text
-100 wardrobe puzzles, gentle classical music, and a cosy wood-panel vibe. Tap to move matching clothes, clear every shelf, and unlock new levels. Fully offline.
+120 wardrobe puzzles, gentle classical music, and a cosy wood-panel vibe. Tap to move matching clothes, clear every shelf, and unlock new levels. Fully offline.
 ```
 
 (159 characters)
@@ -55,7 +55,7 @@ HOW TO PLAY
 • Undo unlocks as you progress (limited uses on harder levels)
 
 FEATURES
-• 100 handcrafted levels with a gentle difficulty curve
+• 120 wardrobe puzzles with a gentle difficulty curve
 • Cosy wardrobe look and feel, with wooden shelves and cheerful clothes
 • Original classical piano recordings, with volume controls and track selection in Settings
 • Progress, settings, and unlocked levels saved on your device
@@ -90,7 +90,7 @@ puzzle,sort,match,wardrobe,clothes,offline,casual,brain,relaxing,cozy,organize,s
 Paste into **App Store Connect → version 1.0.0 → What’s New in This Version**.
 
 ```text
-Welcome to Clothes Sort! Match and move clothes across cosy wardrobe shelves through 100 levels. Play offline with optional classical background music, sound controls, and progress saved on your device.
+Welcome to Clothes Sort! Match and move clothes across cosy wardrobe shelves through 120 levels. Play offline with optional classical background music, sound controls, and progress saved on your device.
 ```
 
 ---
@@ -126,4 +126,4 @@ Capture on the largest iPhone simulator (6.9" class); Apple scales for smaller s
 
 ## Content rights (App Information)
 
-The game art and levels are original. **Background music** is your own piano performances — declare **contains third-party content** only for the **musical compositions** (public-domain works; you own the recordings).
+The game art and levels are original. **Background music** uses your own piano **recordings** of classical works (compositions are public domain; performances are original). In Connect, answer that the app contains third-party content **only if** the questionnaire treats PD compositions that way; otherwise state original content with PD musical works and owned recordings — match your honest interpretation of Apple’s wording.

@@ -22,6 +22,8 @@ https://sachinchopra35.github.io/clothes-sort/
 
 Keep [privacy-policy.md](privacy-policy.md) and [support.md](support.md) in sync with `docs/index.html` when you edit them.
 
+**Go-live now:** [GO-LIVE.md](GO-LIVE.md) — ordered checklist + `npm run release:prep`.
+
 Update *Last updated* in the privacy policy when you publish changes.
 
 ## Git

@@ -28,7 +28,8 @@
     "levels:generate:106": "vite-node scripts/levels-generate.ts --from=106",
     "levels:generate:111": "vite-node scripts/levels-generate.ts --from=111",
     "levels:generate:116": "vite-node scripts/levels-generate.ts --from=116",
-    "levels:generate:81-100": "npm run levels:generate:81 && npm run levels:generate:86 && npm run levels:generate:91 && npm run levels:generate:96"
+    "levels:generate:81-100": "npm run levels:generate:81 && npm run levels:generate:86 && npm run levels:generate:91 && npm run levels:generate:96",
+    "release:prep": "npm test && npm run build && npm run music:attribution:check && npm run build:icon && npx cap copy ios"
   },
   "dependencies": {
     "@capacitor/cli": "^8.6.2",

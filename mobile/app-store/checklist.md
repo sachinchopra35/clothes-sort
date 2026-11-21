@@ -11,8 +11,8 @@ Tick items as you go. Details: [docs/release-steps.md](../../docs/release-steps.
 
 ## Phase 0 — Before Connect
 
-- [ ] Musopen links + licences in `music/manifest.json`; `npm run music:attribution`; merge credits into [support.md](support.md)
-- [ ] Before submit: `npm run music:attribution:check` passes
+- [x] Music: original recordings in `music/manifest.json`; credits in [support.md](support.md)
+- [x] `npm run music:attribution:check` passes
 - [ ] Draft store copy → [listing.md](listing.md)
 - [x] `docs/index.html` built from privacy + support (keep in sync when editing `.md`)
 - [x] Push `docs/` to `main`; enable GitHub Pages — [github-pages-setup.md](../../docs/github-pages-setup.md)
@@ -44,7 +44,7 @@ npx cap open ios
 - [ ] Team = paid developer account (`3WCP3D9KXB`)
 - [ ] Bundle Identifier = `com.sachinchopra35.clothessort`
 - [x] `ITSAppUsesNonExemptEncryption` = NO in `ios/App/App/Info.plist`
-- [ ] **Version** = `1.0.0`, **Build** = `1` (increment build on each re-upload)
+- [x] **Version** = `1.0.0`, **Build** = `1` in Xcode project (increment build on each re-upload)
 - [ ] Run on physical device; delete old sideload if bundle ID differed
 - [ ] **Product → Archive** → **Distribute App** → App Store Connect → Upload
 

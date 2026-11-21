@@ -10,7 +10,7 @@ A walkthrough for the first iOS release, tailored to this repo. The longer refer
 | App name | Clothes Sort |
 | Bundle ID | `com.sachinchopra35.clothessort` (in `capacitor.config.ts` and Xcode — they match) |
 | Apple team | `3WCP3D9KXB` already set in Xcode |
-| Version / build | `1.0` / `1` in Xcode — change version to `1.0.0` to match the handoff convention |
+| Version / build | `1.0.0` / `1` in Xcode (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`) |
 | GitHub repo | `sachinchopra35/clothes-sort` |
 | Likely privacy/support URL | `https://sachinchopra35.github.io/clothes-sort/` |
 | Data collected | None. No accounts, no analytics, no ads, no network calls. Progress and settings stay on the device (`localStorage`). |
@@ -20,15 +20,13 @@ Because nothing leaves the device, the privacy side is the easy case: **"Data No
 
 ---
 
-## Step 1 — Finish the music (the one thing you're waiting on)
+## Step 1 — Music (done for v1.0.0)
 
-1. Download the remaining Musopen tracks into `music/source/`.
-2. Add each one to `music/manifest.json` with a friendly `"Composer — Piece"` title.
-3. Run `npm run build:music` to make the normalised `.m4a` files.
-4. For each track, fill **`music/manifest.json`**: `musopenUrl`, `recordingLicense` (`public-domain` | `cc0` | `cc-by-4.0`), and `attribution` if CC BY. Run `npm run music:attribution` and paste `music/support-credits.snippet.md` into the support page (step 3).
-5. Before submit: `npm run music:attribution:check` must pass (or set `MUSIC_ATTRIBUTION_STRICT=1` when running tests).
+All tracks are **original recordings** in `music/manifest.json`. Credits are in [support.md](../mobile/app-store/support.md). Before each upload run:
 
-You can do every step below in parallel while you wait.
+```bash
+npm run music:attribution:check
+```
 
 ## Step 2 — Release folder (admin paperwork)
 
@@ -69,8 +67,7 @@ Done: `ITSAppUsesNonExemptEncryption` = `NO` in `ios/App/App/Info.plist` (app us
 ## Step 6 — Build and upload
 
 ```bash
-npm run build
-npx cap copy ios
+npm run release:prep
 npx cap open ios
 ```
 
@@ -89,7 +86,8 @@ Every re-upload needs a **higher Build number** (2, 3, …). The Version stays `
 
 - Fresh install (delete the old dev build first): level 1 tutorial appears and works.
 - Play through several levels; win confetti + chord; next level.
-- Undo appears at level 11 with the intro popup; limits are 1 then 2.
+- Undo appears at level 11 with the intro popup; level 21 explains 5 items per shelf.
+- Level 120: “Game Complete!!” button; confetti on win and on that button.
 - Settings: both sliders, mute buttons, track ◀ ▶, a track ends and the next one starts.
 - Kill and reopen the app: progress, volumes and track are remembered.
 - Locked level → cheat code panel → `CLEANCLOTHES25` unlocks.
