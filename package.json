@@ -24,6 +24,10 @@
     "levels:generate:86": "vite-node scripts/levels-generate.ts --from=86",
     "levels:generate:91": "vite-node scripts/levels-generate.ts --from=91",
     "levels:generate:96": "vite-node scripts/levels-generate.ts --from=96",
+    "levels:generate:101": "vite-node scripts/levels-generate.ts --from=101",
+    "levels:generate:106": "vite-node scripts/levels-generate.ts --from=106",
+    "levels:generate:111": "vite-node scripts/levels-generate.ts --from=111",
+    "levels:generate:116": "vite-node scripts/levels-generate.ts --from=116",
     "levels:generate:81-100": "npm run levels:generate:81 && npm run levels:generate:86 && npm run levels:generate:91 && npm run levels:generate:96"
   },
   "dependencies": {

@@ -3,8 +3,8 @@ import { applyMusicSettings } from "../audio/musicManager";
 import { playUiKnock } from "../audio/uiSounds";
 import { DESIGN_HEIGHT, DESIGN_WIDTH, MODAL_UI_DEPTH } from "../config/layout";
 import {
-  PANEL_BUTTON_H,
   PANEL_INSET,
+  PANEL_PRIMARY_BTN_H,
   panelContentWidth,
 } from "../config/panelLayout";
 import {
@@ -43,7 +43,7 @@ const PANEL_H =
   ABOUT_BELOW_PICKER +
   ABOUT_LINK_H +
   ABOUT_ABOVE_DONE +
-  PANEL_BUTTON_H +
+  PANEL_PRIMARY_BTN_H +
   PANEL_INSET;
 
 const INFO_ICON_SIZE = 30;
@@ -206,9 +206,9 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
       scene,
       {
         x: CX,
-        y: panelTop + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2,
+        y: panelTop + PANEL_H - PANEL_INSET - PANEL_PRIMARY_BTN_H / 2,
         width: rowW,
-        height: PANEL_BUTTON_H,
+        height: PANEL_PRIMARY_BTN_H,
         label: "Done",
         fontSize: theme.fontSize.body,
         onClick: onClose,

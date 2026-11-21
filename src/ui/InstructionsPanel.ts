@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import { DESIGN_HEIGHT, DESIGN_WIDTH } from "../config/layout";
 import {
-  PANEL_BUTTON_H,
   PANEL_INSET,
+  PANEL_PRIMARY_BTN_H,
   panelContentWidth,
 } from "../config/panelLayout";
 import { theme } from "../config/theme";
@@ -18,7 +18,7 @@ const PADDING = 40;
 const TITLE_Y = 52;
 const TITLE_TO_BODY = 44;
 const HEADER = TITLE_Y + 56 + TITLE_TO_BODY;
-const FOOTER = PANEL_INSET + PANEL_BUTTON_H + 28;
+const FOOTER = PANEL_INSET + PANEL_PRIMARY_BTN_H + 28;
 /** Cleared between the scroll clip and the “read more” hint when content scrolls. */
 const SCROLL_HINT_RESERVE = 68;
 const INSTRUCTION_FONT = "42px";
@@ -196,13 +196,13 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
     };
     scene.input.on("wheel", this.wheelHandler);
 
-    const btnY = PANEL_TOP + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2;
+    const btnY = PANEL_TOP + PANEL_H - PANEL_INSET - PANEL_PRIMARY_BTN_H / 2;
     const btnW = panelContentWidth(PANEL_W);
 
     if (scrollable) {
       const hint = scene.add.text(
         CX,
-        btnY - PANEL_BUTTON_H / 2 - 40,
+        btnY - PANEL_PRIMARY_BTN_H / 2 - 40,
         "Swipe up or down to read more",
         {
           fontFamily: theme.fontFamily,
@@ -222,7 +222,7 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
         x: CX,
         y: btnY,
         width: btnW,
-        height: PANEL_BUTTON_H,
+        height: PANEL_PRIMARY_BTN_H,
         label: "Got it",
         fontSize: theme.fontSize.body,
         onClick: onClose,

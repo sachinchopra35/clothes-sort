@@ -9,8 +9,8 @@ import {
   SLOT_SIZE,
 } from "../config/layout";
 import {
-  PANEL_BUTTON_H,
   PANEL_INSET,
+  PANEL_PRIMARY_BTN_H,
   panelContentWidth,
 } from "../config/panelLayout";
 import { theme } from "../config/theme";
@@ -31,7 +31,7 @@ const ICON_GAP_ABOVE = 16;
 const ICON_GAP_BELOW = 24;
 const ICONS_Y = 124 + ICON_SIZE / 2 + ICON_GAP_ABOVE;
 const HEADER = ICONS_Y + ICON_SIZE / 2 + 32 + ICON_GAP_BELOW;
-const FOOTER = PANEL_INSET + PANEL_BUTTON_H + 28;
+const FOOTER = PANEL_INSET + PANEL_PRIMARY_BTN_H + 28;
 const SCROLL_HINT_RESERVE = 68;
 const BODY_FONT_PX = 40;
 const LINE_HEIGHT = 56;
@@ -274,13 +274,13 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
     };
     scene.input.on("wheel", this.wheelHandler);
 
-    const btnY = PANEL_TOP + PANEL_H - PANEL_INSET - PANEL_BUTTON_H / 2;
+    const btnY = PANEL_TOP + PANEL_H - PANEL_INSET - PANEL_PRIMARY_BTN_H / 2;
     const btnW = panelContentWidth(PANEL_W);
 
     if (scrollable) {
       const hint = scene.add.text(
         CX,
-        btnY - PANEL_BUTTON_H / 2 - 40,
+        btnY - PANEL_PRIMARY_BTN_H / 2 - 40,
         "Swipe up or down to read more",
         {
           fontFamily: theme.fontFamily,
@@ -300,8 +300,8 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
         x: CX,
         y: btnY,
         width: btnW,
-        height: PANEL_BUTTON_H,
-        label: "Done",
+        height: PANEL_PRIMARY_BTN_H,
+        label: "Back to Game",
         fontSize: theme.fontSize.body,
         onClick: onClose,
       },

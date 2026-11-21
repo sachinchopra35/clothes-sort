@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { DESIGN_HEIGHT, DESIGN_WIDTH, MODAL_UI_DEPTH } from "../config/layout";
-import { PANEL_BUTTON_H, PANEL_INSET, panelContentWidth } from "../config/panelLayout";
+import { PANEL_INSET, PANEL_PRIMARY_BTN_H, panelContentWidth } from "../config/panelLayout";
 import { theme } from "../config/theme";
 import { Button } from "./Button";
 import { playModalPopIn } from "./modalPopIn";
@@ -35,7 +35,7 @@ export class UndoIntroPanel extends Phaser.GameObjects.Container {
     const bodyH = measure.height;
     measure.destroy();
 
-    const footerH = PANEL_INSET + PANEL_BUTTON_H;
+    const footerH = PANEL_INSET + PANEL_PRIMARY_BTN_H;
     const panelH = Math.max(
       PANEL_H_MIN,
       HEADER_BLOCK + bodyH + BODY_ABOVE_BUTTON + footerH,
@@ -71,8 +71,8 @@ export class UndoIntroPanel extends Phaser.GameObjects.Container {
     title.setOrigin(0.5);
     this.add(title);
 
-    const btnY = panelTop + panelH - PANEL_INSET - PANEL_BUTTON_H / 2;
-    const bodyBottom = btnY - PANEL_BUTTON_H / 2 - BODY_ABOVE_BUTTON;
+    const btnY = panelTop + panelH - PANEL_INSET - PANEL_PRIMARY_BTN_H / 2;
+    const bodyBottom = btnY - PANEL_PRIMARY_BTN_H / 2 - BODY_ABOVE_BUTTON;
 
     const body = scene.add.text(cx, panelTop + HEADER_BLOCK, UNDO_INTRO_BODY, bodyStyle);
     body.setOrigin(0.5, 0);
@@ -88,7 +88,7 @@ export class UndoIntroPanel extends Phaser.GameObjects.Container {
         x: cx,
         y: btnY,
         width: contentW,
-        height: PANEL_BUTTON_H,
+        height: PANEL_PRIMARY_BTN_H,
         label: "Got it",
         fontSize: theme.fontSize.body,
         onClick: onDismiss,

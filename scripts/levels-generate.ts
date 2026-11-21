@@ -1222,8 +1222,65 @@ const SPECS_81_100: LevelSpec[] = [
   },
 ];
 
+/** Levels 101–120: new wardrobe (psychedelic tees, coloured jackets/socks/trunks) plus pets. */
+const SPEC_101_BASE = {
+  emptyShelves: 2,
+  capacity: 5,
+  maxStartRun: 2,
+  pickStrategy: "nearestTarget" as const,
+};
+const BAND_101_COZY: Pick<LevelSpec, "attempts" | "scoreBand"> = { attempts: 260, scoreBand: [40, 50] };
+const BAND_101_MED: Pick<LevelSpec, "attempts" | "scoreBand"> = { attempts: 280, scoreBand: [47, 55] };
+const BAND_101_FULL: Pick<LevelSpec, "attempts" | "scoreBand"> = { attempts: 300, scoreBand: [55, 60] };
+const BAND_101_PEAK: Pick<LevelSpec, "attempts" | "scoreBand"> = { attempts: 320, scoreBand: [57, 61] };
+const BAND_101_SCRAMBLE: Pick<LevelSpec, "attempts" | "scoreBand"> = { attempts: 340, scoreBand: [35, 45] };
+const BAND_101_FLEX: Pick<LevelSpec, "attempts" | "scoreBand"> = { attempts: 280, scoreBand: [42, 54] };
+
+const SPECS_101_120: LevelSpec[] = [
+  { ...SPEC_101_BASE, number: 101, seed: 101, ...BAND_101_COZY,
+    types: ["psychedelic-tee", "red-jacket", "green-socks", "blue-trunks", "white-tee", "light-blue-jeans"] },
+  { ...SPEC_101_BASE, number: 102, seed: 102, ...BAND_101_FLEX,
+    types: ["purple-jacket", "blue-jacket", "red-jacket", "yellow-jacket", "black-boots", "orange-scarf"] },
+  { ...SPEC_101_BASE, number: 103, seed: 103, ...BAND_101_FULL,
+    types: ["crown", "penguin", "sardine", "blue-cap", "pink-socks", "yellow-sun-hat", "green-trunks", "red-trainers"] },
+  { ...SPEC_101_BASE, number: 104, seed: 104, ...BAND_101_FLEX,
+    types: ["green-socks", "orange-socks", "pink-socks", "purple-socks", "red-trainers", "black-boots"] },
+  { ...SPEC_101_BASE, number: 105, seed: 105, ...BAND_101_MED,
+    types: ["blue-trunks", "pink-trunks", "green-trunks", "yellow-shorts", "coral-swimsuit", "yellow-sun-hat", "tropical-fish"] },
+  { ...SPEC_101_BASE, number: 106, seed: 106, ...BAND_101_FLEX,
+    types: ["tie-dye-tee", "purple-jacket", "orange-socks", "red-jeans", "teal-kimono", "blue-cap"] },
+  { ...SPEC_101_BASE, number: 107, seed: 107, maxStartRun: 1, ...BAND_101_SCRAMBLE,
+    types: ["red-jacket", "blue-jacket", "psychedelic-tee", "green-socks", "pink-trunks", "top-hat"] },
+  { ...SPEC_101_BASE, number: 108, seed: 108, ...BAND_101_COZY,
+    types: ["penguin", "top-hat", "crown", "sardine", "tropical-fish", "blue-cap"] },
+  { ...SPEC_101_BASE, number: 109, seed: 109, ...BAND_101_FULL,
+    types: ["yellow-jacket", "psychedelic-tee", "pink-socks", "blue-trunks", "orange-dress", "green-scarf", "black-boots", "red-jeans"] },
+  { ...SPEC_101_BASE, number: 110, seed: 110, ...BAND_101_PEAK,
+    types: ["purple-jacket", "tie-dye-tee", "green-trunks", "orange-socks", "red-trainers", "light-blue-jeans", "pink-gloves", "crown"] },
+  { ...SPEC_101_BASE, number: 111, seed: 111, ...BAND_101_FLEX,
+    types: ["psychedelic-tee", "red-tee", "blue-tee", "green-tee", "purple-tee", "white-tee"] },
+  { ...SPEC_101_BASE, number: 112, seed: 112, ...BAND_101_MED,
+    types: ["blue-jacket", "pink-trunks", "green-socks", "yellow-sun-hat", "red-polka-dress", "sardine", "black-bootcut-jeans"] },
+  { ...SPEC_101_BASE, number: 113, seed: 113, ...BAND_101_FULL,
+    types: ["red-jacket", "yellow-jacket", "blue-trunks", "orange-socks", "teal-kimono", "coral-swimsuit", "penguin", "white-tee"] },
+  { ...SPEC_101_BASE, number: 114, seed: 114, maxStartRun: 1, ...BAND_101_SCRAMBLE,
+    types: ["purple-jacket", "green-trunks", "pink-socks", "top-hat", "orange-scarf", "light-blue-jeans"] },
+  { ...SPEC_101_BASE, number: 115, seed: 115, ...BAND_101_FULL,
+    types: ["psychedelic-tee", "blue-jacket", "orange-socks", "pink-trunks", "crown", "green-scarf", "black-boots", "yellow-sun-hat"] },
+  { ...SPEC_101_BASE, number: 116, seed: 116, ...BAND_101_FLEX,
+    types: ["tropical-fish", "sardine", "blue-trunks", "coral-swimsuit", "teal-kimono", "yellow-sun-hat"] },
+  { ...SPEC_101_BASE, number: 117, seed: 117, ...BAND_101_MED,
+    types: ["tie-dye-tee", "red-jacket", "green-socks", "blue-cap", "orange-dress", "black-bootcut-jeans", "penguin"] },
+  { ...SPEC_101_BASE, number: 118, seed: 118, ...BAND_101_PEAK,
+    types: ["yellow-jacket", "purple-jacket", "pink-socks", "green-trunks", "red-trainers", "light-blue-jeans", "psychedelic-tee", "sardine"] },
+  { ...SPEC_101_BASE, number: 119, seed: 119, ...BAND_101_PEAK,
+    types: ["blue-jacket", "red-jacket", "orange-socks", "pink-trunks", "tie-dye-tee", "top-hat", "green-scarf", "white-tee"] },
+  { ...SPEC_101_BASE, number: 120, seed: 120, ...BAND_101_PEAK,
+    types: ["crown", "penguin", "sardine", "psychedelic-tee", "purple-jacket", "green-socks", "blue-trunks", "yellow-sun-hat"] },
+];
+
 function specsInRange(from: number, to: number): LevelSpec[] {
-  return SPECS_81_100.filter((s) => s.number >= from && s.number <= to);
+  return [...SPECS_81_100, ...SPECS_101_120].filter((s) => s.number >= from && s.number <= to);
 }
 
 const APPEND_BATCHES: Record<number, LevelSpec[]> = {
@@ -1235,6 +1292,10 @@ const APPEND_BATCHES: Record<number, LevelSpec[]> = {
   86: specsInRange(86, 90),
   91: specsInRange(91, 95),
   96: specsInRange(96, 100),
+  101: specsInRange(101, 105),
+  106: specsInRange(106, 110),
+  111: specsInRange(111, 115),
+  116: specsInRange(116, 120),
 };
 
 type Mode = "4-10" | "11-20" | "append" | "all";

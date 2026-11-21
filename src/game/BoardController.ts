@@ -71,7 +71,7 @@ export class BoardController {
       boardShelf.items.forEach((clothingId, index) => {
         const pos = shelf.getSlotWorldPosition(index);
         const item = new ClothingItem(scene, pos.x, pos.y, clothingId);
-        item.setDepth(clothingDepthOnShelf(entry.y, index));
+        item.setRestingDepth(clothingDepthOnShelf(entry.y, index));
         items.push(item);
       });
       this.itemsByShelf.set(entry.definition.id, items);
@@ -190,7 +190,7 @@ export class BoardController {
     const animPromises = movingViews.map((item, i) => {
       const slotIndex = toItems.length - moveCount + i;
       const pos = destShelf.getSlotWorldPosition(slotIndex);
-      item.setDepth(clothingDepthOnShelf(destShelf.y, slotIndex));
+      item.setRestingDepth(clothingDepthOnShelf(destShelf.y, slotIndex));
       return item.animateTo(pos.x, pos.y);
     });
     await Promise.all(animPromises);
@@ -312,7 +312,7 @@ export class BoardController {
       boardShelf.items.forEach((clothingId, index) => {
         const pos = view!.getSlotWorldPosition(index);
         const item = new ClothingItem(this.scene, pos.x, pos.y, clothingId);
-        item.setDepth(clothingDepthOnShelf(entry.y, index));
+        item.setRestingDepth(clothingDepthOnShelf(entry.y, index));
         items.push(item);
       });
       this.itemsByShelf.set(id, items);
@@ -351,7 +351,7 @@ export class BoardController {
       boardShelf.items.forEach((clothingId, index) => {
         const pos = shelf.getSlotWorldPosition(index);
         const item = new ClothingItem(this.scene, pos.x, pos.y, clothingId);
-        item.setDepth(clothingDepthOnShelf(entry.y, index));
+        item.setRestingDepth(clothingDepthOnShelf(entry.y, index));
         items.push(item);
       });
       this.itemsByShelf.set(entry.definition.id, items);

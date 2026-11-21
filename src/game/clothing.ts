@@ -21,6 +21,23 @@ export const CLOTHING_IDS = [
   "coral-swimsuit",
   "black-boots",
   "red-trainers",
+  "psychedelic-tee",
+  "tie-dye-tee",
+  "red-jacket",
+  "purple-jacket",
+  "blue-jacket",
+  "yellow-jacket",
+  "green-socks",
+  "orange-socks",
+  "pink-socks",
+  "green-trunks",
+  "blue-trunks",
+  "pink-trunks",
+  "crown",
+  "penguin",
+  "top-hat",
+  "sardine",
+  "tropical-fish",
 ] as const;
 
 export type ClothingId = (typeof CLOTHING_IDS)[number];
@@ -32,7 +49,28 @@ export interface ClothingDef {
   textureKey: string;
 }
 
+function def(id: ClothingId, name: string): ClothingDef {
+  return { id, name, assetPath: `assets/clothes/${id}.svg`, textureKey: `clothes-${id}` };
+}
+
 export const CLOTHING_CATALOG: Record<ClothingId, ClothingDef> = {
+  "psychedelic-tee": def("psychedelic-tee", "Psychedelic tee"),
+  "tie-dye-tee": def("tie-dye-tee", "Tie-dye tee"),
+  "red-jacket": def("red-jacket", "Red jacket"),
+  "purple-jacket": def("purple-jacket", "Purple jacket"),
+  "blue-jacket": def("blue-jacket", "Blue jacket"),
+  "yellow-jacket": def("yellow-jacket", "Yellow jacket"),
+  "green-socks": def("green-socks", "Green socks"),
+  "orange-socks": def("orange-socks", "Orange socks"),
+  "pink-socks": def("pink-socks", "Pink socks"),
+  "green-trunks": def("green-trunks", "Green swim trunks"),
+  "blue-trunks": def("blue-trunks", "Blue swim trunks"),
+  "pink-trunks": def("pink-trunks", "Pink swim trunks"),
+  crown: def("crown", "Crown"),
+  penguin: def("penguin", "Penguin"),
+  "top-hat": def("top-hat", "Top hat"),
+  sardine: def("sardine", "Sardine"),
+  "tropical-fish": def("tropical-fish", "Tropical fish"),
   "light-blue-jeans": {
     id: "light-blue-jeans",
     name: "Light blue jeans",
