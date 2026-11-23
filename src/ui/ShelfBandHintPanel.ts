@@ -21,7 +21,7 @@ const GAP_INSET = 28;
 
 export interface ShelfBandHintContent {
   title?: string;
-  lines: string[];
+  lines: readonly string[];
 }
 
 /** Hint panel centred in the gap below the lowest shelf. */
