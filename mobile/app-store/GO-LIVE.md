@@ -55,7 +55,7 @@ Target **6.9" iPhone** (Pro Max simulator); Apple scales smaller sizes.
 
 Simulator: **File → Save Screen** (⌘S).
 
-**iPad:** Xcode target is iPhone + iPad (`TARGETED_DEVICE_FAMILY = 1,2`). Either capture **13" iPad** shots or change target to **iPhone only** before archive to skip iPad metadata.
+**iPad:** Target is **iPhone only** — no iPad screenshots; avoids upload error 90474 (iPad multitasking orientations).
 
 Paste from [listing.md](listing.md): name, subtitle, promo text, description, keywords, copyright `2026 Sachin Chopra`, What's New.
 
