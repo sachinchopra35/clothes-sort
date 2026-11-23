@@ -308,7 +308,7 @@ const VARIANTS = [
     url: FLUENT.boot,
     colors: [
       ["#CA0B4A", "#2B2B33"],
-      ["#F3C07B", "#D9B48F"],
+      ["#F3C07B", "#D62828"],
     ],
   },
   {
@@ -476,6 +476,12 @@ for (const variant of VARIANTS) {
   }
   if (variant.polka) {
     svg = addPolkaDots(svg);
+  }
+  if (variant.id === "black-boots") {
+    svg = svg.replace(
+      /(<path d="M6\.98297 14\.9914[^"]+") fill="#D62828"/,
+      '$1 fill="#D9B48F"',
+    );
   }
   await writeFile(outPath, svg, "utf8");
   console.log(`Wrote ${variant.id}.svg`);

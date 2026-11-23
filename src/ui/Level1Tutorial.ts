@@ -2,14 +2,18 @@ import Phaser from "phaser";
 import { DESIGN_WIDTH, GAME_HUD_DEPTH, SLOT_SIZE } from "../config/layout";
 import { theme } from "../config/theme";
 import type { BoardController } from "../game/BoardController";
+import type { ShelfLayoutEntry } from "../layout/shelfLayout";
+import { ShelfBandHintPanel } from "./ShelfBandHintPanel";
 
-/** Level 1: the green top starts at the open end of l1 and belongs on r1. */
+/** Level 1: jeans at the open end of l1 belong on r1 with the other jeans. */
 const PICK_SHELF = "l1";
 const DROP_SHELF = "r1";
 
 const HINT_Y = 430;
 const HINT_W = 860;
-const HINT_PAD = 28;
+const HINT_PAD = 36;
+const HINT_FONT_PX = 58;
+const HINT_LINE_SPACING = 13;
 const ARROW_GAP_ABOVE_ITEM = SLOT_SIZE / 2 + 34;
 const BOB_PX = 14;
 const FINAL_HINT_MS = 4200;
@@ -29,18 +33,25 @@ export class Level1Tutorial {
   private readonly hintText: Phaser.GameObjects.Text;
   private readonly arrow: Phaser.GameObjects.Graphics;
   private bob: Phaser.Tweens.Tween | null = null;
+  private bottomHint: ShelfBandHintPanel | null = null;
+  private readonly layout: ShelfLayoutEntry[];
 
-  constructor(scene: Phaser.Scene, board: BoardController) {
+  constructor(
+    scene: Phaser.Scene,
+    board: BoardController,
+    layout: ShelfLayoutEntry[],
+  ) {
     this.scene = scene;
     this.board = board;
+    this.layout = layout;
 
     this.hintBg = scene.add.graphics();
     this.hintText = scene.add.text(0, 0, "", {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.body,
+      fontSize: `${HINT_FONT_PX}px`,
       color: theme.ui.text,
       align: "center",
-      lineSpacing: 8,
+      lineSpacing: HINT_LINE_SPACING,
       wordWrap: { width: HINT_W - HINT_PAD * 2 },
     });
     this.hintText.setOrigin(0.5);
@@ -74,11 +85,13 @@ export class Level1Tutorial {
     this.scene.tweens.killTweensOf(this.hint);
     this.hint.destroy();
     this.arrow.destroy();
+    this.bottomHint?.destroy();
+    this.bottomHint = null;
   }
 
   private showPick(): void {
     this.step = "pick";
-    this.setHint("Tap the green top to pick it up");
+    this.setHint("Tap the blue jeans to pick them up");
     // The open end is the last item on the shelf.
     this.pointAt(PICK_SHELF, this.board.getItemCount(PICK_SHELF) - 1);
   }
@@ -96,6 +109,9 @@ export class Level1Tutorial {
     this.bob?.remove();
     this.bob = null;
     this.arrow.setVisible(false);
+    this.bottomHint = new ShelfBandHintPanel(this.scene, this.layout, {
+      lines: ["Put all the red t-shirts onto the same shelf"],
+    });
     this.setHint("Nice! Keep matching clothes until every shelf is cleared");
     this.scene.tweens.add({
       targets: this.hint,

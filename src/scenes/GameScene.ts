@@ -38,6 +38,8 @@ import { showBriefMessage } from "../ui/BriefMessage";
 import { Level21IntroPanel } from "../ui/Level21IntroPanel";
 import { UndoIntroPanel } from "../ui/UndoIntroPanel";
 import { Level1Tutorial } from "../ui/Level1Tutorial";
+import { Level2RulesHint } from "../ui/Level2RulesHint";
+import type { ShelfLayoutEntry } from "../layout/shelfLayout";
 import {
   fadeInCamera,
   fadeOutCamera,
@@ -66,6 +68,7 @@ export class GameScene extends Phaser.Scene {
   private undoIntroPanel: UndoIntroPanel | null = null;
   private level21IntroPanel: Level21IntroPanel | null = null;
   private tutorial: Level1Tutorial | null = null;
+  private levelRulesHint: Level2RulesHint | null = null;
 
   constructor() {
     super(SCENE_GAME);
@@ -90,7 +93,10 @@ export class GameScene extends Phaser.Scene {
     if (this.board) this.board.onWon = null;
     // Phaser reuses this scene instance; anything not rebuilt below must be cleared here,
     // or levels without an undo button keep calling into the previous level's destroyed one.
+    this.tutorial?.destroy();
     this.tutorial = null;
+    this.levelRulesHint?.destroy();
+    this.levelRulesHint = null;
     this.undoButton = null;
     this.undoIntroPanel = null;
     this.level21IntroPanel = null;
@@ -111,7 +117,7 @@ export class GameScene extends Phaser.Scene {
     this.board.onUndoStateChange = (remaining, exhausted) => {
       this.undoButton?.setRemaining(remaining, exhausted);
     };
-    this.startTutorialIfNeeded();
+    this.startTutorialIfNeeded(layout);
 
     const topBar = this.add.graphics();
     topBar.setDepth(GAME_HUD_DEPTH - 1);
@@ -269,11 +275,17 @@ export class GameScene extends Phaser.Scene {
     this.settingsButton?.setInputEnabled(enabled);
   }
 
-  private startTutorialIfNeeded(): void {
+  private startTutorialIfNeeded(layout: ShelfLayoutEntry[]): void {
     this.tutorial?.destroy();
     this.tutorial = null;
-    if (this.board && getLevelIndex(this.levelId) === 0) {
-      this.tutorial = new Level1Tutorial(this, this.board);
+    this.levelRulesHint?.destroy();
+    this.levelRulesHint = null;
+    if (!this.board) return;
+    const idx = getLevelIndex(this.levelId);
+    if (idx === 0) {
+      this.tutorial = new Level1Tutorial(this, this.board, layout);
+    } else if (idx === 1) {
+      this.levelRulesHint = new Level2RulesHint(this, layout);
     }
   }
 
@@ -296,7 +308,7 @@ export class GameScene extends Phaser.Scene {
     this.board.onUndoStateChange = (remaining, exhausted) => {
       this.undoButton?.setRemaining(remaining, exhausted);
     };
-    this.startTutorialIfNeeded();
+    this.startTutorialIfNeeded(layout);
   }
 
   private onLevelWon(): void {
@@ -308,6 +320,10 @@ export class GameScene extends Phaser.Scene {
     const hasNext = idx >= 0 && idx < LEVELS.length - 1;
 
     this.setHudEnabled(false);
+    this.tutorial?.destroy();
+    this.tutorial = null;
+    this.levelRulesHint?.destroy();
+    this.levelRulesHint = null;
 
     this.completePanel = new LevelCompletePanel(this, {
       levelNumber: idx + 1,

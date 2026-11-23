@@ -11,7 +11,7 @@ import {
   registerMusicScene,
   unlockMusicFromGesture,
 } from "../audio/musicManager";
-import { getSelectedLevelId, resetProgressCache } from "../state/progress";
+import { getMenuLevelId, resetProgressCache } from "../state/progress";
 import { Button } from "../ui/Button";
 import { MenuPlayCard } from "../ui/MenuPlayCard";
 import { CheatCodePanel } from "../ui/CheatCodePanel";
@@ -87,7 +87,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.playCard = new MenuPlayCard(this, {
       x: DESIGN_WIDTH / 2,
       y: DESIGN_HEIGHT / 2 + 60,
-      initialLevelId: getSelectedLevelId(),
+      initialLevelId: getMenuLevelId(),
       onPlay: () => this.startGame(),
       onLockedTap: (levelId) => this.openCheatCode(levelId),
     });

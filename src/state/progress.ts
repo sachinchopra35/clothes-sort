@@ -1,4 +1,5 @@
 import { LEVELS, getLevelIndex } from "../levels/levelData";
+import { hasWarmSession, markWarmSession } from "./appSession";
 import { loadJson, saveJson } from "./storage";
 
 const KEY_SELECTED = "selected-level-id";
@@ -30,6 +31,34 @@ let cached = readState();
 
 export function getSelectedLevelId(): string {
   return cached.selectedLevelId;
+}
+
+/** First incomplete level in order; last level if the player cleared everything. */
+export function getResumeLevelId(): string {
+  for (const level of LEVELS) {
+    if (!isLevelCompleted(level.id)) {
+      return level.id;
+    }
+  }
+  return LEVELS[LEVELS.length - 1]?.id ?? "level-1";
+}
+
+/**
+ * Level for the menu picker. After a cold start (e.g. app swiped away), jumps to the
+ * earliest incomplete level; while the session is warm, keeps the last selected level.
+ */
+export function getMenuLevelId(): string {
+  if (hasWarmSession()) {
+    const exists = LEVELS.some((l) => l.id === cached.selectedLevelId);
+    if (exists) {
+      markWarmSession();
+      return cached.selectedLevelId;
+    }
+  }
+  const resume = getResumeLevelId();
+  setSelectedLevelId(resume);
+  markWarmSession();
+  return resume;
 }
 
 export function setSelectedLevelId(id: string): void {

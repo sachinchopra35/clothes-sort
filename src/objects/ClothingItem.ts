@@ -1,7 +1,10 @@
 import Phaser from "phaser";
 import { CLOTHING_DISPLAY_SCALE, SLOT_SIZE } from "../config/layout";
 import type { ClothingId } from "../game/clothing";
-import { CLOTHING_CATALOG } from "../game/clothing";
+import {
+  CLOTHING_CATALOG,
+  CLOTHING_SCALE_MULTIPLIER,
+} from "../game/clothing";
 
 /** Moves with less horizontal travel than this are treated as vertical (no tilt). */
 const MIN_TILT_HORIZONTAL_PX = 10;
@@ -39,8 +42,14 @@ export class ClothingItem extends Phaser.GameObjects.Container {
     this.clothingId = clothingId;
     const key = CLOTHING_CATALOG[clothingId].textureKey;
     this.image = scene.add.image(0, 0, key);
-    this.displayScale = (SLOT_SIZE * CLOTHING_DISPLAY_SCALE) / this.image.width;
+    const scaleMul = CLOTHING_SCALE_MULTIPLIER[clothingId] ?? 1;
+    this.displayScale =
+      (SLOT_SIZE * CLOTHING_DISPLAY_SCALE * scaleMul) / this.image.width;
     this.image.setScale(this.displayScale);
+    if (scaleMul !== 1) {
+      const nominal = SLOT_SIZE * CLOTHING_DISPLAY_SCALE;
+      this.image.setY((nominal * (1 - scaleMul)) / 2);
+    }
     this.glowGfx = scene.add.graphics();
     this.add([this.glowGfx, this.image]);
     this.setSize(SLOT_SIZE, SLOT_SIZE);

@@ -42,6 +42,11 @@ export const CLOTHING_IDS = [
 
 export type ClothingId = (typeof CLOTHING_IDS)[number];
 
+/** Per-item sprite scale tweaks (1 = default). */
+export const CLOTHING_SCALE_MULTIPLIER: Partial<Record<ClothingId, number>> = {
+  "black-boots": 0.85,
+};
+
 export interface ClothingDef {
   id: ClothingId;
   name: string;
