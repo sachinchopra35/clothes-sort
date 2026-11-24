@@ -29,8 +29,12 @@ const PADDING = 60;
 const ICON_SIZE = Math.round(SLOT_SIZE * CLOTHING_DISPLAY_SCALE);
 const ICON_GAP_ABOVE = 40;
 const ICON_GAP_BELOW = 52;
-const ICONS_Y = 124 + ICON_SIZE / 2 + ICON_GAP_ABOVE;
-const HEADER = ICONS_Y + ICON_SIZE / 2 + 32 + ICON_GAP_BELOW;
+/** Fixed title area; the icons and essay scroll beneath it. */
+const TITLE_Y = 86;
+const HEADER = TITLE_Y + 86;
+/** Icon row centre within the scrolling content. */
+const ICONS_Y = ICON_GAP_ABOVE + ICON_SIZE / 2;
+const BODY_START_Y = ICONS_Y + ICON_SIZE / 2 + 32 + ICON_GAP_BELOW;
 const FOOTER = PANEL_INSET + PANEL_PRIMARY_BTN_H + 44;
 const SCROLL_HINT_RESERVE = 68;
 const BODY_FONT_PX = 43;
@@ -42,6 +46,17 @@ const SECTION_DIVIDER_PAD = 28;
 const LINK_COLOR = "#f4a261";
 const LINK_COLOR_NUM = 0xf4a261;
 const TAP_SLOP = 16;
+/** Only finger movement this recent counts towards flick speed. */
+const FLICK_SAMPLE_MS = 100;
+/** Momentum decay per 60fps frame. */
+const FLICK_FRICTION = 0.92;
+const FLICK_MAX_V = 6;
+const FLICK_MIN_V = 0.02;
+/** Fraction of finger movement applied when dragging past an end. */
+const OVERSCROLL_RESIST = 0.35;
+/** Spring pulling overscrolled text back (per ms²); with damping ≈ critical. */
+const BOUNCE_STIFFNESS = 0.0002;
+const BOUNCE_DAMPING = 0.028;
 
 type Segment = { text: string; url?: string };
 type LinkRect = { x: number; y: number; w: number; h: number; url: string };
@@ -128,27 +143,13 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
     panel.strokeRoundedRect(panelLeft, PANEL_TOP, PANEL_W, PANEL_H, 24);
     this.add(panel);
 
-    const title = scene.add.text(CX, PANEL_TOP + 52, "About the Music", {
+    const title = scene.add.text(CX, PANEL_TOP + TITLE_Y, "About the Music", {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.heading,
       color: theme.ui.text,
     });
     title.setOrigin(0.5);
     this.add(title);
-
-    const teeKey = CLOTHING_CATALOG["red-tee"].textureKey;
-    const iconsY = PANEL_TOP + ICONS_Y;
-    const iconGap = 36;
-    const tee = scene.add.image(CX - (ICON_SIZE + iconGap) / 2, iconsY, teeKey);
-    tee.setDisplaySize(ICON_SIZE, ICON_SIZE);
-    this.add(tee);
-
-    const notes = scene.add.text(CX + (ICON_SIZE + iconGap) / 2, iconsY, "🎵", {
-      fontFamily: theme.fontFamily,
-      fontSize: `${Math.round(ICON_SIZE * 0.85)}px`,
-    });
-    notes.setOrigin(0.5);
-    this.add(notes);
 
     const textWidth = PANEL_W - PADDING * 2;
     const viewTop = PANEL_TOP + HEADER;
@@ -158,10 +159,23 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
     const scrollContent = scene.add.container(textX, viewTop);
     this.add(scrollContent);
 
+    const teeKey = CLOTHING_CATALOG["red-tee"].textureKey;
+    const iconsCX = CX - textX;
+    const iconGap = 36;
+    const tee = scene.add.image(iconsCX - (ICON_SIZE + iconGap) / 2, ICONS_Y, teeKey);
+    tee.setDisplaySize(ICON_SIZE, ICON_SIZE);
+
+    const notes = scene.add.text(iconsCX + (ICON_SIZE + iconGap) / 2, ICONS_Y, "🎵", {
+      fontFamily: theme.fontFamily,
+      fontSize: `${Math.round(ICON_SIZE * 0.85)}px`,
+    });
+    notes.setOrigin(0.5);
+    scrollContent.add([tee, notes]);
+
     const linkRects: LinkRect[] = [];
     const underline = scene.add.graphics();
     const sectionDividers = scene.add.graphics();
-    let cursorY = 0;
+    let cursorY = BODY_START_Y;
 
     const style = (color: string): Phaser.Types.GameObjects.Text.TextStyle => ({
       fontFamily: theme.fontFamily,
@@ -257,10 +271,27 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
     let scrollOffset = 0;
     const scrollHomeY = viewTop - PANEL_PIVOT_Y;
 
-    const applyScroll = (next: number) => {
-      scrollOffset = Phaser.Math.Clamp(next, 0, maxScroll);
+    const setScroll = (next: number) => {
+      scrollOffset = next;
       scrollContent.y = scrollHomeY - scrollOffset;
     };
+    const applyScroll = (next: number) => setScroll(Phaser.Math.Clamp(next, 0, maxScroll));
+    /** Signed distance past either end (0 when within bounds). */
+    const overscroll = () =>
+      scrollOffset < 0 ? scrollOffset : scrollOffset > maxScroll ? scrollOffset - maxScroll : 0;
+    /** Drag position → displayed offset, resisting past the ends. */
+    const rubberBand = (raw: number) =>
+      raw < 0
+        ? raw * OVERSCROLL_RESIST
+        : raw > maxScroll
+          ? maxScroll + (raw - maxScroll) * OVERSCROLL_RESIST
+          : raw;
+    const unRubberBand = (shown: number) =>
+      shown < 0
+        ? shown / OVERSCROLL_RESIST
+        : shown > maxScroll
+          ? maxScroll + (shown - maxScroll) / OVERSCROLL_RESIST
+          : shown;
 
     const scrollZone = scene.add.zone(
       textX + textWidth / 2,
@@ -273,19 +304,73 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
 
     let dragStartY = 0;
     let scrollStart = 0;
+    let dragging = false;
+    /** Scroll velocity in px per ms; positive scrolls further down the text. */
+    let velocity = 0;
+    const samples: { t: number; y: number }[] = [];
+
+    const startMomentum = () => {
+      const now = performance.now();
+      const recent = samples.filter((s) => now - s.t <= FLICK_SAMPLE_MS);
+      samples.length = 0;
+      if (recent.length < 2) return;
+      const first = recent[0]!;
+      const last = recent[recent.length - 1]!;
+      const dt = last.t - first.t;
+      if (dt <= 0) return;
+      velocity = Phaser.Math.Clamp(-(last.y - first.y) / dt, -FLICK_MAX_V, FLICK_MAX_V);
+    };
+
+    const onUpdate = (_time: number, delta: number) => {
+      if (dragging) return;
+      const step = Math.min(delta, 50);
+      const over = overscroll();
+      if (over === 0 && velocity === 0) return;
+      if (over !== 0) {
+        // Critically damped spring pulling back to the nearest end.
+        velocity -= over * BOUNCE_STIFFNESS * step;
+        velocity *= Math.exp(-BOUNCE_DAMPING * step);
+      } else {
+        velocity *= Math.pow(FLICK_FRICTION, step / 16.67);
+      }
+      setScroll(scrollOffset + velocity * step);
+      const settledOver = overscroll();
+      if (settledOver !== 0 && Math.abs(settledOver) < 0.5 && Math.abs(velocity) < FLICK_MIN_V) {
+        setScroll(Phaser.Math.Clamp(scrollOffset, 0, maxScroll));
+        velocity = 0;
+      } else if (settledOver === 0 && Math.abs(velocity) < FLICK_MIN_V) {
+        velocity = 0;
+      }
+    };
+    scene.events.on(Phaser.Scenes.Events.UPDATE, onUpdate);
 
     scrollZone.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       dragStartY = pointer.y;
-      scrollStart = scrollOffset;
+      scrollStart = unRubberBand(scrollOffset);
+      dragging = true;
+      velocity = 0;
+      samples.length = 0;
+      samples.push({ t: performance.now(), y: pointer.y });
     });
 
     scrollZone.on("pointermove", (pointer: Phaser.Input.Pointer) => {
-      if (!pointer.isDown) return;
-      applyScroll(scrollStart - (pointer.y - dragStartY));
+      if (!pointer.isDown || !dragging) return;
+      setScroll(rubberBand(scrollStart - (pointer.y - dragStartY)));
+      samples.push({ t: performance.now(), y: pointer.y });
+      if (samples.length > 12) samples.shift();
+    });
+
+    scrollZone.on("pointerupoutside", () => {
+      if (!dragging) return;
+      dragging = false;
+      startMomentum();
     });
 
     const local = new Phaser.Math.Vector2();
     scrollZone.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      if (!dragging) return;
+      dragging = false;
+      startMomentum();
       if (Math.abs(pointer.y - dragStartY) > TAP_SLOP) return;
       scrollContent.getWorldTransformMatrix().applyInverse(pointer.worldX, pointer.worldY, local);
       const hit = linkRects.find(
@@ -336,6 +421,7 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
     );
 
     this.on(Phaser.GameObjects.Events.DESTROY, () => {
+      scene.events.off(Phaser.Scenes.Events.UPDATE, onUpdate);
       if (this.wheelHandler) {
         scene.input.off("wheel", this.wheelHandler);
       }
