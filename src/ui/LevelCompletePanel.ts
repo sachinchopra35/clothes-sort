@@ -10,6 +10,7 @@ const PANEL_W = 680;
 const PANEL_H = 508;
 const LEVEL_BTN_H = 116;
 const BTN_GAP = 20;
+const SUBTITLE_FONT_PX = 42;
 
 export interface LevelCompletePanelOptions {
   levelNumber: number;
@@ -67,7 +68,7 @@ export class LevelCompletePanel extends Phaser.GameObjects.Container {
 
     const subtitle = scene.add.text(cx, panelTop + 120, pickLevelCompleteSubtitle(), {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.body,
+      fontSize: `${SUBTITLE_FONT_PX}px`,
       color: theme.ui.textMuted,
       align: "center",
       wordWrap: { width: btnW },

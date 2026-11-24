@@ -73,7 +73,7 @@ export class VolumeSlider extends Phaser.GameObjects.Container {
         width: MUTE_W,
         height: MUTE_H,
         label: "Mute",
-        fontSize: theme.fontSize.small,
+        fontSize: "34px",
         onClick: () => this.toggleMute(),
       },
       this,

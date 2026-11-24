@@ -128,7 +128,7 @@ export class LevelPicker extends Phaser.GameObjects.Container {
 
     this.lockHint = scene.add.text(0, 52, "", {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.small,
+      fontSize: "34px",
       color: theme.ui.textMuted,
     });
     this.lockHint.setOrigin(0.5);

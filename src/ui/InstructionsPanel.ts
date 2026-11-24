@@ -206,7 +206,7 @@ export class InstructionsPanel extends Phaser.GameObjects.Container {
         "Swipe up or down to read more",
         {
           fontFamily: theme.fontFamily,
-          fontSize: theme.fontSize.small,
+          fontSize: "34px",
           color: theme.ui.textMuted,
           align: "center",
           wordWrap: { width: btnW },

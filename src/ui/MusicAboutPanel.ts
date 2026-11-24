@@ -18,24 +18,27 @@ import { openExternalUrl } from "../util/openUrl";
 import { Button } from "./Button";
 import { playModalPopIn } from "./modalPopIn";
 
-const PANEL_W = DESIGN_WIDTH - 96;
+const PANEL_W = DESIGN_WIDTH - 200;
 /** Tall sheet on phone — room for the essay before scrolling. */
 const PANEL_VERTICAL_MARGIN = 112;
 const PANEL_H = DESIGN_HEIGHT - PANEL_VERTICAL_MARGIN * 2;
 const PANEL_TOP = PANEL_VERTICAL_MARGIN;
 const CX = DESIGN_WIDTH / 2;
 const PANEL_PIVOT_Y = PANEL_TOP + PANEL_H / 2;
-const PADDING = 44;
+const PADDING = 60;
 const ICON_SIZE = Math.round(SLOT_SIZE * CLOTHING_DISPLAY_SCALE);
-const ICON_GAP_ABOVE = 16;
-const ICON_GAP_BELOW = 24;
+const ICON_GAP_ABOVE = 40;
+const ICON_GAP_BELOW = 52;
 const ICONS_Y = 124 + ICON_SIZE / 2 + ICON_GAP_ABOVE;
 const HEADER = ICONS_Y + ICON_SIZE / 2 + 32 + ICON_GAP_BELOW;
-const FOOTER = PANEL_INSET + PANEL_PRIMARY_BTN_H + 28;
+const FOOTER = PANEL_INSET + PANEL_PRIMARY_BTN_H + 44;
 const SCROLL_HINT_RESERVE = 68;
-const BODY_FONT_PX = 40;
-const LINE_HEIGHT = 56;
-const PARAGRAPH_GAP = 56;
+const BODY_FONT_PX = 43;
+const LINE_HEIGHT = 64;
+const PARAGRAPH_GAP = 84;
+/** Index of the “If you like the vibe…” paragraph — divider drawn above it. */
+const PLAYLIST_PARAGRAPH_INDEX = 3;
+const SECTION_DIVIDER_PAD = 28;
 const LINK_COLOR = "#f4a261";
 const LINK_COLOR_NUM = 0xf4a261;
 const TAP_SLOP = 16;
@@ -107,6 +110,17 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
 
     const panelLeft = CX - PANEL_W / 2;
 
+    const panelHit = scene.add.rectangle(
+      CX,
+      PANEL_PIVOT_Y,
+      PANEL_W,
+      PANEL_H,
+      0xffffff,
+      0.001,
+    );
+    panelHit.setInteractive();
+    this.add(panelHit);
+
     const panel = scene.add.graphics();
     panel.fillStyle(theme.ui.panelFill, 0.97);
     panel.fillRoundedRect(panelLeft, PANEL_TOP, PANEL_W, PANEL_H, 24);
@@ -146,6 +160,7 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
 
     const linkRects: LinkRect[] = [];
     const underline = scene.add.graphics();
+    const sectionDividers = scene.add.graphics();
     let cursorY = 0;
 
     const style = (color: string): Phaser.Types.GameObjects.Text.TextStyle => ({
@@ -163,7 +178,18 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
     })();
 
     // Word-by-word flow so links stay inline with the sentence.
-    for (const paragraph of PARAGRAPHS) {
+    for (let pIdx = 0; pIdx < PARAGRAPHS.length; pIdx++) {
+      const paragraph = PARAGRAPHS[pIdx]!;
+      if (pIdx === PLAYLIST_PARAGRAPH_INDEX) {
+        cursorY += SECTION_DIVIDER_PAD;
+        sectionDividers.lineStyle(1, theme.ui.panelStroke, 0.6);
+        sectionDividers.beginPath();
+        sectionDividers.moveTo(0, cursorY);
+        sectionDividers.lineTo(textWidth, cursorY);
+        sectionDividers.strokePath();
+        // Match space above the line: prior paragraph gap + pad above the stroke.
+        cursorY += SECTION_DIVIDER_PAD + PARAGRAPH_GAP;
+      }
       const tokens: { word: string; url?: string; spaceBefore: boolean }[] = [];
       let pendingSpace = false;
       for (const seg of paragraph) {
@@ -211,6 +237,7 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
       });
       cursorY += LINE_HEIGHT + PARAGRAPH_GAP;
     }
+    scrollContent.add(sectionDividers);
     scrollContent.add(underline);
 
     const bodyHeight = cursorY - PARAGRAPH_GAP;
@@ -284,7 +311,7 @@ export class MusicAboutPanel extends Phaser.GameObjects.Container {
         "Swipe up or down to read more",
         {
           fontFamily: theme.fontFamily,
-          fontSize: theme.fontSize.small,
+          fontSize: "34px",
           color: theme.ui.textMuted,
           align: "center",
           wordWrap: { width: btnW },

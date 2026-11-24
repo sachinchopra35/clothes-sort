@@ -24,14 +24,21 @@ const CX = DESIGN_WIDTH / 2;
 const CY = DESIGN_HEIGHT / 2;
 
 /** Offsets from the panel top (design px). */
-const SOUND_ROW_Y = 166;
-const MUSIC_ROW_Y = 316;
-const DIVIDER_Y = 400;
-const NOW_PLAYING_Y = 440;
-const PICKER_Y = 520;
+const TITLE_Y = 86;
+const HEADER_EXTRA = 42;
+const SOUND_ROW_Y = 166 + HEADER_EXTRA;
+const MUSIC_ROW_Y = 316 + HEADER_EXTRA;
+/** Matches VolumeSlider: CONTROL_Y + MUTE_H / 2 below the row anchor. */
+const MUSIC_SLIDER_BOTTOM = 58;
+const SETTINGS_DIVIDER_PAD = 58;
+const DIVIDER_Y = MUSIC_ROW_Y + MUSIC_SLIDER_BOTTOM + SETTINGS_DIVIDER_PAD;
+const NOW_PLAYING_Y = DIVIDER_Y + SETTINGS_DIVIDER_PAD + 20;
+const PICKER_Y = NOW_PLAYING_Y + 72;
 /** Lowest point of the picker text block (two piece lines) below PICKER_Y. */
 const PICKER_BOTTOM = 112;
 const ABOUT_BELOW_PICKER = 8;
+/** Nudges the visible row up; touch zone follows (ABOUT_HIT_H unchanged). */
+const ABOUT_ROW_LIFT = 28;
 /** Generous touch target (visual row is smaller, centered in this zone). */
 const ABOUT_LINK_H = 96;
 const ABOUT_ABOVE_DONE = 20;
@@ -41,12 +48,14 @@ const PANEL_H =
   PICKER_Y +
   PICKER_BOTTOM +
   ABOUT_BELOW_PICKER +
-  ABOUT_LINK_H +
+  ABOUT_LINK_H -
+  ABOUT_ROW_LIFT +
   ABOUT_ABOVE_DONE +
   PANEL_PRIMARY_BTN_H +
   PANEL_INSET;
 
-const INFO_ICON_SIZE = 30;
+const INFO_ICON_SIZE = 34;
+const SETTINGS_LABEL_FONT_PX = 34;
 const INFO_ICON_COLOR = 0xf4a261;
 
 function createInfoIcon(scene: Phaser.Scene, diameter: number, color: number): Phaser.GameObjects.Graphics {
@@ -108,7 +117,7 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
     panel.strokeRoundedRect(panelLeft, panelTop, PANEL_W, PANEL_H, 24);
     this.add(panel);
 
-    const title = scene.add.text(CX, panelTop + 56, "Settings", {
+    const title = scene.add.text(CX, panelTop + TITLE_Y, "Settings", {
       fontFamily: theme.fontFamily,
       fontSize: theme.fontSize.heading,
       color: theme.ui.text,
@@ -156,7 +165,7 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
 
     const nowPlayingLabel = scene.add.text(CX, panelTop + NOW_PLAYING_Y, "Now playing", {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.small,
+      fontSize: `${SETTINGS_LABEL_FONT_PX}px`,
       color: theme.ui.textMuted,
     });
     nowPlayingLabel.setOrigin(0.5);
@@ -173,12 +182,13 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
       PICKER_Y +
       PICKER_BOTTOM +
       ABOUT_BELOW_PICKER +
-      ABOUT_LINK_H / 2;
+      ABOUT_LINK_H / 2 -
+      ABOUT_ROW_LIFT;
     const aboutRow = scene.add.container(CX, aboutY);
     const infoIcon = createInfoIcon(scene, INFO_ICON_SIZE, INFO_ICON_COLOR);
     const aboutLabel = scene.add.text(0, 0, "About the Music", {
       fontFamily: theme.fontFamily,
-      fontSize: theme.fontSize.small,
+      fontSize: `${SETTINGS_LABEL_FONT_PX}px`,
       color: theme.ui.textMuted,
     });
     aboutLabel.setOrigin(0, 0.5);
