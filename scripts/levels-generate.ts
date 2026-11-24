@@ -1315,11 +1315,274 @@ function parseMode(): Mode {
   return "4-10";
 }
 
+/**
+ * Levels 1–100 were solved with a single green jacket type; each level shows it in
+ * one colour instead (cycled through levels that have jackets). A one-for-one type swap
+ * leaves the puzzle unchanged. Levels 2–3 live in levelData.ts.
+ */
+const JACKET_COLOUR_BY_LEVEL: Readonly<Record<number, ClothingId>> = {
+  4: "brown-leather-jacket",
+  5: "purple-jacket",
+  6: "orange-jacket",
+  7: "navy-jacket",
+  8: "yellow-jacket",
+  9: "pink-jacket",
+  10: "dark-green-jacket",
+  11: "charcoal-jacket",
+  12: "blue-jacket",
+  13: "red-jacket",
+  14: "brown-leather-jacket",
+  15: "purple-jacket",
+  16: "orange-jacket",
+  17: "navy-jacket",
+  18: "yellow-jacket",
+  19: "pink-jacket",
+  20: "dark-green-jacket",
+  24: "charcoal-jacket",
+  27: "blue-jacket",
+  33: "red-jacket",
+  35: "brown-leather-jacket",
+  40: "purple-jacket",
+  45: "orange-jacket",
+  51: "navy-jacket",
+  57: "yellow-jacket",
+  62: "pink-jacket",
+  66: "dark-green-jacket",
+  70: "charcoal-jacket",
+  71: "blue-jacket",
+  75: "red-jacket",
+  79: "brown-leather-jacket",
+  83: "purple-jacket",
+  87: "orange-jacket",
+  89: "navy-jacket",
+  92: "yellow-jacket",
+  95: "pink-jacket",
+  96: "dark-green-jacket",
+  100: "charcoal-jacket",
+};
+
+/** Levels 13–100: purple socks shown in a cycle of colours (same one-for-one swap). */
+const SOCKS_COLOUR_BY_LEVEL: Readonly<Record<number, ClothingId>> = {
+  13: "green-socks",
+  15: "yellow-socks",
+  16: "blue-socks",
+  18: "red-socks",
+  19: "brown-socks",
+  23: "black-white-socks",
+  24: "orange-socks",
+  29: "pink-socks",
+  31: "green-socks",
+  35: "yellow-socks",
+  40: "blue-socks",
+  41: "red-socks",
+  47: "brown-socks",
+  48: "black-white-socks",
+  49: "orange-socks",
+  51: "pink-socks",
+  56: "green-socks",
+  58: "yellow-socks",
+  62: "blue-socks",
+  63: "red-socks",
+  66: "brown-socks",
+  68: "black-white-socks",
+  70: "orange-socks",
+  71: "pink-socks",
+  73: "green-socks",
+  75: "yellow-socks",
+  76: "blue-socks",
+  78: "red-socks",
+  79: "brown-socks",
+  81: "black-white-socks",
+  82: "orange-socks",
+  85: "pink-socks",
+  86: "green-socks",
+  88: "yellow-socks",
+  89: "blue-socks",
+  92: "red-socks",
+  93: "brown-socks",
+  96: "black-white-socks",
+  98: "orange-socks",
+  99: "pink-socks",
+};
+
+/** Levels 20–100: some yellow swim shorts shown as other trunks colours (burgundy from 40). */
+const TRUNKS_COLOUR_BY_LEVEL: Readonly<Record<number, ClothingId>> = {
+  20: "light-blue-trunks",
+  24: "pink-trunks",
+  31: "light-blue-trunks",
+  39: "pink-trunks",
+  41: "burgundy-trunks",
+  51: "light-blue-trunks",
+  59: "pink-trunks",
+  63: "burgundy-trunks",
+  69: "light-blue-trunks",
+  74: "pink-trunks",
+  78: "burgundy-trunks",
+  82: "light-blue-trunks",
+  90: "pink-trunks",
+  94: "burgundy-trunks",
+};
+
+/** Levels 11+: some red polka dresses shown as plain green, blue or purple dresses. */
+const DRESS_COLOUR_BY_LEVEL: Readonly<Record<number, ClothingId>> = {
+  11: "green-dress",
+  12: "blue-dress",
+  15: "purple-dress",
+  17: "green-dress",
+  18: "blue-dress",
+  24: "purple-dress",
+  28: "green-dress",
+  34: "blue-dress",
+  45: "purple-dress",
+  46: "green-dress",
+  50: "blue-dress",
+  55: "purple-dress",
+  60: "green-dress",
+  64: "blue-dress",
+  71: "purple-dress",
+  72: "green-dress",
+  73: "blue-dress",
+  80: "purple-dress",
+  84: "green-dress",
+  92: "blue-dress",
+  97: "purple-dress",
+  99: "green-dress",
+  112: "blue-dress",
+};
+
+/** After level 27: occasional plain-dress recolour (swap one dress colour on that level). */
+const POST_27_DRESS_SWAP: Readonly<
+  Record<number, { readonly from: ClothingId; readonly with: ClothingId }>
+> = {
+  31: { from: "orange-dress", with: "black-dress" },
+  39: { from: "orange-dress", with: "light-blue-dress" },
+  53: { from: "orange-dress", with: "black-dress" },
+  60: { from: "green-dress", with: "light-blue-dress" },
+  70: { from: "orange-dress", with: "light-blue-dress" },
+  84: { from: "green-dress", with: "black-dress" },
+  94: { from: "orange-dress", with: "black-dress" },
+  109: { from: "orange-dress", with: "light-blue-dress" },
+  117: { from: "orange-dress", with: "black-dress" },
+};
+
+/** Orange / green scarf recolours (puzzle unchanged; per-level type swap). */
+const ORANGE_SCARF_COLOUR_BY_LEVEL: Readonly<Record<number, ClothingId>> = {
+  10: "navy-scarf",
+  13: "purple-scarf",
+  16: "brown-scarf",
+  19: "navy-scarf",
+  23: "purple-scarf",
+  35: "brown-scarf",
+  39: "navy-scarf",
+  42: "purple-scarf",
+  48: "purple-scarf",
+  52: "navy-scarf",
+  58: "brown-scarf",
+  63: "navy-scarf",
+  66: "purple-scarf",
+  69: "purple-scarf",
+  74: "brown-scarf",
+  78: "navy-scarf",
+  85: "purple-scarf",
+  90: "brown-scarf",
+  94: "navy-scarf",
+  100: "purple-scarf",
+};
+
+const GREEN_SCARF_COLOUR_BY_LEVEL: Readonly<Record<number, ClothingId>> = {
+  12: "navy-scarf",
+  18: "purple-scarf",
+  26: "brown-scarf",
+  27: "navy-scarf",
+  33: "navy-scarf",
+  40: "purple-scarf",
+  45: "brown-scarf",
+  56: "brown-scarf",
+  60: "navy-scarf",
+  70: "purple-scarf",
+  75: "brown-scarf",
+  77: "brown-scarf",
+  79: "navy-scarf",
+  81: "navy-scarf",
+  87: "purple-scarf",
+  89: "brown-scarf",
+  95: "navy-scarf",
+  97: "purple-scarf",
+  99: "purple-scarf",
+};
+
+/** Level 27: dress-themed wardrobe (puzzle unchanged; one-for-one type swap). */
+const LEVEL_27_THEME: Readonly<Partial<Record<ClothingId, ClothingId>>> = {
+  "orange-scarf": "red-polka-dress",
+  "navy-scarf": "orange-dress",
+  "red-tee": "green-dress",
+  "yellow-sun-hat": "blue-dress",
+  "black-bootcut-jeans": "purple-dress",
+  "yellow-shorts": "light-blue-dress",
+  "blue-tee": "black-dress",
+  "blue-jacket": "dark-brown-dress",
+};
+
+function recolourLevelItems(items: readonly ClothingId[], n: number): ClothingId[] {
+  const jacket = JACKET_COLOUR_BY_LEVEL[n] ?? "brown-leather-jacket";
+  const socks = SOCKS_COLOUR_BY_LEVEL[n] ?? "purple-socks";
+  const trunks = TRUNKS_COLOUR_BY_LEVEL[n] ?? "yellow-shorts";
+  const dress = DRESS_COLOUR_BY_LEVEL[n] ?? "red-polka-dress";
+  const orangeScarf = ORANGE_SCARF_COLOUR_BY_LEVEL[n] ?? "orange-scarf";
+  const greenScarf = GREEN_SCARF_COLOUR_BY_LEVEL[n] ?? "green-scarf";
+  const recoloured = items.map((id) => {
+    if (id === "brown-leather-jacket") return jacket;
+    if (id === "purple-socks") return socks;
+    if (id === "yellow-shorts") return trunks;
+    if (id === "red-polka-dress") return dress;
+    if (id === "orange-scarf") return orangeScarf;
+    if (id === "green-scarf") return greenScarf;
+    return id;
+  });
+  let out =
+    n === 27 ? recoloured.map((id) => LEVEL_27_THEME[id] ?? id) : recoloured;
+  if (n > 27) {
+    const swap = POST_27_DRESS_SWAP[n];
+    if (swap) {
+      out = out.map((id) => (id === swap.from ? swap.with : id));
+    }
+  }
+  return out;
+}
+
+/**
+ * Same-garment levels: each distinct type (in first-appearance order across shelves)
+ * becomes palette[i]. Applied after the per-level recolours above.
+ */
+const SAME_GARMENT_LEVELS: Readonly<Record<number, readonly ClothingId[]>> = {
+  54: ["orange-scarf", "green-scarf", "navy-scarf", "purple-scarf", "brown-scarf"],
+  68: ["green-socks", "yellow-socks", "blue-socks", "red-socks", "black-white-socks", "orange-socks"],
+  82: ["white-tee", "red-tee", "green-tee", "blue-tee", "purple-tee", "psychedelic-tee"],
+  96: ["red-jacket", "blue-jacket", "yellow-jacket", "purple-jacket", "orange-jacket", "dark-green-jacket"],
+};
+
+function recolourLevelShelves(shelves: readonly (readonly ClothingId[])[], n: number): ClothingId[][] {
+  const recoloured = shelves.map((items) => recolourLevelItems(items, n));
+  const palette = SAME_GARMENT_LEVELS[n];
+  if (!palette) return recoloured;
+  const order = [...new Set(recoloured.flat())];
+  if (order.length > palette.length) {
+    throw new Error(`Level ${n}: ${order.length} types but same-garment palette has ${palette.length}`);
+  }
+  const map = new Map(order.map((id, i) => [id, palette[i]!]));
+  return recoloured.map((items) => items.map((id) => map.get(id)!));
+}
+
 function formatLevel(level: LevelDefinition, header: string): string {
+  const n = levelNumber(level.id);
+  const shelfItems = recolourLevelShelves(
+    level.shelves.map((s) => s.items),
+    n,
+  );
   const shelves = level.shelves
     .map(
-      (s) =>
-        `      { id: ${JSON.stringify(s.id)}, side: ${JSON.stringify(s.side)}, capacity: ${s.capacity}, items: ${JSON.stringify(s.items)} },`,
+      (s, i) =>
+        `      { id: ${JSON.stringify(s.id)}, side: ${JSON.stringify(s.side)}, capacity: ${s.capacity}, items: ${JSON.stringify(shelfItems[i])} },`,
     )
     .join("\n");
   const solution = (level.solution ?? [])

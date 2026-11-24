@@ -48,6 +48,17 @@ export class ConfirmPanel extends Phaser.GameObjects.Container {
     backdrop.on("pointerdown", close);
     this.add(backdrop);
 
+    const panelHit = scene.add.rectangle(
+      cx,
+      cy,
+      PANEL_W,
+      PANEL_H,
+      0xffffff,
+      0.001,
+    );
+    panelHit.setInteractive();
+    this.add(panelHit);
+
     const panel = scene.add.graphics();
     panel.fillStyle(theme.ui.panelFill, 0.97);
     panel.fillRoundedRect(panelLeft, panelTop, PANEL_W, PANEL_H, 24);

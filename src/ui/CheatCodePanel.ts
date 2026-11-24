@@ -174,6 +174,8 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
     this.inputEl.placeholder = "";
     this.inputEl.setAttribute("inputmode", "text");
     this.inputEl.style.textTransform = "uppercase";
+    // Hidden before insertion: a style flush at opacity 1 would make the reveal fade out first.
+    this.inputEl.style.opacity = "0";
     this.inputEl.addEventListener("input", () => {
       const start = this.inputEl.selectionStart;
       const end = this.inputEl.selectionEnd;
@@ -213,6 +215,7 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
         outline: "none",
         padding: `0 ${Math.round(16 * uiScale)}px`,
         boxSizing: "border-box",
+        transformOrigin: `${(contentW / 2) * scaleX}px ${(cy - inputDesignY + INPUT_H / 2) * scaleY}px`,
       });
     };
 
@@ -292,18 +295,21 @@ export class CheatCodePanel extends Phaser.GameObjects.Container {
     this.errorText.setOrigin(0.5, 0);
     this.add(this.errorText);
 
-    this.inputEl.style.opacity = "0";
-    this.inputEl.style.transition = "opacity 140ms ease-out";
-
-    const revealInput = () => {
-      this.inputEl.style.opacity = "1";
-      this.focusInput();
+    const syncInputToPopup = (alpha: number, scale: number) => {
+      this.inputEl.style.opacity = String(Phaser.Math.Clamp(alpha, 0, 1));
+      this.inputEl.style.transform = `scale(${scale})`;
     };
+    syncInputToPopup(0, 0.9);
 
     playModalPopIn(scene, this, backdrop, {
       pivotX: cx,
       pivotY: cy,
-      onComplete: revealInput,
+      onUpdate: syncInputToPopup,
+      onComplete: () => {
+        this.inputEl.style.opacity = "1";
+        this.inputEl.style.transform = "";
+        this.focusInput();
+      },
     });
 
     scene.input.once("pointerup", () => this.focusInput());

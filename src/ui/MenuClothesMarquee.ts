@@ -5,7 +5,7 @@ import {
   SIDE_PANEL_WIDTH,
   SLOT_SIZE,
 } from "../config/layout";
-import { CLOTHING_CATALOG, CLOTHING_IDS } from "../game/clothing";
+import { CLOTHING_CATALOG, MENU_MARQUEE_CLOTHING_IDS } from "../game/clothing";
 
 const TEXTURE_PX = 192;
 const ITEM_SCALE = ((SLOT_SIZE * CLOTHING_DISPLAY_SCALE) / TEXTURE_PX) * 0.86;
@@ -38,7 +38,7 @@ export interface MenuClothesMarqueeOptions {
   bandTop: number;
   bandHeight: number;
   direction: MarqueeDirection;
-  /** Offset into CLOTHING_IDS so upper/lower strips differ. */
+  /** Offset into MENU_MARQUEE_CLOTHING_IDS so upper/lower strips differ. */
   clothingOffset?: number;
 }
 
@@ -84,7 +84,7 @@ export class MenuClothesMarquee extends Phaser.GameObjects.Container {
     const count = Math.ceil((DESIGN_WIDTH + EDGE_PAD * 2) / ITEM_SPACING) + 4;
 
     for (let i = 0; i < count; i++) {
-      const id = CLOTHING_IDS[(clothingOffset + i) % CLOTHING_IDS.length]!;
+      const id = MENU_MARQUEE_CLOTHING_IDS[(clothingOffset + i) % MENU_MARQUEE_CLOTHING_IDS.length]!;
       const key = CLOTHING_CATALOG[id].textureKey;
       const img = scene.add.image(0, this.centerY, key);
       img.setScale(ITEM_SCALE);

@@ -12,7 +12,8 @@ import type { LevelDefinition } from "./levelTypes";
 const C = {
   jb: "light-blue-jeans" as const,
   jk: "black-bootcut-jeans" as const,
-  jkt: "brown-leather-jacket" as const,
+  redJkt: "red-jacket" as const,
+  blueJkt: "blue-jacket" as const,
   tee: "white-tee" as const,
   dr: "red-polka-dress" as const,
 };
@@ -51,19 +52,19 @@ const HANDCRAFTED_LEVELS: LevelDefinition[] = [
         id: "l1",
         side: "left",
         capacity: 4,
-        items: [C.jb, C.jkt, C.jk, C.jb],
+        items: [C.jb, C.redJkt, C.jk, C.jb],
       },
       {
         id: "r1",
         side: "right",
         capacity: 4,
-        items: [C.jk, C.jkt, C.jk, C.tee],
+        items: [C.jk, C.redJkt, C.jk, C.tee],
       },
       {
         id: "l2",
         side: "left",
         capacity: 4,
-        items: [C.tee, C.tee, C.jkt, C.jkt],
+        items: [C.tee, C.tee, C.redJkt, C.redJkt],
       },
       {
         id: "r2",
@@ -83,13 +84,13 @@ const HANDCRAFTED_LEVELS: LevelDefinition[] = [
         id: "l1",
         side: "left",
         capacity: 4,
-        items: [C.jkt, C.dr, C.dr, C.jb],
+        items: [C.blueJkt, C.dr, C.dr, C.jb],
       },
       {
         id: "r1",
         side: "right",
         capacity: 4,
-        items: [C.jkt, C.jkt, C.dr, C.jb],
+        items: [C.blueJkt, C.blueJkt, C.dr, C.jb],
       },
       {
         id: "l2",
@@ -101,7 +102,7 @@ const HANDCRAFTED_LEVELS: LevelDefinition[] = [
         id: "r2",
         side: "right",
         capacity: 4,
-        items: [C.dr, C.jb, C.jkt, C.jk],
+        items: [C.dr, C.jb, C.blueJkt, C.jk],
       },
       { id: "l3", side: "left", capacity: 4, items: [] },
       { id: "r3", side: "right", capacity: 4, items: [] },

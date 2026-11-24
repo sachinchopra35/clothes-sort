@@ -34,6 +34,8 @@ export class BoardController {
   private busy = false;
   /** Bumped by undo/restart so in-flight move animations stop touching the rebuilt board. */
   private boardEpoch = 0;
+  /** Moves can overlap, so the win waits until every move's animations have finished. */
+  private visualsInFlight = 0;
   private readonly undoAllowance: number;
   private undosRemaining = 0;
   private readonly undoSnapshots: BoardState[] = [];
@@ -187,6 +189,26 @@ export class BoardController {
     clearedShelfIds: string[],
   ): Promise<void> {
     const epoch = this.boardEpoch;
+    this.visualsInFlight++;
+    try {
+      await this.animateMove(movingViews, moveCount, destShelf, toItems, clearedShelfIds, epoch);
+    } finally {
+      this.visualsInFlight--;
+    }
+    if (epoch !== this.boardEpoch) return;
+    if (this.visualsInFlight === 0 && isWon(this.state)) {
+      this.onWon?.();
+    }
+  }
+
+  private async animateMove(
+    movingViews: ClothingItem[],
+    moveCount: number,
+    destShelf: Shelf,
+    toItems: ClothingItem[],
+    clearedShelfIds: string[],
+    epoch: number,
+  ): Promise<void> {
     const animPromises = movingViews.map((item, i) => {
       const slotIndex = toItems.length - moveCount + i;
       const pos = destShelf.getSlotWorldPosition(slotIndex);
@@ -206,10 +228,6 @@ export class BoardController {
       if (epoch !== this.boardEpoch) return;
       clearedItems.forEach((item) => item.destroy());
       this.itemsByShelf.delete(clearedId);
-    }
-
-    if (isWon(this.state)) {
-      this.onWon?.();
     }
   }
 

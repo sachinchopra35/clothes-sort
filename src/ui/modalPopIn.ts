@@ -17,6 +17,8 @@ export interface ModalPopInOptions {
   /** Overshoot for `Back.easeOut` only (default 1.15). */
   backOvershoot?: number;
   onComplete?: () => void;
+  /** Called every frame of the pop tween, e.g. to keep DOM overlays in sync. */
+  onUpdate?: (alpha: number, scale: number) => void;
 }
 
 /**
@@ -39,6 +41,7 @@ export function playModalPopIn(
     popEase = "Back.easeOut",
     backOvershoot = 1.15,
     onComplete,
+    onUpdate,
   } = options;
   const skip = new Set([backdrop, ...fadeOnly]);
 
@@ -78,6 +81,7 @@ export function playModalPopIn(
     alpha: 1,
     duration: popDuration,
     ease: popEase,
+    onUpdate: () => onUpdate?.(popup.alpha, popup.scaleX),
     onComplete: () => onComplete?.(),
   };
   if (popEase === "Back.easeOut") {

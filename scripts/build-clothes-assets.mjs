@@ -255,12 +255,87 @@ const VARIANTS = [
     ],
   },
   {
+    id: "green-dress",
+    url: FLUENT.dress,
+    colors: [
+      ["#46A4FB", "#2DB34A"],
+      ["#6B438B", "#16692A"],
+    ],
+  },
+  {
+    id: "blue-dress",
+    url: FLUENT.dress,
+    colors: [
+      ["#46A4FB", "#2F6FE4"],
+      ["#6B438B", "#1A3E91"],
+    ],
+  },
+  {
+    id: "purple-dress",
+    url: FLUENT.dress,
+    colors: [
+      ["#46A4FB", "#7B2FBF"],
+      ["#6B438B", "#4A1A7A"],
+    ],
+  },
+  {
+    id: "light-blue-dress",
+    url: FLUENT.dress,
+    colors: [
+      ["#46A4FB", "#B8E0FF"],
+      ["#6B438B", "#6BB8E8"],
+    ],
+  },
+  {
+    id: "black-dress",
+    url: FLUENT.dress,
+    colors: [
+      ["#46A4FB", "#3D4048"],
+      ["#6B438B", "#1A1C22"],
+    ],
+  },
+  {
+    id: "dark-brown-dress",
+    url: FLUENT.dress,
+    colors: [
+      ["#46A4FB", "#7A4E2B"],
+      ["#6B438B", "#4A2F1A"],
+    ],
+  },
+  {
     id: "green-scarf",
     url: FLUENT.scarf,
     colors: [
       ["#990838", "#1B5E20"],
       ["#CA0B4A", "#2E7D32"],
       ["#F8312F", "#66BB6A"],
+    ],
+  },
+  {
+    id: "navy-scarf",
+    url: FLUENT.scarf,
+    colors: [
+      ["#990838", "#0A1628"],
+      ["#CA0B4A", "#152A47"],
+      ["#F8312F", "#3D5F8C"],
+    ],
+  },
+  {
+    id: "purple-scarf",
+    url: FLUENT.scarf,
+    colors: [
+      ["#990838", "#3C096C"],
+      ["#CA0B4A", "#5A189A"],
+      ["#F8312F", "#9D4EDD"],
+    ],
+  },
+  {
+    id: "brown-scarf",
+    url: FLUENT.scarf,
+    colors: [
+      ["#990838", "#2C1810"],
+      ["#CA0B4A", "#4E342E"],
+      ["#F8312F", "#8D6E4A"],
     ],
   },
   {
@@ -387,6 +462,61 @@ const VARIANTS = [
     ],
   },
   {
+    id: "navy-jacket",
+    url: FLUENT.coat,
+    colors: [
+      ["#8C5543", "#060B1E"],
+      ["#E19747", "#0D1838"],
+      ["#F3AD61", "#14244D"],
+      ["#F3C07B", "#4A6FB5"],
+      ["#FFDEA7", "#22396E"],
+    ],
+  },
+  {
+    id: "dark-green-jacket",
+    url: FLUENT.coat,
+    colors: [
+      ["#8C5543", "#06200F"],
+      ["#E19747", "#0E3A1C"],
+      ["#F3AD61", "#154A26"],
+      ["#F3C07B", "#4C9A63"],
+      ["#FFDEA7", "#1F6136"],
+    ],
+  },
+  {
+    id: "pink-jacket",
+    url: FLUENT.coat,
+    colors: [
+      ["#8C5543", "#7A1340"],
+      ["#E19747", "#B8236A"],
+      ["#F3AD61", "#D63E86"],
+      ["#F3C07B", "#F06BA8"],
+      ["#FFDEA7", "#FF9CC8"],
+    ],
+  },
+  {
+    id: "orange-jacket",
+    url: FLUENT.coat,
+    colors: [
+      ["#8C5543", "#6B2A00"],
+      ["#E19747", "#A64400"],
+      ["#F3AD61", "#D35400"],
+      ["#F3C07B", "#F07C14"],
+      ["#FFDEA7", "#FF9F43"],
+    ],
+  },
+  {
+    id: "charcoal-jacket",
+    url: FLUENT.coat,
+    colors: [
+      ["#8C5543", "#121317"],
+      ["#E19747", "#24262C"],
+      ["#F3AD61", "#30333A"],
+      ["#F3C07B", "#7A808C"],
+      ["#FFDEA7", "#4B4F58"],
+    ],
+  },
+  {
     id: "green-socks",
     url: FLUENT.socks,
     colors: [
@@ -414,6 +544,51 @@ const VARIANTS = [
     ],
   },
   {
+    id: "yellow-socks",
+    url: FLUENT.socks,
+    colors: [
+      ["#46A4FB", "#FFD23F"],
+      ["#3F5FFF", "#C98F00"],
+      ["#F9C23C", "#FFF3C4"],
+    ],
+  },
+  {
+    id: "blue-socks",
+    url: FLUENT.socks,
+    colors: [
+      ["#46A4FB", "#4D96FF"],
+      ["#3F5FFF", "#1D4ED8"],
+      ["#F9C23C", "#DCEBFF"],
+    ],
+  },
+  {
+    id: "red-socks",
+    url: FLUENT.socks,
+    colors: [
+      ["#46A4FB", "#E63946"],
+      ["#3F5FFF", "#9B1B30"],
+      ["#F9C23C", "#FFDADC"],
+    ],
+  },
+  {
+    id: "brown-socks",
+    url: FLUENT.socks,
+    colors: [
+      ["#46A4FB", "#A0673D"],
+      ["#3F5FFF", "#5C3A1E"],
+      ["#F9C23C", "#E8D2BC"],
+    ],
+  },
+  {
+    id: "black-white-socks",
+    url: FLUENT.socks,
+    colors: [
+      ["#46A4FB", "#F4F4F4"],
+      ["#3F5FFF", "#1E1E24"],
+      ["#F9C23C", "#E2E2E2"],
+    ],
+  },
+  {
     id: "green-trunks",
     url: FLUENT.shorts,
     colors: [],
@@ -424,6 +599,22 @@ const VARIANTS = [
     colors: [
       ["#6AFCAC", "#4CC9F0"],
       ["#00D26A", "#1D4ED8"],
+    ],
+  },
+  {
+    id: "light-blue-trunks",
+    url: FLUENT.shorts,
+    colors: [
+      ["#6AFCAC", "#8FD3F7"],
+      ["#00D26A", "#3A9BD9"],
+    ],
+  },
+  {
+    id: "burgundy-trunks",
+    url: FLUENT.shorts,
+    colors: [
+      ["#6AFCAC", "#93203F"],
+      ["#00D26A", "#5A0A20"],
     ],
   },
   {

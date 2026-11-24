@@ -225,8 +225,7 @@ export class GameScene extends Phaser.Scene {
       confirmLabel: "Main menu",
       onCancel: () => this.closeConfirmPanel(),
       onConfirm: () => {
-        this.closeConfirmPanel();
-        void startSceneWithFade(this, SCENE_MENU);
+        void this.leaveToMenuWithFade();
       },
     });
   }
@@ -243,7 +242,6 @@ export class GameScene extends Phaser.Scene {
       confirmLabel: "Restart",
       onCancel: () => this.closeConfirmPanel(),
       onConfirm: () => {
-        this.closeConfirmPanel();
         void this.restartLevelWithFade();
       },
     });
@@ -289,14 +287,36 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private async leaveToMenuWithFade(): Promise<void> {
+    this.setHudEnabled(false);
+    this.input.enabled = false;
+    await fadeOutCamera(this);
+    this.confirmPanel?.destroy();
+    this.confirmPanel = null;
+    this.scene.start(SCENE_MENU, { introFade: true });
+  }
+
   private async restartLevelWithFade(): Promise<void> {
     this.setHudEnabled(false);
     this.input.enabled = false;
     await fadeOutCamera(this);
     this.restartLevel();
+    this.confirmPanel?.destroy();
+    this.confirmPanel = null;
     fadeInCamera(this);
     this.input.enabled = true;
     if (!this.isModalOpen()) this.setHudEnabled(true);
+  }
+
+  private async advanceToNextLevel(): Promise<void> {
+    const idx = getLevelIndex(this.levelId);
+    const next = LEVELS[idx + 1];
+    if (!next) return;
+
+    this.setHudEnabled(false);
+    this.input.enabled = false;
+    await fadeOutCamera(this);
+    this.scene.restart({ levelId: next.id, introFade: true });
   }
 
   private restartLevel(): void {
@@ -329,8 +349,7 @@ export class GameScene extends Phaser.Scene {
       levelNumber: idx + 1,
       hasNextLevel: hasNext,
       onNext: () => {
-        const next = LEVELS[idx + 1];
-        if (next) this.scene.restart({ levelId: next.id });
+        void this.advanceToNextLevel();
       },
       onGameComplete: () => {
         playConfetti();

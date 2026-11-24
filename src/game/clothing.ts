@@ -7,12 +7,21 @@ export const CLOTHING_IDS = [
   "yellow-shorts",
   "purple-socks",
   "orange-scarf",
+  "navy-scarf",
+  "purple-scarf",
+  "brown-scarf",
   "red-jeans",
   "green-tee",
   "red-tee",
   "purple-tee",
   "blue-tee",
   "orange-dress",
+  "green-dress",
+  "blue-dress",
+  "purple-dress",
+  "light-blue-dress",
+  "black-dress",
+  "dark-brown-dress",
   "green-scarf",
   "pink-gloves",
   "blue-cap",
@@ -27,12 +36,24 @@ export const CLOTHING_IDS = [
   "purple-jacket",
   "blue-jacket",
   "yellow-jacket",
+  "navy-jacket",
+  "dark-green-jacket",
+  "pink-jacket",
+  "orange-jacket",
+  "charcoal-jacket",
   "green-socks",
   "orange-socks",
   "pink-socks",
+  "yellow-socks",
+  "blue-socks",
+  "red-socks",
+  "brown-socks",
+  "black-white-socks",
   "green-trunks",
   "blue-trunks",
   "pink-trunks",
+  "light-blue-trunks",
+  "burgundy-trunks",
   "crown",
   "penguin",
   "top-hat",
@@ -43,8 +64,19 @@ export const CLOTHING_IDS = [
 export type ClothingId = (typeof CLOTHING_IDS)[number];
 
 /** Per-item sprite scale tweaks (1 = default). */
+const SOCKS_SCALE = 0.88;
+const TRUNKS_SCALE = 0.92;
+
+const TRUNKS_IDS = new Set<ClothingId>(
+  CLOTHING_IDS.filter((id) => id.endsWith("-trunks") || id === "yellow-shorts"),
+);
+
 export const CLOTHING_SCALE_MULTIPLIER: Partial<Record<ClothingId, number>> = {
   "black-boots": 0.85,
+  ...Object.fromEntries(
+    CLOTHING_IDS.filter((id) => id.endsWith("-socks")).map((id) => [id, SOCKS_SCALE]),
+  ),
+  ...Object.fromEntries([...TRUNKS_IDS].map((id) => [id, TRUNKS_SCALE])),
 };
 
 export interface ClothingDef {
@@ -63,14 +95,35 @@ export const CLOTHING_CATALOG: Record<ClothingId, ClothingDef> = {
   "tie-dye-tee": def("tie-dye-tee", "Tie-dye tee"),
   "red-jacket": def("red-jacket", "Red jacket"),
   "purple-jacket": def("purple-jacket", "Purple jacket"),
-  "blue-jacket": def("blue-jacket", "Blue jacket"),
+  "blue-jacket": def("blue-jacket", "Light blue jacket"),
   "yellow-jacket": def("yellow-jacket", "Yellow jacket"),
+  "navy-jacket": def("navy-jacket", "Navy jacket"),
+  "dark-green-jacket": def("dark-green-jacket", "Dark green jacket"),
+  "pink-jacket": def("pink-jacket", "Pink jacket"),
+  "orange-jacket": def("orange-jacket", "Orange jacket"),
+  "charcoal-jacket": def("charcoal-jacket", "Charcoal jacket"),
+  "navy-scarf": def("navy-scarf", "Navy scarf"),
+  "purple-scarf": def("purple-scarf", "Purple scarf"),
+  "brown-scarf": def("brown-scarf", "Brown scarf"),
+  "green-dress": def("green-dress", "Green dress"),
+  "blue-dress": def("blue-dress", "Blue dress"),
+  "purple-dress": def("purple-dress", "Purple dress"),
+  "light-blue-dress": def("light-blue-dress", "Light blue dress"),
+  "black-dress": def("black-dress", "Black dress"),
+  "dark-brown-dress": def("dark-brown-dress", "Dark brown dress"),
   "green-socks": def("green-socks", "Green socks"),
   "orange-socks": def("orange-socks", "Orange socks"),
   "pink-socks": def("pink-socks", "Pink socks"),
+  "yellow-socks": def("yellow-socks", "Yellow socks"),
+  "blue-socks": def("blue-socks", "Blue socks"),
+  "red-socks": def("red-socks", "Red socks"),
+  "brown-socks": def("brown-socks", "Brown socks"),
+  "black-white-socks": def("black-white-socks", "Black and white socks"),
   "green-trunks": def("green-trunks", "Green swim trunks"),
   "blue-trunks": def("blue-trunks", "Blue swim trunks"),
   "pink-trunks": def("pink-trunks", "Pink swim trunks"),
+  "light-blue-trunks": def("light-blue-trunks", "Light blue swim trunks"),
+  "burgundy-trunks": def("burgundy-trunks", "Burgundy swim trunks"),
   crown: def("crown", "Crown"),
   penguin: def("penguin", "Penguin"),
   "top-hat": def("top-hat", "Top hat"),
@@ -90,7 +143,7 @@ export const CLOTHING_CATALOG: Record<ClothingId, ClothingDef> = {
   },
   "brown-leather-jacket": {
     id: "brown-leather-jacket",
-    name: "Green jacket",
+    name: "Light green jacket",
     assetPath: "assets/clothes/brown-leather-jacket.svg",
     textureKey: "clothes-brown-leather-jacket",
   },
@@ -211,3 +264,8 @@ export const CLOTHING_CATALOG: Record<ClothingId, ClothingDef> = {
 };
 
 export const ALL_CLOTHING: ClothingDef[] = CLOTHING_IDS.map((id) => CLOTHING_CATALOG[id]);
+
+/** Main-menu scrolling strips — omit variants that crowd similar items. */
+export const MENU_MARQUEE_CLOTHING_IDS: readonly ClothingId[] = CLOTHING_IDS.filter(
+  (id) => id !== "brown-scarf",
+);
