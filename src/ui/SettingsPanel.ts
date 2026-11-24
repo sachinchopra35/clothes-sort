@@ -44,6 +44,8 @@ const ABOUT_LINK_H = 96;
 const ABOUT_ABOVE_DONE = 20;
 /** Touch zone only; extends past the row into the gaps above and below. */
 const ABOUT_HIT_H = 150;
+/** Trimmed off the top of the touch zone so it stays clear of the picker arrows. */
+const ABOUT_HIT_TOP_TRIM = 34;
 const PANEL_H =
   PICKER_Y +
   PICKER_BOTTOM +
@@ -200,7 +202,12 @@ export class SettingsPanel extends Phaser.GameObjects.Container {
 
     this.add(aboutRow);
 
-    const aboutHit = scene.add.zone(CX, aboutY, rowW, ABOUT_HIT_H);
+    const aboutHit = scene.add.zone(
+      CX,
+      aboutY + ABOUT_HIT_TOP_TRIM / 2,
+      rowW,
+      ABOUT_HIT_H - ABOUT_HIT_TOP_TRIM,
+    );
     aboutHit.setInteractive({ useHandCursor: true });
     aboutHit.on("pointerdown", () => {
       playUiKnock();
