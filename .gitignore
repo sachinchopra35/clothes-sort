@@ -3,6 +3,11 @@ dist/
 .DS_Store
 *.pages
 
+# App Store preview recordings and exports — upload to Connect, don't commit.
+*.mov
+*.MOV
+docs/*.mp4
+
 # Master recordings — keep locally; ship built .m4a only (see music/README.md).
 music/source/*.wav
 music/source/*.WAV
