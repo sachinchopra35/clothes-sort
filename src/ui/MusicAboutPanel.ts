@@ -49,7 +49,7 @@ const TAP_SLOP = 16;
 /** Only finger movement this recent counts towards flick speed. */
 const FLICK_SAMPLE_MS = 100;
 /** Momentum decay per 60fps frame. */
-const FLICK_FRICTION = 0.92;
+const FLICK_FRICTION = 0.95;
 const FLICK_MAX_V = 6;
 const FLICK_MIN_V = 0.02;
 /** Fraction of finger movement applied when dragging past an end. */
