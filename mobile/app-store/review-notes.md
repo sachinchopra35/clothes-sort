@@ -21,7 +21,7 @@ A screen recording from a physical iPhone on current iOS is attached [here / in 
 
 
 —— 2. PURPOSE AND AUDIENCE ——
-Clothes Sort is a calm, offline wardrobe-sorting puzzle for casual players (teens and adults) who want short, relaxing brain-teaser sessions. The player moves matching clothes between shelves until every shelf is clear. It provides satisfying progression (120 levels), gentle difficulty curve, and optional classical piano music—without ads, accounts, or social features.
+Clothes Sort is a calm, offline wardrobe-sorting puzzle for casual players (teens and adults) who want short, relaxing brain-teaser sessions. The player moves matching clothes between shelves until every shelf is clear. It provides satisfying progression (200 levels), gentle difficulty curve, and optional classical piano music—without ads, accounts, or social features.
 
 
 —— 3. SETUP AND MAIN FEATURES ——
@@ -45,7 +45,7 @@ None for core gameplay. The app is fully offline after install. No authenticatio
 
 
 —— 5. REGIONAL DIFFERENCES ——
-No regional differences. The same 120 levels, assets, and bundled music are identical in all countries. No geo-restricted content or features.
+No regional differences. The same 200 levels, assets, and bundled music are identical in all countries. No geo-restricted content or features.
 
 
 —— 6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL ——
@@ -73,7 +73,7 @@ How to test:
 4. Main menu: Settings → adjust music/sound sliders and switch tracks with ◀ ▶.
 5. Level 11+: undo button appears at the bottom (limited undo uses on later levels); a one-time undo intro may appear.
 6. Level 21: one-time popup explains shelves hold 5 items (not 4).
-7. Level 120: finishing shows “Game Complete!!” (confetti still plays on win); tapping it fires confetti again. There is no level 121.
+7. Level 200: finishing shows “Game Complete!!” (confetti still plays on win); tapping it fires confetti again. There is no level 201.
 
 Locked levels: only levels after the player’s current furthest unlock are locked. For review access to a locked level without playing through, tap the greyed level number or “Locked” on the level picker and enter the cheat code CLEANCLOTHES followed by the level number (example: CLEANCLOTHES25 unlocks level 25 and prior progress gates). This flow is intentional for support/testing; there is no in-app purchase.
 

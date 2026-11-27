@@ -29,7 +29,12 @@ import {
   hasSeenMusicVolumeHint,
   markMusicVolumeHintSeen,
 } from "../state/musicVolumeHint";
-import { hasSeenLevel21Intro, markLevel21IntroSeen } from "../state/level21Intro";
+import {
+  hasSeenLevel21Intro,
+  hasSeenLevel121SixIntro,
+  markLevel21IntroSeen,
+  markLevel121SixIntroSeen,
+} from "../state/level21Intro";
 import { hasSeenUndoIntro, markUndoIntroSeen } from "../state/undoIntro";
 import { LevelCompletePanel } from "../ui/LevelCompletePanel";
 import { playConfetti } from "../ui/playConfetti";
@@ -177,6 +182,19 @@ export class GameScene extends Phaser.Scene {
         this.level21IntroPanel?.destroy();
         this.level21IntroPanel = null;
       });
+    }
+
+    if (levelNum === 121 && !hasSeenLevel121SixIntro()) {
+      this.level21IntroPanel = new Level21IntroPanel(
+        this,
+        () => {
+          markLevel121SixIntroSeen();
+          this.level21IntroPanel?.destroy();
+          this.level21IntroPanel = null;
+        },
+        6,
+        true,
+      );
     }
 
     if (levelNum === 5 && !hasSeenMusicVolumeHint()) {

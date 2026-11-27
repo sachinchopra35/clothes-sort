@@ -32,7 +32,93 @@ const FLUENT = {
   topHat: `${BASE}/Top%20hat/Flat/top_hat_flat.svg`,
   fish: `${BASE}/Fish/Flat/fish_flat.svg`,
   tropicalFish: `${BASE}/Tropical%20fish/Flat/tropical_fish_flat.svg`,
+  blowfish: `${BASE}/Blowfish/Flat/blowfish_flat.svg`,
+  bikini: `${BASE}/Bikini/Flat/bikini_flat.svg`,
+  sari: `${BASE}/Sari/Flat/sari_flat.svg`,
+  highHeel: `${BASE}/High-heeled%20shoe/Flat/high-heeled_shoe_flat.svg`,
+  flipFlops: `${BASE}/Thong%20sandal/Flat/thong_sandal_flat.svg`,
+  hikingBoot: `${BASE}/Hiking%20boot/Flat/hiking_boot_flat.svg`,
+  gradCap: `${BASE}/Graduation%20cap/Flat/graduation_cap_flat.svg`,
+  handbag: `${BASE}/Handbag/Flat/handbag_flat.svg`,
+  backpack: `${BASE}/Backpack/Flat/backpack_flat.svg`,
 };
+
+/** Billed cap shades: crown, side panel, button, brim top, brim underside. */
+function capVariant(id, [crown, side, button, brimTop, brimUnder]) {
+  return {
+    id,
+    url: FLUENT.cap,
+    colors: [
+      ["#8BAFFF", crown],
+      ["#6A8CFF", side],
+      ["#6683FF", button],
+      ["#526CE3", brimTop],
+      ["#3C378C", brimUnder],
+    ],
+  };
+}
+
+/** Fluent scarf shades: dark, mid, light. */
+function scarfVariant(id, [dark, mid, light]) {
+  return {
+    id,
+    url: FLUENT.scarf,
+    colors: [
+      ["#990838", dark],
+      ["#CA0B4A", mid],
+      ["#F8312F", light],
+    ],
+  };
+}
+
+/** Tee body, collar shadow, collar inner, plus a contrasting chest band. */
+function stripeTeeVariant(id, [body, shadow, inner], band) {
+  return {
+    id,
+    url: FLUENT.tee,
+    colors: [
+      ["#86D72F", body],
+      ["#44911B", shadow],
+      ["#00D26A", inner],
+      ["#C3EF3C", band],
+    ],
+  };
+}
+
+/** Tropical fish: front body, back half and stripe, tail, small fin. */
+function tropicalFishVariant(id, [body, back, tail, fin]) {
+  return {
+    id,
+    url: FLUENT.tropicalFish,
+    colors: [
+      ["#00A6ED", body],
+      ["#F9C23C", back],
+      ["#8D65C5", tail],
+      ["#635994", fin],
+    ],
+  };
+}
+
+/** Plain fish: body and fins. */
+/** Club Penguin vibes: recolour the body shell (Fluent purple #533566). */
+function penguinVariant(id, body) {
+  return {
+    id,
+    url: FLUENT.penguin,
+    colors: [["#533566", body]],
+  };
+}
+
+function fishVariant(id, [body, fins]) {
+  return {
+    id,
+    url: FLUENT.fish,
+    colors: [
+      ["#00A6ED", body],
+      ["#0074BA", fins],
+    ],
+  };
+}
 
 /** Only write assets that don't exist yet (keeps existing art stable). */
 const NEW_ONLY = process.argv.includes("--new-only");
@@ -244,6 +330,36 @@ const VARIANTS = [
       ["#44911B", "#1D4ED8"],
       ["#86D72F", "#3B82F6"],
       ["#C3EF3C", "#93C5FD"],
+    ],
+  },
+  {
+    id: "orange-tee",
+    url: FLUENT.tee,
+    colors: [
+      ["#00D26A", "#E85D04"],
+      ["#44911B", "#C2570C"],
+      ["#86D72F", "#F77F00"],
+      ["#C3EF3C", "#FFB067"],
+    ],
+  },
+  {
+    id: "yellow-tee",
+    url: FLUENT.tee,
+    colors: [
+      ["#00D26A", "#E0A800"],
+      ["#44911B", "#C99A00"],
+      ["#86D72F", "#F2B705"],
+      ["#C3EF3C", "#FFE066"],
+    ],
+  },
+  {
+    id: "black-tee",
+    url: FLUENT.tee,
+    colors: [
+      ["#00D26A", "#2B2B33"],
+      ["#44911B", "#1A1A20"],
+      ["#86D72F", "#3A3A44"],
+      ["#C3EF3C", "#5C5C66"],
     ],
   },
   {
@@ -635,6 +751,14 @@ const VARIANTS = [
     url: FLUENT.penguin,
     colors: [],
   },
+  penguinVariant("orange-penguin", "#E85D04"),
+  penguinVariant("blue-penguin", "#2563EB"),
+  penguinVariant("green-penguin", "#2D6A4F"),
+  penguinVariant("red-penguin", "#C1121F"),
+  penguinVariant("yellow-penguin", "#E0A800"),
+  penguinVariant("pink-penguin", "#D9488A"),
+  penguinVariant("teal-penguin", "#0E7C7B"),
+  penguinVariant("purple-penguin", "#7B3FD1"),
   {
     id: "top-hat",
     url: FLUENT.topHat,
@@ -653,6 +777,60 @@ const VARIANTS = [
     url: FLUENT.tropicalFish,
     colors: [],
   },
+  capVariant("red-cap", ["#FF6B6B", "#E63946", "#E63946", "#C1121F", "#7A0E17"]),
+  capVariant("green-cap", ["#6FD08C", "#40B86A", "#40B86A", "#2D8A4E", "#1B4D2E"]),
+  capVariant("yellow-cap", ["#FFE066", "#FFCC33", "#FFCC33", "#E0A800", "#8A6500"]),
+  capVariant("pink-cap", ["#FFA8D2", "#FF7EB6", "#FF7EB6", "#E0558F", "#8A2C55"]),
+  capVariant("purple-cap", ["#C59BFF", "#A06CF0", "#A06CF0", "#7B3FD1", "#45207A"]),
+  capVariant("orange-cap", ["#FFB067", "#FF8C2E", "#FF8C2E", "#E06A00", "#7F3C00"]),
+  capVariant("black-cap", ["#4A4A52", "#3A3A42", "#3A3A42", "#2B2B33", "#111114"]),
+  capVariant("white-cap", ["#FFFFFF", "#ECECEC", "#DDDDDD", "#CFCFCF", "#8E8E8E"]),
+  scarfVariant("red-scarf", ["#990838", "#CA0B4A", "#F8312F"]),
+  scarfVariant("yellow-scarf", ["#B8860B", "#E0A800", "#FFD43B"]),
+  scarfVariant("pink-scarf", ["#A8235F", "#D9488A", "#FF8CC6"]),
+  scarfVariant("teal-scarf", ["#0B5D5B", "#0E7C7B", "#2EC4B6"]),
+  scarfVariant("light-blue-scarf", ["#1F6FA8", "#4BA3E0", "#9AD1FF"]),
+  stripeTeeVariant("navy-stripe-tee", ["#F5F5F5", "#C9C9C9", "#E0E0E0"], "#1D3557"),
+  stripeTeeVariant("sailor-tee", ["#1D3557", "#12223A", "#2A4A75"], "#FFFFFF"),
+  stripeTeeVariant("bumblebee-tee", ["#FFD43B", "#C99A00", "#F2B705"], "#1C1C1C"),
+  stripeTeeVariant("cherry-tee", ["#D62839", "#8E1522", "#B71C2C"], "#FFFFFF"),
+  stripeTeeVariant("rebel-tee", ["#2B2B33", "#141418", "#3A3A44"], "#E63946"),
+  stripeTeeVariant("candy-tee", ["#FF8CC6", "#C24F8A", "#FF6DB0"], "#7DF2C4"),
+  stripeTeeVariant("forest-tee", ["#2D6A4F", "#1B4332", "#40916C"], "#FFD43B"),
+  tropicalFishVariant("clownfish", ["#FF7A1A", "#FFFFFF", "#E85D04", "#9C3D00"]),
+  tropicalFishVariant("neon-fish", ["#FF3EA5", "#3CF0FF", "#7B2FF7", "#4A1A9E"]),
+  tropicalFishVariant("royal-fish", ["#8E3FD6", "#FFD23F", "#FFB703", "#E09F00"]),
+  tropicalFishVariant("lagoon-fish", ["#7CDB2D", "#1E6FFF", "#0B4FD1", "#083A9A"]),
+  fishVariant("goldfish", ["#FF9F1C", "#E36414"]),
+  fishVariant("trout", ["#8A9A5B", "#5C4B2E"]),
+  fishVariant("salmon", ["#F2A3A0", "#8C7C86"]),
+  { id: "blowfish", url: FLUENT.blowfish, colors: [] },
+  { id: "pink-bikini", url: FLUENT.bikini, colors: [] },
+  { id: "sari", url: FLUENT.sari, colors: [] },
+  {
+    id: "red-sari",
+    url: FLUENT.sari,
+    colors: [
+      ["#37C9CD", "#B5172A"],
+      ["#00F397", "#5B1A5E"],
+      ["#6AFCAC", "#8E2D8F"],
+      ["#FF8257", "#E63946"],
+    ],
+  },
+  { id: "high-heels", url: FLUENT.highHeel, colors: [] },
+  { id: "flip-flops", url: FLUENT.flipFlops, colors: [] },
+  {
+    id: "navy-backpack",
+    url: FLUENT.backpack,
+    colors: [
+      ["#CA0B4A", "#14213D"],
+      ["#F8312F", "#1D3557"],
+    ],
+  },
+  { id: "hiking-boots", url: FLUENT.hikingBoot, colors: [] },
+  { id: "graduation-cap", url: FLUENT.gradCap, colors: [] },
+  { id: "handbag", url: FLUENT.handbag, colors: [] },
+  { id: "backpack", url: FLUENT.backpack, colors: [] },
 ];
 
 await mkdir(OUT_DIR, { recursive: true });

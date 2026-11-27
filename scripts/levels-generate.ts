@@ -1279,8 +1279,229 @@ const SPECS_101_120: LevelSpec[] = [
     types: ["crown", "penguin", "sardine", "psychedelic-tee", "purple-jacket", "green-socks", "blue-trunks", "yellow-sun-hat"] },
 ];
 
+/**
+ * Levels 121–140: coloured caps, scarves, fish and striped tees plus new Fluent items.
+ * 121 is all caps (5 per shelf); from 122 every shelf holds 6, which is what lets the
+ * scores climb past the ~60 ceiling of 8 types × 5. Breathers at 128 and 134.
+ */
+const SPEC_121_BASE = {
+  emptyShelves: 2,
+  capacity: 6,
+  maxStartRun: 2,
+  pickStrategy: "nearestTarget" as const,
+};
+const band = (min: number, max: number, attempts = 200): Pick<LevelSpec, "attempts" | "scoreBand"> => ({
+  attempts,
+  scoreBand: [min, max],
+});
+
+const SPECS_121_140: LevelSpec[] = [
+  { ...SPEC_121_BASE, number: 121, seed: 121, ...band(65, 69, 400),
+    types: ["red-cap", "green-cap", "yellow-cap", "pink-cap", "purple-cap", "orange-cap", "black-cap", "white-cap"] },
+  { ...SPEC_121_BASE, number: 122, seed: 122, ...band(59, 63),
+    types: ["navy-stripe-tee", "red-cap", "teal-scarf", "clownfish", "high-heels", "light-blue-jeans", "orange-dress", "green-socks"] },
+  { ...SPEC_121_BASE, number: 123, seed: 123, ...band(60, 64),
+    types: ["bumblebee-tee", "purple-cap", "pink-scarf", "goldfish", "pink-bikini", "backpack", "blue-jacket", "black-boots"] },
+  { ...SPEC_121_BASE, number: 124, seed: 124, ...band(61, 64),
+    types: ["sailor-tee", "orange-cap", "yellow-scarf", "neon-fish", "sari", "hiking-boots", "red-jeans", "handbag"] },
+  { ...SPEC_121_BASE, number: 125, seed: 125, ...band(61, 65),
+    types: ["cherry-tee", "green-cap", "light-blue-scarf", "royal-fish", "red-sari", "navy-backpack", "flip-flops", "pink-trunks"] },
+  { ...SPEC_121_BASE, number: 126, seed: 126, ...band(62, 65),
+    types: ["rebel-tee", "yellow-cap", "red-scarf", "lagoon-fish", "graduation-cap", "blowfish", "coral-swimsuit", "light-blue-jeans"] },
+  { ...SPEC_121_BASE, number: 127, seed: 127, ...band(62, 66),
+    types: ["candy-tee", "black-cap", "teal-scarf", "trout", "high-heels", "backpack", "purple-jacket", "orange-socks"] },
+  { ...SPEC_121_BASE, number: 128, seed: 128, ...band(44, 52),
+    types: ["forest-tee", "pink-cap", "yellow-scarf", "salmon", "pink-gloves", "flip-flops", "teal-kimono"] },
+  { ...SPEC_121_BASE, number: 129, seed: 129, ...band(63, 66),
+    types: ["navy-stripe-tee", "white-cap", "pink-scarf", "clownfish", "sari", "hiking-boots", "red-jacket", "blue-trunks"] },
+  { ...SPEC_121_BASE, number: 130, seed: 130, ...band(63, 67),
+    types: ["bumblebee-tee", "red-cap", "light-blue-scarf", "neon-fish", "handbag", "red-sari", "crown", "black-bootcut-jeans"] },
+  { ...SPEC_121_BASE, number: 131, seed: 131, ...band(64, 67, 250),
+    types: ["sailor-tee", "purple-cap", "red-scarf", "goldfish", "navy-backpack", "pink-bikini", "yellow-jacket", "red-trainers"] },
+  { ...SPEC_121_BASE, number: 132, seed: 132, ...band(64, 68, 250),
+    types: ["cherry-tee", "orange-cap", "teal-scarf", "royal-fish", "graduation-cap", "purple-jacket", "penguin", "green-trunks"] },
+  { ...SPEC_121_BASE, number: 133, seed: 133, ...band(65, 68, 250),
+    types: ["rebel-tee", "green-cap", "yellow-scarf", "lagoon-fish", "blowfish", "high-heels", "sari", "light-blue-jeans"] },
+  { ...SPEC_121_BASE, number: 134, seed: 134, ...band(46, 54),
+    types: ["candy-tee", "yellow-cap", "pink-scarf", "trout", "backpack", "flip-flops", "orange-dress"] },
+  { ...SPEC_121_BASE, number: 135, seed: 135, ...band(65, 69, 250),
+    types: ["forest-tee", "black-cap", "light-blue-scarf", "salmon", "hiking-boots", "handbag", "pink-jacket", "psychedelic-tee"] },
+  { ...SPEC_121_BASE, number: 136, seed: 136, ...band(60, 64),
+    types: ["clownfish", "neon-fish", "royal-fish", "lagoon-fish", "goldfish", "trout", "salmon", "blowfish"] },
+  { ...SPEC_121_BASE, number: 137, seed: 137, ...band(66, 69, 300),
+    types: ["navy-stripe-tee", "pink-cap", "red-scarf", "neon-fish", "red-sari", "navy-backpack", "top-hat", "purple-socks"] },
+  { ...SPEC_121_BASE, number: 138, seed: 138, ...band(66, 70, 300),
+    types: ["sailor-tee", "white-cap", "yellow-scarf", "clownfish", "pink-bikini", "graduation-cap", "tie-dye-tee", "red-trainers"] },
+  { ...SPEC_121_BASE, number: 139, seed: 139, ...band(67, 70, 300),
+    types: ["bumblebee-tee", "red-cap", "teal-scarf", "royal-fish", "sari", "coral-swimsuit", "black-boots", "dark-green-jacket"] },
+  { ...SPEC_121_BASE, number: 140, seed: 1400, ...band(68.8, 74, 300),
+    types: ["psychedelic-tee", "purple-cap", "pink-scarf", "lagoon-fish", "high-heels", "crown", "backpack", "cherry-tee"] },
+];
+
+/** Levels 141–160: coloured Club Penguin pals, gentle climb from 140. */
+const SPEC_141_BASE = SPEC_121_BASE;
+
+const SPECS_141_160: LevelSpec[] = [
+  { ...SPEC_141_BASE, number: 141, seed: 141, ...band(67, 71, 250),
+    types: ["orange-penguin", "blue-penguin", "green-penguin", "red-penguin", "yellow-penguin", "pink-penguin", "teal-penguin", "purple-penguin"] },
+  { ...SPEC_141_BASE, number: 142, seed: 142, ...band(65, 69, 250),
+    types: ["red-penguin", "navy-stripe-tee", "teal-scarf", "clownfish", "red-sari", "navy-backpack", "purple-jacket", "light-blue-jeans"] },
+  { ...SPEC_141_BASE, number: 143, seed: 143, ...band(65.5, 69.5, 250),
+    types: ["green-cap", "pink-scarf", "royal-fish", "sari", "high-heels", "graduation-cap", "yellow-penguin", "orange-socks"] },
+  { ...SPEC_141_BASE, number: 144, seed: 144, ...band(66, 70, 250),
+    types: ["sailor-tee", "purple-cap", "red-scarf", "goldfish", "pink-bikini", "hiking-boots", "crown", "blue-penguin"] },
+  { ...SPEC_141_BASE, number: 145, seed: 145, ...band(66.5, 70.5, 250),
+    types: ["cherry-tee", "orange-cap", "light-blue-scarf", "neon-fish", "handbag", "flip-flops", "red-jacket", "penguin"] },
+  { ...SPEC_141_BASE, number: 146, seed: 146, ...band(67, 70.5, 250),
+    types: ["rebel-tee", "black-cap", "yellow-scarf", "lagoon-fish", "blowfish", "backpack", "teal-kimono", "pink-penguin"] },
+  { ...SPEC_141_BASE, number: 147, seed: 147, ...band(67.2, 70.8, 250),
+    types: ["candy-tee", "white-cap", "teal-scarf", "trout", "red-sari", "coral-swimsuit", "black-boots", "red-penguin"] },
+  { ...SPEC_141_BASE, number: 148, seed: 148, ...band(48, 56),
+    types: ["forest-tee", "yellow-cap", "pink-scarf", "salmon", "pink-gloves", "flip-flops", "green-penguin", "teal-penguin"] },
+  { ...SPEC_141_BASE, number: 149, seed: 149, ...band(67.5, 71, 250),
+    types: ["bumblebee-tee", "red-cap", "navy-scarf", "clownfish", "navy-backpack", "yellow-jacket", "top-hat", "purple-penguin"] },
+  { ...SPEC_141_BASE, number: 150, seed: 150, ...band(68, 71.2, 250),
+    types: ["psychedelic-tee", "green-cap", "purple-scarf", "royal-fish", "sari", "high-heels", "pink-trunks", "orange-penguin"] },
+  { ...SPEC_141_BASE, number: 151, seed: 151, ...band(66, 69.5, 250),
+    types: ["navy-stripe-tee", "pink-cap", "brown-scarf", "neon-fish", "hiking-boots", "handbag", "tie-dye-tee", "blue-penguin"] },
+  { ...SPEC_141_BASE, number: 152, seed: 152, ...band(66.5, 70, 250),
+    types: ["sailor-tee", "orange-cap", "red-scarf", "goldfish", "pink-bikini", "graduation-cap", "dark-green-jacket", "yellow-penguin"] },
+  { ...SPEC_141_BASE, number: 153, seed: 153, ...band(67, 70.5, 250),
+    types: ["cherry-tee", "purple-cap", "light-blue-scarf", "lagoon-fish", "red-sari", "backpack", "red-trainers", "green-penguin"] },
+  { ...SPEC_141_BASE, number: 154, seed: 154, ...band(50, 57),
+    types: ["candy-tee", "yellow-cap", "green-scarf", "trout", "flip-flops", "pink-gloves", "teal-penguin", "orange-dress"] },
+  { ...SPEC_141_BASE, number: 155, seed: 155, ...band(67.5, 71, 250),
+    types: ["rebel-tee", "black-cap", "pink-scarf", "blowfish", "navy-backpack", "sardine", "charcoal-jacket", "red-penguin"] },
+  { ...SPEC_141_BASE, number: 156, seed: 156, ...band(68, 72, 250),
+    types: ["white-tee", "red-tee", "blue-tee", "green-tee", "purple-tee", "orange-scarf", "red-cap", "penguin"] },
+  { ...SPEC_141_BASE, number: 157, seed: 157, ...band(66.5, 70, 300),
+    types: ["forest-tee", "white-cap", "teal-scarf", "clownfish", "sari", "high-heels", "crown", "pink-penguin"] },
+  { ...SPEC_141_BASE, number: 158, seed: 158, ...band(67, 70.5, 300),
+    types: ["bumblebee-tee", "red-cap", "yellow-scarf", "royal-fish", "hiking-boots", "purple-jacket", "black-bootcut-jeans", "purple-penguin"] },
+  { ...SPEC_141_BASE, number: 159, seed: 159, ...band(67.5, 71, 300),
+    types: ["psychedelic-tee", "green-cap", "navy-scarf", "neon-fish", "red-sari", "graduation-cap", "blue-trunks", "orange-penguin"] },
+  { ...SPEC_141_BASE, number: 160, seed: 1400, ...band(68.8, 72, 400),
+    types: ["psychedelic-tee", "purple-cap", "pink-scarf", "lagoon-fish", "high-heels", "crown", "backpack", "cherry-tee"] },
+];
+
+/** Levels 161–180: nostalgic early wardrobe (mostly 1–60 staples). */
+const SPEC_161_BASE = SPEC_121_BASE;
+
+const SPECS_161_180: LevelSpec[] = [
+  { ...SPEC_161_BASE, number: 161, seed: 161, ...band(66, 69),
+    types: ["white-tee", "brown-leather-jacket", "light-blue-jeans", "black-bootcut-jeans", "red-polka-dress", "yellow-shorts", "purple-socks", "orange-scarf"] },
+  { ...SPEC_161_BASE, number: 162, seed: 162, ...band(66.2, 69.5),
+    types: ["green-tee", "blue-tee", "red-jeans", "pink-gloves", "blue-cap", "green-scarf", "black-boots", "red-trainers"] },
+  { ...SPEC_161_BASE, number: 163, seed: 163, ...band(66.5, 70),
+    types: ["purple-tee", "brown-leather-jacket", "yellow-sun-hat", "teal-kimono", "coral-swimsuit", "purple-socks", "orange-dress", "light-blue-jeans"] },
+  { ...SPEC_161_BASE, number: 164, seed: 164, ...band(67, 70.2),
+    types: ["red-tee", "white-tee", "black-bootcut-jeans", "red-polka-dress", "yellow-shorts", "orange-scarf", "pink-gloves", "red-trainers"] },
+  { ...SPEC_161_BASE, number: 165, seed: 165, ...band(48, 56),
+    types: ["green-tee", "blue-cap", "green-scarf", "yellow-shorts", "purple-socks", "pink-gloves", "teal-kimono", "red-trainers"] },
+  { ...SPEC_161_BASE, number: 166, seed: 166, ...band(67, 70.5),
+    types: ["brown-leather-jacket", "light-blue-jeans", "red-tee", "purple-tee", "black-boots", "yellow-sun-hat", "coral-swimsuit", "orange-scarf"] },
+  { ...SPEC_161_BASE, number: 167, seed: 167, ...band(66, 69.5),
+    types: ["white-tee", "red-jeans", "red-polka-dress", "purple-socks", "green-scarf", "blue-cap", "teal-kimono", "black-bootcut-jeans"] },
+  { ...SPEC_161_BASE, number: 168, seed: 168, ...band(67.5, 71),
+    types: ["green-tee", "brown-leather-jacket", "yellow-shorts", "orange-scarf", "pink-gloves", "black-boots", "red-trainers", "blue-tee"] },
+  { ...SPEC_161_BASE, number: 169, seed: 169, ...band(67.8, 71.2),
+    types: ["purple-tee", "light-blue-jeans", "red-polka-dress", "yellow-sun-hat", "purple-socks", "green-scarf", "coral-swimsuit", "white-tee"] },
+  { ...SPEC_161_BASE, number: 170, seed: 170, ...band(68, 71.5),
+    types: ["red-tee", "brown-leather-jacket", "black-bootcut-jeans", "orange-scarf", "blue-cap", "pink-gloves", "teal-kimono", "red-trainers"] },
+  { ...SPEC_161_BASE, number: 171, seed: 171, ...band(66, 69.5, 250),
+    types: ["white-tee", "red-jeans", "yellow-shorts", "green-scarf", "black-boots", "purple-socks", "yellow-sun-hat", "green-tee"] },
+  { ...SPEC_161_BASE, number: 172, seed: 172, ...band(68.2, 71.2, 250),
+    types: ["blue-tee", "brown-leather-jacket", "light-blue-jeans", "red-polka-dress", "orange-scarf", "pink-gloves", "coral-swimsuit", "red-trainers"] },
+  { ...SPEC_161_BASE, number: 173, seed: 173, ...band(66, 69.8, 250),
+    types: ["purple-tee", "black-bootcut-jeans", "orange-dress", "purple-socks", "blue-cap", "green-scarf", "teal-kimono", "black-boots"] },
+  { ...SPEC_161_BASE, number: 174, seed: 174, ...band(66, 69.8, 250),
+    types: ["red-tee", "brown-leather-jacket", "yellow-shorts", "orange-scarf", "pink-gloves", "red-trainers", "white-tee", "light-blue-jeans"] },
+  { ...SPEC_161_BASE, number: 175, seed: 175, ...band(50, 57),
+    types: ["green-tee", "blue-tee", "red-polka-dress", "yellow-sun-hat", "green-scarf", "purple-socks", "teal-kimono", "blue-cap"] },
+  { ...SPEC_161_BASE, number: 176, seed: 176, ...band(69, 72, 250),
+    types: ["white-tee", "red-jeans", "brown-leather-jacket", "coral-swimsuit", "orange-scarf", "black-boots", "pink-gloves", "purple-tee"] },
+  { ...SPEC_161_BASE, number: 177, seed: 177, ...band(66, 70, 250),
+    types: ["blue-tee", "light-blue-jeans", "red-polka-dress", "yellow-shorts", "purple-socks", "green-scarf", "red-trainers", "black-bootcut-jeans"] },
+  { ...SPEC_161_BASE, number: 178, seed: 178, ...band(66, 70, 250),
+    types: ["green-tee", "brown-leather-jacket", "orange-dress", "blue-cap", "pink-gloves", "yellow-sun-hat", "teal-kimono", "orange-scarf"] },
+  { ...SPEC_161_BASE, number: 179, seed: 179, ...band(66.5, 70.2, 250),
+    types: ["red-tee", "purple-tee", "black-bootcut-jeans", "red-jeans", "green-scarf", "purple-socks", "coral-swimsuit", "black-boots"] },
+  { ...SPEC_161_BASE, number: 180, seed: 180, ...band(68, 71.5, 300),
+    types: ["white-tee", "brown-leather-jacket", "light-blue-jeans", "red-polka-dress", "yellow-shorts", "orange-scarf", "red-trainers", "pink-gloves"] },
+];
+
+/** Levels 181–200: new wardrobe, themed parade, hard finale. */
+const SPECS_181_200: LevelSpec[] = [
+  { ...SPEC_161_BASE, number: 181, seed: 181, ...band(66, 69.5, 250),
+    types: ["red-cap", "teal-scarf", "navy-stripe-tee", "clownfish", "orange-penguin", "navy-backpack", "pink-bikini", "graduation-cap"] },
+  { ...SPEC_161_BASE, number: 182, seed: 182, ...band(66.2, 70, 250),
+    types: ["purple-cap", "pink-scarf", "cherry-tee", "goldfish", "blue-penguin", "red-sari", "high-heels", "hiking-boots"] },
+  { ...SPEC_161_BASE, number: 183, seed: 183, ...band(66.5, 70.2, 250),
+    types: ["green-cap", "light-blue-scarf", "sailor-tee", "neon-fish", "yellow-penguin", "handbag", "flip-flops", "blue-jacket"] },
+  { ...SPEC_161_BASE, number: 184, seed: 184, ...band(67, 70.5, 250),
+    types: ["black-cap", "yellow-scarf", "bumblebee-tee", "royal-fish", "pink-penguin", "backpack", "sari", "green-trunks"] },
+  { ...SPEC_161_BASE, number: 185, seed: 185, ...band(67.2, 70.8, 250),
+    types: ["white-cap", "red-scarf", "rebel-tee", "lagoon-fish", "teal-penguin", "coral-swimsuit", "blowfish", "orange-socks"] },
+  { ...SPEC_161_BASE, number: 186, seed: 186, ...band(67.5, 71, 250),
+    types: ["orange-cap", "brown-scarf", "candy-tee", "trout", "red-penguin", "navy-backpack", "purple-jacket", "pink-trunks"] },
+  { ...SPEC_161_BASE, number: 187, seed: 187, ...band(67.8, 71.2, 250),
+    types: ["pink-cap", "navy-scarf", "forest-tee", "salmon", "purple-penguin", "high-heels", "tie-dye-tee", "light-blue-trunks"] },
+  { ...SPEC_161_BASE, number: 188, seed: 188, ...band(66, 69.5, 250),
+    types: ["yellow-cap", "purple-scarf", "psychedelic-tee", "tropical-fish", "orange-penguin", "graduation-cap", "red-sari", "burgundy-trunks"] },
+  { ...SPEC_161_BASE, number: 189, seed: 189, ...band(68.2, 71.8, 250),
+    types: ["red-cap", "teal-scarf", "navy-stripe-tee", "clownfish", "green-penguin", "handbag", "sardine", "yellow-jacket"] },
+  { ...SPEC_161_BASE, number: 190, seed: 190, ...band(66.5, 70, 300),
+    types: ["purple-cap", "pink-scarf", "sailor-tee", "neon-fish", "blue-penguin", "pink-bikini", "hiking-boots", "charcoal-jacket"] },
+  { ...SPEC_161_BASE, number: 191, seed: 191, ...band(64, 68, 250),
+    types: ["white-tee", "red-tee", "blue-tee", "green-tee", "purple-tee", "orange-scarf", "pink-gloves", "yellow-shorts"] },
+  { ...SPEC_161_BASE, number: 192, seed: 192, ...band(68, 72, 250),
+    types: ["navy-stripe-tee", "sailor-tee", "bumblebee-tee", "cherry-tee", "rebel-tee", "candy-tee", "forest-tee", "psychedelic-tee"] },
+  { ...SPEC_161_BASE, number: 193, seed: 193, ...band(64, 67.5, 250),
+    types: ["red-jacket", "blue-jacket", "yellow-jacket", "purple-jacket", "orange-jacket", "navy-jacket", "pink-jacket", "charcoal-jacket"] },
+  { ...SPEC_161_BASE, number: 194, seed: 194, ...band(63, 66.5, 250),
+    types: ["green-trunks", "blue-trunks", "pink-trunks", "light-blue-trunks", "burgundy-trunks", "yellow-shorts", "coral-swimsuit", "pink-bikini"] },
+  { ...SPEC_161_BASE, number: 195, seed: 195, ...band(63, 66.5, 250),
+    types: ["red-polka-dress", "orange-dress", "green-dress", "blue-dress", "purple-dress", "light-blue-dress", "black-dress", "dark-brown-dress"] },
+  { ...SPEC_161_BASE, number: 196, seed: 196, ...band(62, 66, 250),
+    types: ["clownfish", "neon-fish", "royal-fish", "lagoon-fish", "goldfish", "trout", "salmon", "blowfish"] },
+  { ...SPEC_161_BASE, number: 197, seed: 197, ...band(62, 66, 250),
+    types: ["orange-penguin", "blue-penguin", "green-penguin", "red-penguin", "yellow-penguin", "pink-penguin", "teal-penguin", "purple-penguin"] },
+  { ...SPEC_161_BASE, number: 198, seed: 198, ...band(66, 70, 300),
+    types: ["psychedelic-tee", "red-cap", "orange-penguin", "clownfish", "purple-jacket", "navy-backpack", "red-sari", "graduation-cap"] },
+  { ...SPEC_161_BASE, number: 199, seed: 199, ...band(68.5, 72, 350),
+    types: ["tie-dye-tee", "teal-scarf", "royal-fish", "pink-penguin", "yellow-jacket", "handbag", "coral-swimsuit", "top-hat"] },
+  { ...SPEC_161_BASE, number: 200, seed: 2000, ...band(68.5, 72.5, 400),
+    types: ["crown", "light-blue-dress", "penguin", "neon-fish", "backpack", "navy-backpack", "purple-jacket", "rebel-tee"] },
+];
+
 function specsInRange(from: number, to: number): LevelSpec[] {
-  return [...SPECS_81_100, ...SPECS_101_120].filter((s) => s.number >= from && s.number <= to);
+  return [
+    ...SPECS_81_100,
+    ...SPECS_101_120,
+    ...SPECS_121_140,
+    ...SPECS_141_160,
+    ...SPECS_161_180,
+    ...SPECS_181_200,
+  ].filter((s) => s.number >= from && s.number <= to);
+}
+
+function findLevelSpec(n: number): LevelSpec | undefined {
+  return specsInRange(121, 200).find((s) => s.number === n);
+}
+
+function removeLevelBlock(source: string, levelNum: number): string {
+  const start = source.indexOf(`  // Level ${levelNum}:`);
+  if (start < 0) throw new Error(`Could not find level ${levelNum} in ${OUT}`);
+  const next = source.indexOf(`  // Level ${levelNum + 1}:`, start);
+  const end = next >= 0 ? next : source.lastIndexOf("\n];");
+  if (end < 0) throw new Error(`Could not find splice point after level ${levelNum}`);
+  return source.slice(0, start) + source.slice(end);
+}
+
+function insertLevelBlock(source: string, beforeLevel: number, block: string): string {
+  const pos = source.indexOf(`  // Level ${beforeLevel}:`);
+  if (pos < 0) throw new Error(`Could not find level ${beforeLevel} for insert`);
+  return `${source.slice(0, pos)}${block}\n${source.slice(pos)}`;
 }
 
 const APPEND_BATCHES: Record<number, LevelSpec[]> = {
@@ -1296,9 +1517,32 @@ const APPEND_BATCHES: Record<number, LevelSpec[]> = {
   106: specsInRange(106, 110),
   111: specsInRange(111, 115),
   116: specsInRange(116, 120),
+  121: specsInRange(121, 125),
+  126: specsInRange(126, 130),
+  131: specsInRange(131, 135),
+  136: specsInRange(136, 140),
+  141: specsInRange(141, 145),
+  146: specsInRange(146, 150),
+  151: specsInRange(151, 155),
+  156: specsInRange(156, 160),
+  161: specsInRange(161, 165),
+  166: specsInRange(166, 170),
+  171: specsInRange(171, 175),
+  176: specsInRange(176, 180),
+  181: specsInRange(181, 185),
+  186: specsInRange(186, 190),
+  191: specsInRange(191, 195),
+  196: specsInRange(196, 200),
 };
 
-type Mode = "4-10" | "11-20" | "append" | "all";
+type Mode = "4-10" | "11-20" | "append" | "replace" | "all";
+
+function parseReplaceLevel(): number | null {
+  const arg = process.argv.find((a) => /^--replace=\d+$/.test(a));
+  if (!arg) return null;
+  const n = Number.parseInt(arg.split("=")[1]!, 10);
+  return Number.isFinite(n) && findLevelSpec(n) ? n : null;
+}
 
 function parseAppendFrom(): number | null {
   const arg = process.argv.find((a) => /^--from=\d+$/.test(a));
@@ -1309,6 +1553,7 @@ function parseAppendFrom(): number | null {
 
 function parseMode(): Mode {
   const args = process.argv.slice(2);
+  if (parseReplaceLevel() !== null) return "replace";
   if (parseAppendFrom() !== null) return "append";
   if (args.includes("--all")) return "all";
   if (args.includes("--more") || args.includes("--from=11")) return "11-20";
@@ -1559,6 +1804,36 @@ const SAME_GARMENT_LEVELS: Readonly<Record<number, readonly ClothingId[]>> = {
   68: ["green-socks", "yellow-socks", "blue-socks", "red-socks", "black-white-socks", "orange-socks"],
   82: ["white-tee", "red-tee", "green-tee", "blue-tee", "purple-tee", "psychedelic-tee"],
   96: ["red-jacket", "blue-jacket", "yellow-jacket", "purple-jacket", "orange-jacket", "dark-green-jacket"],
+  156: [
+    "navy-stripe-tee",
+    "sailor-tee",
+    "bumblebee-tee",
+    "cherry-tee",
+    "rebel-tee",
+    "candy-tee",
+    "forest-tee",
+    "tie-dye-tee",
+  ],
+  191: [
+    "white-tee",
+    "red-tee",
+    "green-tee",
+    "blue-tee",
+    "purple-tee",
+    "orange-tee",
+    "yellow-tee",
+    "black-tee",
+  ],
+  192: [
+    "navy-stripe-tee",
+    "sailor-tee",
+    "bumblebee-tee",
+    "cherry-tee",
+    "rebel-tee",
+    "candy-tee",
+    "forest-tee",
+    "tie-dye-tee",
+  ],
 };
 
 function recolourLevelShelves(shelves: readonly (readonly ClothingId[])[], n: number): ClothingId[][] {
@@ -1692,6 +1967,27 @@ async function runSpecs(
 }
 
 const mode = parseMode();
+
+if (mode === "replace") {
+  const levelNum = parseReplaceLevel()!;
+  const spec = findLevelSpec(levelNum)!;
+  const existing = await readFile(OUT, "utf8");
+  console.log(`Replacing level ${levelNum} only; all other levels untouched`);
+  const stripped = removeLevelBlock(existing, levelNum);
+  const { blocks } = await runSpecs([spec], { full: -Infinity, fast: -Infinity });
+  if (blocks.length !== 1) throw new Error(`Expected one level block, got ${blocks.length}`);
+  const next =
+    levelNum < 200
+      ? insertLevelBlock(stripped, levelNum + 1, blocks[0]!)
+      : (() => {
+          const closeAt = stripped.lastIndexOf("\n];");
+          if (closeAt < 0) throw new Error("Could not find end of GENERATED_LEVELS array");
+          return `${stripped.slice(0, closeAt)}\n${blocks[0]!}${stripped.slice(closeAt)}`;
+        })();
+  await writeFile(OUT, next, "utf8");
+  console.log(`Replaced level ${levelNum} in ${OUT}`);
+  process.exit(0);
+}
 
 if (mode === "append") {
   const from = parseAppendFrom()!;

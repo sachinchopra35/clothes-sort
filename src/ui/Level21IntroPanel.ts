@@ -11,12 +11,20 @@ const TITLE_TOP = 56;
 const HEADER_BLOCK = 128;
 const BODY_ABOVE_BUTTON = 32;
 
-const TITLE = "The game just got harder";
-const BODY = "You can now fit 5 clothes on a shelf.\n\nGood luck.";
+const TITLE_FIRST = "The game just got harder";
+const TITLE_EVEN = "The game just got even harder";
 const TITLE_TO_BODY_GAP = 40;
 
+/** Shown when shelf capacity grows (5 at level 21, 6 at level 121). */
 export class Level21IntroPanel extends Phaser.GameObjects.Container {
-  constructor(scene: Phaser.Scene, onDismiss: () => void) {
+  constructor(
+    scene: Phaser.Scene,
+    onDismiss: () => void,
+    capacity = 5,
+    evenHarder = false,
+  ) {
+    const TITLE = evenHarder ? TITLE_EVEN : TITLE_FIRST;
+    const BODY = `You can now fit ${capacity} clothes on a shelf.\n\nGood luck.`;
     super(scene, 0, 0);
     scene.add.existing(this);
     this.setDepth(MODAL_UI_DEPTH);

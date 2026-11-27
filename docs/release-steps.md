@@ -87,7 +87,7 @@ Every re-upload needs a **higher Build number** (2, 3, …). The Version stays `
 - Fresh install (delete the old dev build first): level 1 tutorial appears and works.
 - Play through several levels; win confetti + chord; next level.
 - Undo appears at level 11 with the intro popup; level 21 explains 5 items per shelf.
-- Level 120: “Game Complete!!” button; confetti on win and on that button.
+- Level 200: “Game Complete!!” button; confetti on win and on that button.
 - Settings: both sliders, mute buttons, track ◀ ▶, a track ends and the next one starts.
 - Kill and reopen the app: progress, volumes and track are remembered.
 - Locked level → cheat code panel → `CLEANCLOTHES25` unlocks.

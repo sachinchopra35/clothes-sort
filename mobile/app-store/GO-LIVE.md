@@ -10,7 +10,7 @@ One-page order of operations. Details: [checklist.md](checklist.md), [release-st
 
 ## ✅ Already done in the repo (verify before upload)
 
-- [x] Game: 120 levels, tests pass (`npm test`)
+- [x] Game: 200 levels, tests pass (`npm test`)
 - [x] Music: original recordings in manifest; `npm run music:attribution:check` passes
 - [x] Support + privacy copy; `docs/index.html` for GitHub Pages
 - [x] `ITSAppUsesNonExemptEncryption` = NO in `ios/App/App/Info.plist`
@@ -93,7 +93,7 @@ No need to **Clean Build Folder** every time; use `release:prep` after web chang
 - [ ] Level 11 undo + intro; level 21 “5 per shelf” popup.
 - [ ] Settings: sliders, mute, track ◀ ▶, **About the Music** links open.
 - [ ] Restart level: dark/light fade.
-- [ ] Level 120: **Game Complete!!** + confetti on win and on button.
+- [ ] Level 200: **Game Complete!!** + confetti on win and on button.
 - [ ] Cheat `CLEANCLOTHES25` on locked picker.
 - [ ] Airplane mode: fully playable.
 - [ ] Kill app: progress + volumes remembered.
